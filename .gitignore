@@ -1,0 +1,11 @@
+**/.DS_Store
+**/.idea/
+**/out/
+**/*.iml
+**/~*.docx
+**/*.class
+**/target 
+**/.settings 
+**/out
+**/.classpath
+**/.project
