@@ -5,23 +5,26 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>spring stu</name>
 
-    <!-- Note: 在maven center中（例如：https://mvnrepository.com/）可以查找添加dependencies时所需要的配置属性 -->
-    <!-- Note: maven项目默认的代码目录是src/main/java， 资源文件目录是src/main/resources -->
-    <!-- Note: src/main/resources/applicationContext.xml是其中一个spring配置文件，代码在创建ClassPathXmlApplicationContext时可以指定使用这个文件 -->
+    <!-- 在maven center中（例如：https://mvnrepository.com/）可以查找添加dependencies时所需要的配置属性 -->
+    <!-- maven项目默认的代码目录是src/main/java， 资源文件目录是src/main/resources -->
+    <!-- src/main/resources/applicationContext.xml是其中一个spring配置文件，
+         代码在创建ClassPathXmlApplicationContext时可以指定使用这个文件 -->
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
+        <!-- 来自https://mvnrepository.com/artifact/org.springframework/spring-context -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>5.1.7.RELEASE</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
+
+        <!-- 来自https://mvnrepository.com/artifact/org.springframework/spring-core -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <version>5.1.7.RELEASE</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+
+        <!-- 来自https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>

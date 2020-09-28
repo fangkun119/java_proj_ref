@@ -3,32 +3,32 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xmlns:p="http://www.springframework.org/schema/p"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-		<!-- Note: 想使用属性对象注入的p-namespace简写方式，可添加xmlns:p="http://www.springframework.org/schema/p"命名空间 -->
-		<!-- Note：可以引入多个其他类似的Spring配置文件 -->
+
+		<!-- 可以引入多个其他类似的Spring配置文件 -->
 		<import resource="applicationContext-*.xml"/>
 
-		<!-- Note：上一个例子用到的构造器注入，会调用Person的构造函数Person(String name, int age, Food food)来完成DI-->
-		<!-- <bean id="person" class="com.mashibing.spring.Person">
+		<!-- 上一个例子用到的构造器注入，会调用Person的构造函数Person(String name, int age, Food food)来完成DI-->
+		<!-- <bean id="person" class="com.javaref.spring.Person">
 			<constructor-arg name="name" value="maxiaosan"></constructor-arg>
 			<constructor-arg name="age" value="18"></constructor-arg>
 			<constructor-arg name="food" ref="food"></constructor-arg>
 		</bean> -->
 
-		<!-- Note: 属性对象注入，Spring会调用对象的set方法来完成DI -->
-        <bean id="person1" name="human,star" class="com.mashibing.spring.Person">
-			<!-- Note: 可以给bean提供多个name，除了id，这些name也可以用于被java代码获取bean的对象 -->
-			<!-- Note: 三种指定属性值的方式：(1)value标签 (2)value属性 (3)引用另一个bean -->
-        	<property name="name"><value>马小六</value></property>
+		<!-- 属性对象注入，Spring会调用对象的set方法来完成DI -->
+        <bean id="person1" name="human,star" class="com.javaref.spring.Person">
+			<!-- 可以给bean提供多个name，除了id，这些name也可以用于被java代码获取bean的对象 -->
+			<!-- 三种指定属性值的方式：(1)value标签 (2)value属性 (3)引用另一个bean -->
+        	<property name="name"><value>Jerry</value></property>
         	<property name="age" value="18" />
         	<property name="food" ref="food" />
         </bean>
-        <bean id="food" class="com.mashibing.spring.Food"></bean>
+        <bean id="food" class="com.javaref.spring.Food"></bean>
 
-		<!--  Note: 有时上面的bean是其他team维护的，遇到命名冲突时不方便修改，可以使用alias -->
+		<!-- 有时上面的bean是其他team维护的，遇到命名冲突时不方便修改，可以使用alias -->
 		<alias name="person1" alias="person1_alias"/>
 
-		<!-- Note: 属性对象注入的p-namespace简写方式（不常使用）-->
-		<bean id="person2" class="com.mashibing.spring.Person" p:age="21" p:name = "zhangsan" p:food-ref="food2"/>
-		<bean id="food2" class="com.mashibing.spring.Food"></bean>
+		<!-- 属性对象注入的p-namespace简写方式（不常使用）-->
+		<bean id="person2" class="com.javaref.spring.Person" p:age="21" p:name = "Tom" p:food-ref="food2"/>
+		<bean id="food2" class="com.javaref.spring.Food"></bean>
 </beans>
 
