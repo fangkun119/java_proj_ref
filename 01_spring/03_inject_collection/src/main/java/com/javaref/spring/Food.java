@@ -1,4 +1,4 @@
-package com.mashibing.spring;
+package com.javaref.spring;
 
 public class Food {
 

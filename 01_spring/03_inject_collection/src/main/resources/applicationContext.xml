@@ -2,13 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-	<!-- Note:  可以引入多个类似的Spring Context配置文件 -->
+	<!-- 可以引入多个类似的Spring Context配置文件 -->
     <import resource="applicationContext-*.xml"/>
 
-	<!-- Note: 属性对象注入(<property ..>)，Spring会调起对象的set方法来完成DI -->
-    <bean id="person" name="human,star" class="com.mashibing.spring.Person">
-		<!-- Note: 三种定义属性值的方式：(1)<value>标签; (2)value属性；(3)引用其他bean -->
-        <property name="name"><value>马小六</value></property>
+	<!-- 属性对象注入(<property ..>)，Spring会调起对象的set方法来完成DI -->
+    <bean id="person" name="human,star" class="com.javaref.spring.Person">
+		<!-- 三种定义属性值的方式：(1)<value>标签; (2)value属性；(3)引用其他bean -->
+        <property name="name"><value>Jerry</value></property>
         <property name="age"  value="18"/>
         <property name="food" ref="food"/>
         <property name="list">
@@ -19,7 +19,7 @@
             </array>
         </property>
 
-		<!-- Note：注入一个Set, 两个c会被去重 -->
+		<!-- 注入一个Set, 两个c会被去重 -->
         <property name="set">
             <array>
                 <value>a</value>
@@ -29,7 +29,7 @@
             </array>
         </property>
 
-		<!-- Note：注入一个Map，两个b会被去重 -->
+		<!-- 注入一个Map，两个b会被去重 -->
         <property name="map">
             <props>
                 <prop key="a">1</prop>
@@ -44,10 +44,10 @@
              -->
         </property>
 
-		<!-- Note: 如果属性的类型是java.util.Properties，可以采用下面的方法注入 -->
-		<!-- Note: 对于注入来自文件的数据（如网上爬下来解析），Properties类会比较方便 -->
+		<!-- 如果属性的类型是java.util.Properties，可以采用下面的方法注入 -->
+		<!-- 对于注入来自文件的数据（如网上爬下来解析），Properties类会比较方便 -->
         <property name="gift">
-			<!-- Note: java代码中可以使用gift.getProperty("douban")来获得douban的值 -->
+			<!-- java代码中可以使用gift.getProperty("douban")来获得douban的值 -->
             <value>
                 douban=http://douban.com/movie/xx.html
                 dushu=200
@@ -55,13 +55,13 @@
         </property>
     </bean>
 
-	<!-- Note: DI的例子1，2，3都是通过xml来对类之间的（接口实现）依赖解耦-->
+	<!-- DI的例子1，2，3都是通过xml来对类之间的（接口实现）依赖解耦-->
 
-    <!-- Note: 为bean指定lazy-init="true"属性时，bean可以延迟到使用时才创建 -->
-    <bean id="food" class="com.mashibing.spring.Food" lazy-init="true"></bean>
+    <!-- 为bean指定lazy-init="true"属性时，bean可以延迟到使用时才创建 -->
+    <bean id="food" class="com.javaref.spring.Food" lazy-init="true"></bean>
 
-    <!-- Note: 可以指定depends-on，让另一个bean在创建这个bean之前被创建 -->
-    <bean id="food2" class="com.mashibing.spring.Food" depends-on="food" lazy-init="true"></bean>
+    <!-- 可以指定depends-on，让另一个bean在创建这个bean之前被创建 -->
+    <bean id="food2" class="com.javaref.spring.Food" depends-on="food" lazy-init="true"></bean>
 
     <alias name="person" alias="person_alias"/>
 </beans>

@@ -1,4 +1,4 @@
-package com.mashibing.spring;
+package com.javaref.spring;
 
 import java.util.List;
 import java.util.Map;
