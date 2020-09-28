@@ -1,26 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Note: 这个例子没有使用Maven或Gradle，使用了很古老的项目创建方式，代码和Spring配置文件放在src目录下，依赖的jar包下载并拷贝到libs目录下-->
+<!-- 这个例子没有使用Maven或Gradle，使用了很古老的项目创建方式，
+		代码和Spring配置文件放在src目录下，
+		依赖的jar包下载并拷贝到libs目录下-->
 
-<!-- Note: beans是 DI 配置文件的根节点 -->
-<!-- Note: schemaLocation: 用到的具体xml schema资源，IDEA中CMD+O搜索PluggableSchemaResolver类可以看到schema文件缓存在META-INF/spring.schemas中 -->
+<!-- beans是 DI 配置文件的根节点 -->
+<!-- schemaLocation: 用到的具体xml schema资源，IDEA中CMD+O搜索PluggableSchemaResolver类可以看到schema文件缓存在META-INF/spring.schemas中 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-		<!-- Note: 使用多个 DI配置文件 -->
-		<!--       Option 1：在TestGetBean类当中调用ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationCon>text("applicationContext.xml","application-service.xml"); -->
-		<!--       Option 2：在父配置中逐一import子配置，如下 -->
-		<!--                 <import resource="applicationContext-service.xml"/> -->
-		<!--       Option 3：用通配符import子配置，如下 -->
+		<!-- 使用多个 DI配置文件 -->
+		<!--   Option 1：在TestGetBean类当中调用
+					ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationCon>text(
+						"applicationContext.xml","application-service.xml"); -->
+		<!--   Option 2：在父配置中逐一import子配置，如下 -->
+		<!--             <import resource="applicationContext-service.xml"/> -->
+		<!--   Option 3：用通配符import子配置，如下 -->
 		<import resource="applicationContext-*.xml"/>
 
-		<!-- Note:  定义一个bean，通过构造函数注入 -->
-        <bean id="person" class="com.mashibing.spring.Person">
+		<!-- 定义一个bean，通过构造函数注入 -->
+        <bean id="person" class="com.javaref.spring.Person">
 			<!-- 使用了构造器注入，会调用Person的构造函数 Person(String name, int age, Food food) -->
         	<constructor-arg name="name" value="maxiaosan"></constructor-arg>
         	<constructor-arg name="age" value="18"></constructor-arg>
         	<constructor-arg name="food" ref="food"></constructor-arg>
         </bean>
 
-		<!-- Note: 可以给bean指定别名 -->
+		<!-- 可以给bean指定别名 -->
 		<alias name="person" alias="my_person_bean" />
 </beans>

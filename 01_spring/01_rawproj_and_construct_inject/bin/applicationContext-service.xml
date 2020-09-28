@@ -5,7 +5,7 @@
 
         
    
-        <bean id="food" class="com.mashibing.spring.Food"></bean>
+        <bean id="food" class="com.javaref.spring.Food"></bean>
         
         
 </beans>

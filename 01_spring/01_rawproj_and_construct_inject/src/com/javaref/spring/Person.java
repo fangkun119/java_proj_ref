@@ -1,20 +1,17 @@
-package com.mashibing.spring;
+package com.javaref.spring;
 
 public class Person {
-
 	private String name;
 	private int age;
 	private Food food;
-	
-	
+
 	public Person(String name, int age, Food food) {
 		super();
 		this.name = name;
 		this.age = age;
 		this.food = food;
 	}
-	
-	
+
 	public Food getFood() {
 		return food;
 	}
