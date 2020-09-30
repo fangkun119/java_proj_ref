@@ -13,19 +13,12 @@
         <!-- 传给getCar方法参数name的值时"audi"，用于构造Car对象 -->
         <constructor-arg name="name" value="audi"></constructor-arg>
     </bean>
-    <bean id="car2" factory-bean="dynamicCarFactory" factory-method="getCar">
-        <!-- 传给getCar方法参数name的值时"audi"，用于构造Car对象 -->
-        <constructor-arg name="name" value="audi"></constructor-arg>
-    </bean>
 
     <!-- 静态工厂 -->
     <!-- 注入bean car，该bean直接调用CarFactory.getCarStatic静态函数创建 -->
-    <bean id="car3" class="com.javaref.spring.CarFactory" factory-method="getCarStatic" >
+    <bean id="car2" class="com.javaref.spring.CarFactory" factory-method="getCarStatic" >
         <!-- 传给getCarStatic方法参数name的值时"audi"，用于构造Car对象 -->
     	<constructor-arg value="audi"></constructor-arg>
-    </bean>
-    <bean id="car4" class="com.javaref.spring.CarFactory" factory-method="getCarStatic" >
-        <constructor-arg value="audi"></constructor-arg>
     </bean>
 </beans>
 
