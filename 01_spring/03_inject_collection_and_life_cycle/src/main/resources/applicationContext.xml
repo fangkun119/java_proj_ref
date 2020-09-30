@@ -64,5 +64,12 @@
     <bean id="food2" class="com.javaref.spring.Food" depends-on="food" lazy-init="true"></bean>
 
     <alias name="person" alias="person_alias"/>
+
+    <!-- bean默认是Singleton，使用scope属性可以更改bean的作用域 -->
+    <bean id="person_proto" scope="prototype" class="com.javaref.spring.Person">
+        <property name="name"><value>Prototype</value></property>
+        <property name="age"  value="18"/>
+        <property name="food" ref="food"/>
+    </bean>
 </beans>
 
