@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-autowire="byType">
+    <bean id="A1" class="com.javaref.spring.A"></bean>
+    <bean id="A2" class="com.javaref.spring.A" depends-on="B1"></bean>
+    <bean id="B1" class="com.javaref.spring.B"></bean>
+</beans>
+
