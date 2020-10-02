@@ -30,5 +30,15 @@
 		<!-- 属性对象注入的p-namespace简写方式（不常使用）-->
 		<bean id="person2" class="com.javaref.spring.Person" p:age="21" p:name = "Tom" p:food-ref="food2"/>
 		<bean id="food2" class="com.javaref.spring.Food"></bean>
+
+		<!-- 空值注入-->
+		<bean id="person_with_empty_name" class="com.javaref.spring.Person">
+			<property name="name"><value></value></property>
+		</bean>
+
+		<!-- 空值注入-->
+		<bean id="person_with_null_name" class="com.javaref.spring.Person">
+			<property name="name"><null></null></property>
+		</bean>
 </beans>
 
