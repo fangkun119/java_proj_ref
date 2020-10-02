@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-autowire="byType"
+>
+    <!-- 如果不希望给每个bean加上属性autowire="byType"，可以在beans标签设置default-autowire="byType" -->
+    <!-- 但是定义这么多bean，仍然会使applicationContext.xml越来越庞大，这个问题可以用注解来解决 -->
+
+    <!-- 3个singleton bean循环依赖 -->
+    <!--
+    <bean id="singletonA1" class="com.javaref.spring.A">
+        <property name="propertyB" ref="singletonB1"></property>
+    </bean>
+    <bean id="singletonB1" class="com.javaref.spring.B">
+        <property name="propertyC" ref="singletonC1"></property>
+    </bean>
+    <bean id="singletonC1" class="com.javaref.spring.C">
+        <property name="propertyA" ref="singletonA1"></property>
+    </bean>
+    -->
+
+    <!-- 因为每个Bean都只初始化一次，因此可以考虑自动装配，而省去上面繁琐的配置 -->
+    <!--
+        public class A {
+            private B singletonB;
+            public B getSingletonB() {...}
+            public void setSingletonB(B b) {...}
+            ...
+        }
+        public class B {
+            private C singletonC;
+            ...
+        }
+        ...
+    -->
+    <!-- autowire="byName"要求dependent bean的id (singleTonB/C)与成员变量（以及get,set方法）命名相一致 -->
+    <bean id="singletonA" class="com.javaref.spring.A" autowire="byName"></bean>
+    <bean id="singletonB" class="com.javaref.spring.B" autowire="byName"></bean>
+    <bean id="singletonC" class="com.javaref.spring.C" autowire="byName"></bean>
+
+    <!-- autowire="byType"对dependent bean的id没有要求，但是每种class只容许生成一个bean -->
+    <bean id="beanD" class="com.javaref.spring.D" autowire="byType"></bean>
+    <bean id="beanE" class="com.javaref.spring.E" autowire="byType"></bean>
+    <bean id="beamF" class="com.javaref.spring.F" autowire="byType"></bean>
+</beans>
+
