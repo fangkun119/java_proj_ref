@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+        <!-- 3个singleton bean循环依赖 -->
+        <bean id="singletonA1" class="com.javaref.spring.A">
+        	<property name="b" ref="singletonB1"></property>
+        </bean>
+        <bean id="singletonB1" class="com.javaref.spring.B">
+        	<property name="c" ref="singletonC1"></property>
+        </bean>
+        <bean id="singletonC1" class="com.javaref.spring.C">
+            <property name="a" ref="singletonA1"></property>
+        </bean>
+
+        <!-- 1个singleton bean依赖2个prototype bean，其中一个prototype bean又依赖这个singleton bean -->
+        <bean id="singletonA2" class="com.javaref.spring.A">
+            <property name="b" ref="singletonB1"></property>
+        </bean>
+        <bean id="prototypeB1" class="com.javaref.spring.B" scope="prototype">
+            <property name="c" ref="singletonC1"></property>
+        </bean>
+        <bean id="prototypeC1" class="com.javaref.spring.C" scope="prototype">
+            <property name="a" ref="singletonA1"></property>
+        </bean>
+
+</beans>
+

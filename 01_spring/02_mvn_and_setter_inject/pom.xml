@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.javaref.spring</groupId>
-    <artifactId>Spring01</artifactId>
+    <artifactId>spring_01_02_property_inject</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>spring stu</name>
+    <name>spring_01_02_property_inject</name>
 
     <!-- 在maven center中（例如：https://mvnrepository.com/）可以查找添加dependencies时所需要的配置属性 -->
     <!-- maven项目默认的代码目录是src/main/java， 资源文件目录是src/main/resources -->
