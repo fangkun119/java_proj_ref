@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	"
+	>
+	<!-- 使用基于注解的自动注入，需要引入xmlns:context命名空间 -->
+	<!--
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        "
+    -->
+	<!-- 指定component-scan的package，该package下的带有Component标签(或其他实现了@Component的标签）的类，会纳入spring管理 -->
+	<!-- 也可以在base-package中添加多个包 -->
+	<context:component-scan base-package="com.javaref.spring"></context:component-scan>
+</beans>
+
