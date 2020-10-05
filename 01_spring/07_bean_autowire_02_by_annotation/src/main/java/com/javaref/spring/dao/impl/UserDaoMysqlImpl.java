@@ -14,7 +14,7 @@ import com.javaref.spring.entity.User;
  * 因此用@Component注解时，还要加上@Scope("prototype")使其成为非单例模型
  */
 
-//@Repository实现了@Component注解
+//@Repository与@Component一样，让类可以被自动装配
 @Repository("daoMysql")
 public class UserDaoMysqlImpl implements UserDao {
 	@Autowired

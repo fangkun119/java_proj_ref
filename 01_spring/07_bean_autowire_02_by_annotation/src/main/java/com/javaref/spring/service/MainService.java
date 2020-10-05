@@ -12,6 +12,7 @@ import com.javaref.spring.entity.User;
  * Service层负责处理具体业务逻辑，比如校验账号密码等
  */
 
+// @Service与@Component一样，让类可以被自动装配
 @Service
 public class MainService {
 	// UserDao是一个接口，有两个具体实现
