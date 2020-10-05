@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 创建一个Spring Boot项目 -->
+<!--
+	1. 访问 https://start.spring.io 使用Spring Initializer
+	2. Project Metadata相当于描述信息<groupId><artifactId>用于项目识别，不能重复
+	3. Dependencies提供导航页用来添加各种常用的starter，并且已经把依赖冲突解决好，项目构建好之后，可以看到通过starter引入的jar包及内嵌的tomcat等
+	4. 项目目录结构：
+		src/test/java：测试代码
+		src/main/resources/application.properties：个性化配置，用来覆盖默认的Spring, SpringMVC, Tomcat，...的默认配置
+		src/main/resources/static: 静态文件css，html，图片等
+		src/main/resources/templates: 前端页面的模板，如Thermleaf等
+	5. 程序运行方式：
+		(1) 在IDE中运行 FirstSpringBootApplication.main() ，会以一个java application的形式运行（能够启动内嵌的tomcat）
+		(2) 执行mvn install之后，在target目录下可以看到一个FirstSpringBoot-0.0.1-SNAPSHOT.jar，运行这个jar，也可以启动内嵌的tomcat
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.5.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<groupId>com.javaref.springboot</groupId>
+	<artifactId>FirstSpringBoot</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>FirstSpringBoot</name>
+	<description>Demo project for Spring Boot</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+		<!-- Spring Boot Starter 已经解决好依赖冲突 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<!-- Spring Boot引入的Spring Boot与Maven集成的插件 -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
