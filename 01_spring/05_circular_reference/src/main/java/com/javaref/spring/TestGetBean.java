@@ -14,7 +14,9 @@ public class TestGetBean {
 	 * > 当Spring容器在创建A时（发现A引用B），会先去创建B（发现B引用C），会先去创建C（发现C引用A），又要创建A……
 	 * > A、B、C之间互相等待，谁都没法创建成功
 	 *
-	 * 通常情况下，循环依赖导致Object的引用计数始终大于0，对象无法销毁，而Spring可以检测并解决bean的循环依赖
+	 * 老的JVM下，循环依赖导致Object的引用计数始终大于0，对象无法销毁（新的JVM下使用GC Root来销毁，仍然可以销毁对象）
+	 * 对于循环依赖，Spring在启动阶段仍然会检测并解决bean的循环依赖，这是由Spring使用了三级缓存的bean管理机制导致
+	 *
 	 * Spring如何管理bean：
 	 * > 1. 用[bean name/id -> bean object]来存储bean的注册信息
 	 * > 2. 加载配置文件以后，初始化bean
@@ -23,7 +25,6 @@ public class TestGetBean {
 	 *
 	 * @param args
 	 */
-	
 	public static void main(String[] args) {
 		// 如果不使用容器，自己new出一组循环引用的对象，如下面的代码，导致Object的引用计数始终大于0，对象无法销毁
 		// 对于单例模式来说，因为内存有限，影响并不大；对于非单例模式来说，对象数量不限，会产生内存隐患

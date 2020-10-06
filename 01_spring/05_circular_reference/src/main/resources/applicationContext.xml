@@ -23,6 +23,5 @@
         <bean id="prototypeC1" class="com.javaref.spring.C" scope="prototype">
             <property name="a" ref="singletonA1"></property>
         </bean>
-
 </beans>
 
