@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.5.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<groupId>com.javaref.springboot02</groupId>
+	<artifactId>FirstSpringBoot02</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>FirstSpringBoot02</name>
+	<description>Demo project for Spring Boot</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<!--
+		本Demo内容：
+		1.	基于Spring Boot的MVC
+			- 数据展示查询
+			- 表单提交
+		2.	Thymeleaf
+	-->
+
+	<dependencies>
+		<!--
+			用IDE创建项目时，可以选择使用"Spring Initializer"来创建，
+			效果与在http://start.spring.io/上创建项目、生成并下载一个jar相同
+		-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!-- https://docs.spring.io/spring-boot/docs/current/reference/html/using-spring-boot.html#using-boot-starter -->
+		<!-- 添加新的starter：
+			可以在上面的页面查找，另外键入spring-boot-starter-时，也会提示有哪些starter
+			可以在maven上右键添加（如果使用Spring Tool作为IDE）
+		-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+
+		<!-- 如果用spring官方的STS作为IDE，添加spring-boot-devtools依赖，可以在修改代码后立即重启，但重启不是真正热部署-->
+		<!-- 使用jrebel（收费）可以做到真正的热部署，方便开发 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
