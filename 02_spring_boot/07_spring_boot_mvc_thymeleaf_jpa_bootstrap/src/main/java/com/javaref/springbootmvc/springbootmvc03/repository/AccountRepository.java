@@ -21,12 +21,16 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     List<Account> queryWithHQL2(int id);
 
     // 除了HQL，JPA也支持动态拼接SQL，SQL；太复杂的查询也放在这一层，但是会使用ES，Solr等
-
     // 更多JPA相关内容，见附加的JPA文档
 
     // Spring JPA在跨表查询时，问题会非常多，并且需要深入学习JPA及Hibernate底层的知识
-    // 如果使用Spring JPA，尽量在设计上避免在DAO层跨表查询
-    // 这也是Spring JPA在企业中使用较少的原因，并且很多公司禁止使用JPA跨表查询
+    // 1. 如果使用Spring JPA，尽量在设计上避免在DAO层跨表查询
+    // 2. 这也是Spring JPA在企业中使用较少的原因，并且很多公司禁止使用JPA跨表查询
+    // 3. N+1问题：
+    //  (1) ORM: 一个实体类 <-> 一张表；一个实体类对象 <-> 一张表中的一行数据
+    //  (2) 表关联时（例如1:N映射）
+    //      如果代码写不好、会解析成N条SQL查询，改起来比较复杂，需要覆盖一些JPA/Hibernate的方法
+    //      在team人员经验不齐时，难以保证质量
 
-    // 使用MyBatis会更加灵活
+    // 对比JPA、使用MyBatis会更加灵活和容易掌握；对比JDBC、使用MyBatis更加简洁高效
 }

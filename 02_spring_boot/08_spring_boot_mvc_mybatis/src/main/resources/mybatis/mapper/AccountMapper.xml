@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- XML文件的DTD约束 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 将namespace命名为Mapper接口，就不需要实例化这个接口了 -->
+<mapper namespace="com.javaref.springboot.mapper.AccountMapper">
+	<!-- 映射关系：POJO对象属性 - 表字段，如果不配置、将按照MyBatis默认的名称规则来映射 -->
+	<resultMap type="com.javaref.springboot.mapper.Account" id="AccountResultMap">
+		<!-- column   : 表字段 		 -->
+		<!-- property : 实体对象的属性 -->
+		<result column="login_name" property="loginName"/>
+		<result column="password" 	property="password"/>
+	</resultMap>
+
+	<!-- SQL与方法绑定：通过id="findAllByXMLBinding"、绑定到AccountMapper.findAllByXMLBinding() 					-->
+	<!-- 返回的ResultSet与POJO绑定：通过resultMap="AccountResultMap"找到上面的id="AccountResultMap"的<resultMap>标签 -->
+	<select id="findAllByXMLBinding" resultMap="AccountResultMap">
+		select * from account
+	</select>
+
+	<!-- 另一种做法时，用@Select("select * from account")注解AccountMapper接口中的方法，而不用写xml配置 -->
+	<!-- 例如AccountMapper.findAllByAnnotation()方法 -->
+
+	<!-- 向SQL中传参数 -->
+	<!-- #{}表达式中的内容是Account类的属性，框架通过动态代理+反射，找到Account的loginName、password属性的get方法拿到对应的值 -->
+	<insert id="add" parameterType="Account">
+ 	insert into account(login_name,password)
+ 	values 
+ 	(
+ 		#{loginName},#{password}
+ 	)
+ 	</insert>
+</mapper>
+
+<!-- 想要自动生成上面的这些配置、以及Mapper的代码  -->
+<!--
+	方法1：MyBatis Generator，基于XML配置，使用不方便
+	方法2：https://github.com/zouzg/mybatis-generator-gui, 使用GUI生成配置
+	方法3：
+-->
