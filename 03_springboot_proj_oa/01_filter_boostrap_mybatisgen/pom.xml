@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.6.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.javaref.springbootMVC</groupId>
+	<artifactId>SpringBootMVCMybatisDemo</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>SpringBootMVCMybatisDemo</name>
+	<description>Demo project for Spring Boot with MyBatis</description>
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<!--
+		内容：
+		1. 传统项目（SSM，Spring-SpringMVC-MyBatis）中MyBatis的XML配置方式
+		2. MyBatis与SpringBoot整合：相比SSM省略了很多配置文件
+		3. 增删查改、注解查询、Mapper查找
+		4. 分页
+		5. Mapper自动生成（根据数据库表反向生成）
+		6. 数据库连接池
+		7. 反向查询
+
+		底层：
+		SQLSessionFactory
+		-> SQLSession
+			* MyBatis配置：application.properties，知道Mapper接口所在的包，知道ORM配置的位置（xml或注解）
+			* ORM配置：${mybatis.mapper-locations}/*Mapper.xml，
+				例如：<mapper namespace="com.javaref.springboot.mapper.AccountMapper">
+				在Spring容器中查找AccountMapper Bean，
+					需要
+					* 用@MapperScan(value = "${mybatis.type-aliases-package})注解SpringBootMvc04Application类
+					* 或者用@Mapper注解AccountMapper类
+
+		-> Executor
+		-> ResultSet（对象映射配置）
+		-> 实体类
+
+		MyBatis使用
+		1. myBatisConfig.xml
+		2. ORM映射：SQL语句 <- 查询方法 -> POJO
+		3. 使用SQLSessionFactory创建SQLSession
+
+		SpringBootStarter
+		"MySQL Driver", "Thymeleaf", "MyBatis Framework"
+
+		IBatis（前身）==> MyBatis ==> MyBatis Plus (增强：分页、代码生成、ActiveRecord链式调用、……）
+		MyBatis Plus特性：https://mp.baomidou.com
+
+		ORM：通过ORM框架的方法来CURD
+		ActiveRecord：通过实体类的方法来CURD
+	-->
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!-- MyBatis用到的依赖 -->
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+		</dependency>
+		
+		<!-- 分页插件 -->
+		<!-- https://mvnrepository.com/artifact/com.github.pagehelper/pagehelper-spring-boot-starter -->
+		<dependency>
+		    <groupId>com.github.pagehelper</groupId>
+		    <artifactId>pagehelper-spring-boot-starter</artifactId>
+		    <version>1.2.12</version>  
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

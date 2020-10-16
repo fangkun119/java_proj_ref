@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.6.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.javaref.springbootMVC</groupId>
+	<artifactId>SpringBootMVCMybatisDemo</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>SpringBootMVCMybatisDemo</name>
+	<description>Demo project for Spring Boot with MyBatis</description>
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<!--
+		内容：
+		1. 用Bootstrap美化前端页面
+		2. 完整的分页器PageHelper使用
+		3. 用jQuery异步调用后端，进行CRUD
+		4. 项目部署：war包方式；jar包方式
+
+		项目部署：有两种方式
+		1. 旧的方法：生成War包，放入tomcat中
+		(1) 在<build></build>子标签内，添加<packaging>war</packaging>
+		(2) 引入spring-boot-starter-tomcat依赖，让这个包在packaging阶段被exclude，避免tomcat相关的包被重复打包
+			该依赖理论上可以参与编译，测试，运行等周期。相当于compile，但是打包阶段做了exclude操作
+			运行时由外部设施的tomcat来提供，因此不打在war包中
+			<dependency>
+    			<groupId>org.springframework.boot</groupId>
+    			<artifactId>spring-boot-starter-tomcat</artifactId>
+    			<scope>provided</scope>
+			</dependency>
+		(3) 修改入口类（拥有main函数的那个类），让它继承SpringBootServletInitializer，并重写configure方法
+			这样它可以在外部的tomcat启动时被调用注解
+			public class ServletInitializer extends SpringBootServletInitializer {
+				@Override
+				protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+					//此处的Application.class为带有@SpringBootApplication注解的启动类
+					return builder.sources(Application.class);
+				}
+			}
+		(4) mvn install之后，就会构建一个war包
+		现在的项目已经很少有通过war包来部署的，更通用的是下面第2种方法，使用jar包来部署
+
+		2. Spring Boot默认的部署方法
+		不用做上述1.中的修改，直接mvn install，生成一个jar包
+		这个jar包内置了tomcat，运行java -jar ${jar_file_path}，就可以启动
+	-->
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!-- MyBatis用到的依赖 -->
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+		</dependency>
+		
+		<!-- 分页插件 -->
+		<!-- https://mvnrepository.com/artifact/com.github.pagehelper/pagehelper-spring-boot-starter -->
+		<dependency>
+		    <groupId>com.github.pagehelper</groupId>
+		    <artifactId>pagehelper-spring-boot-starter</artifactId>
+		    <version>1.2.12</version>  
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

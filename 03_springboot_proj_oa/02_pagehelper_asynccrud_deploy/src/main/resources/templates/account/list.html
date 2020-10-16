@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>办公自动化系统</title>
+  <script th:src="@{/js/common/jquery-3.4.1.min.js}" ></script>
+  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+  <script th:src="@{/js/bootstrap.min.js}" ></script>
+</head>
+<body>
+
+<!-- 导航栏          开始        ↓  -->
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- 流式布局控件：当页面空间不够时导航栏按钮缩到一个菜单中 -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" th:href="@{/index}">首页</a>
+    </div>
+
+    <!-- 导航栏最左侧按钮以外的部分 -->
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <!-- 搜索块左侧 -->
+      <ul class="nav navbar-nav">
+        <li><a href="#">公文流转 <span class="sr-only">(current)</span></a></li>
+        <li class="dropdown active" > <!-- active -->
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            人员管理 <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li class="active"><a th:href="@{/account/list}">用户列表</a></li> <!-- active -->
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">One more separated link</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <!-- 搜索块 -->
+      <form class="navbar-form navbar-left">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="请输入员工姓名或工号">
+        </div>
+        <button type="搜索" class="btn btn-default">Submit</button>
+      </form>
+
+      <!-- 搜索块右侧的下拉菜单 -->
+      <!-- 对于未登录用户 -->
+      <ul th:if="${session.account} == null" class="nav navbar-nav navbar-right">
+        <li><a th:href="@{/register}">注册</a></li>
+        <li><a th:href="@{/account/login}">登录</a></li>
+      </ul>
+      <!-- 对于已登录用户 -->
+      <ul th:if="${session.account} != null" class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            欢迎你：[[${session.account.loginName}]] <span class="caret"/>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="@{/account/profile}">个人信息</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a th:href="@{/account/logOut}">退出登录</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+<!--        导航栏         结束 ↑ -->
+<!--        表格          开始 ↓  -->
+<table class="table table-hover">
+  <tr>
+    <th>序号</th>
+    <th>工号</th>
+    <th>登录名</th>
+    <th>昵称</th>
+    <th>年龄</th>
+    <th>区域</th>
+    <th>角色</th>
+    <th>操作</th>
+  </tr>
+  <!-- ${page} 是AccountController.list()方法设置到Model中的"page"属性，类型是PageInfo<Account> -->
+  <!-- 点击进入PageInfo类的代码，可以看到它的基类PageSerializable<T>，将传入的List<Account>存储在list属性中，并提供getList, setList方法 -->
+  <!-- 因此使用${page.list}可以拿到存储在PageInfo中的List<Account> -->
+  <tr th:each="account : ${page.list}">
+    <!-- stat: thymeleaf loopstatus相关内容参考word文档，或thymeleaf官网文档th:each相关内容 -->
+    <td th:text="${accountStat.count}"></td> <!-- <td>[[${accountStat.count}]]</td> -->
+    <td th:text="${account.id}"></td>
+    <td th:text="${account.loginName}"></td>
+    <td th:text="${account.nickName}"></td>
+    <td th:text="${account.age}"></td>
+    <td th:text="${account.location}"></td>
+    <td th:text="${account.role}"></td>
+    <td>
+      <!-- 点击"删除"时、会调用javascript:deleteByID(account_id)方法 -->
+      <a class="btn btn-danger" th:href="@{'javascript:deleteById('+ ${account.id} +');'}">删除</a>
+
+      修改密码
+    </td>
+  </tr>
+</table>
+<!--        表格         结束 ↑ -->
+<!--        模态窗口      开始 ↓ -->
+<!-- 手写的模态窗口Html和JS，在jQuery基础上封装得到，作为演示用；其实更好的方法是直接使用Boostrap提供的标签 -->
+<div id="com-alert" class="modal" style="z-index:9999;display: none;" >
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+        <h5 class="modal-title"><i class="fa fa-exclamation-circle"></i> [Title]</h5>
+      </div>
+      <div class="modal-body small">
+        <p>[Message]</p>
+      </div>
+      <div class="modal-footer" >
+        <button type="button" class="btn btn-primary ok" data-dismiss="modal">[BtnOk]</button>
+        <button type="button" class="btn btn-default cancel" data-dismiss="modal">[BtnCancel]</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--        模态窗口      结束↑   -->
+
+<script type="text/javascript">
+  // jQuery太旧了，简单学一下，看看《锋利的jQuery》之类的就够了
+  // 上面手写的模态窗口HTML配套的JS
+  $(function () {
+    window.Modal = function () {
+      var reg = new RegExp("\\[([^\\[\\]]*?)\\]", 'igm');
+      var alr = $("#com-alert");
+      var ahtml = alr.html();
+
+      var _tip = function (options, sec) {
+        alr.html(ahtml);    // 复原
+        alr.find('.ok').hide();
+        alr.find('.cancel').hide();
+        alr.find('.modal-content').width(500);
+        _dialog(options, sec);
+
+        return {
+          on: function (callback) {
+          }
+        };
+      };
+
+      var _alert = function (options) {
+        alr.html(ahtml);  // 复原
+        alr.find('.ok').removeClass('btn-success').addClass('btn-primary');
+        alr.find('.cancel').hide();
+        _dialog(options);
+
+        return {
+          on: function (callback) {
+            if (callback && callback instanceof Function) {
+              alr.find('.ok').click(function () {
+                callback(true)
+              });
+            }
+          }
+        };
+      };
+
+      var _confirm = function (options) {
+        alr.html(ahtml); // 复原
+        alr.find('.ok').removeClass('btn-primary').addClass('btn-success');
+        alr.find('.cancel').show();
+        _dialog(options);
+
+        return {
+          on: function (callback) {
+            if (callback && callback instanceof Function) {
+              alr.find('.ok').click(function () {
+                callback(true)
+              });
+              alr.find('.cancel').click(function () {
+                return;
+              });
+            }
+          }
+        };
+      };
+
+      var _dialog = function (options) {
+        var ops = {
+          msg: "提示内容",
+          title: "操作提示",
+          btnok: "确定",
+          btncl: "取消"
+        };
+
+        $.extend(ops, options);
+
+        var html = alr.html().replace(reg, function (node, key) {
+          return {
+            Title: ops.title,
+            Message: ops.msg,
+            BtnOk: ops.btnok,
+            BtnCancel: ops.btncl
+          }[key];
+        });
+
+        alr.html(html);
+        alr.modal({
+          width: 250,
+          backdrop: 'static'
+        });
+      }
+
+      return {
+        tip: _tip,
+        alert: _alert,
+        confirm: _confirm
+      }
+
+    }();
+  });
+  function showTip(msg, sec, callback) {
+    if (!sec) {
+      sec = 1000;
+    }
+    Modal.tip({
+      title: '提示',
+      msg: msg
+    }, sec);
+    setTimeout(callback, sec);
+  }
+
+  // 显示消息
+  function showMsg(msg, callback) {
+    Modal.alert({
+      title: '提示',
+      msg: msg,
+      btnok: '确定'
+    }).on(function (e) {
+      if (callback) {
+        callback();
+      }
+    });
+  }
+
+  // 模态对话框
+  function showConfirm(msg, callback) {
+    //var res = false;
+    Modal.confirm(
+            {
+              title: '提示',
+              msg: msg,
+            }).on(function (e) {
+      callback();
+      //res=true;
+    });
+    //return res;
+  }
+
+  function deleteById(id) {
+    // 查看是否能调用到这个方法
+    console.log("id: " + id)
+    //	showTip("haha", 5000, function() {});
+    //	showMsg("haha", function() {});
+    showConfirm("确认要删除吗？", function() {
+      // 确认删除
+      var url = "/account/deleteById";
+      var args = {id:id};
+      // RESPStat 类型的结果
+      $.post(url,args,function(data){
+        console.log(data)
+        if (data.code == 200){
+          //删除成功，刷新页面
+          window.location.reload();
+        }else {
+          alert(data.msg)
+        }
+      });
+    });
+
+    /* 下面的提示方法太原始，改为使用上面的代码，用模态窗口做提示
+    // 提示用户，确认是否要真的删除
+    var isDel = confirm("真的要删除吗？")
+    if (false == isDel) {
+      return;
+    }
+    // 执行删除
+    // 方法1：直接以链接的方式访问AccountController里的删除方法
+    // 缺点是会产生url跳转，即浏览器的url变成形如 http://localhost:8080/account/deleteById?id=1 的样子
+    // 方法2：通过Ajax去访问返回Json的AccountController的方法
+    var url = "/account/deleteById"
+    var args = {id:id}
+    $.post(url, args, function(data) {
+      // 查看一下data的数据格式，其实他就是AccountController.deleteById(id)返回的RespStat类型
+      console.log(data)
+      // 处理返回结果
+      if (200 == data.code) {
+        window.location.reload();
+      } else {
+        alert(data.msg)
+      }
+    })
+    */
+  }
+</script>
+
+<!--        分页        开始 ↓ -->
+<!-- 为了搞清楚如何使用PageInfo来编写分页控件，用 [[${page}]] 打印后端传来的"page"看一下数据结构 -->
+<!-- [[${page}]] -->
+<!--
+  PageInfo{
+    pageNum=1, pageSize=5, size=5, startRow=1, endRow=5, total=11, pages=3, list=Page{count=true, pageNum=1, pageSize=5, startRow=0, endRow=5, total=11, pages=3, reasonable=false, pageSizeZero=false}[Account [Hash = -850496857, id=1, loginName=aaa, password=123, nickName=aaa, age=12, location=null, role=user, serialVersionUID=1], Account [Hash = 1153310490, id=2, loginName=maxiaoliu, password=hh, nickName=xiaoliu, age=12, location=null, role=user, serialVersionUID=1], Account [Hash = 1539344109, id=5, loginName=xiaoming, password=123, nickName=null, age=0, location=null, role=user, serialVersionUID=1], Account [Hash = -1490326884, id=7, loginName=11, password=11, nickName=11, age=11, location=null, role=user, serialVersionUID=1], Account [Hash = -573191140, id=8, loginName=12, password=12, nickName=12, age=12, location=12, role=user, serialVersionUID=1]],
+    prePage=0, nextPage=2, isFirstPage=true, isLastPage=false,
+    hasPreviousPage=false, hasNextPage=true, navigatePages=8,
+    navigateFirstPage=1, navigateLastPage=3, navigatepageNums=[1, 2, 3]
+  }
+-->
+<nav aria-label="Page navigation">
+  <ul class="pagination">
+    <!-- 在 https://v3.bootcss.com/components/#pagination 查到使用哪个css class，可以显式屏蔽提示符 -->
+    <!-- 在 thymeleaf 文档上查到如何只在没有上一页时，屏蔽这个链接 -->
+    <li th:class="${page.prePage} == 0 ? 'disabled' : ''">
+      <!-- 同理，在没有上一页时，不仅要显式屏蔽提示符，还要屏蔽页面链接      -->
+      <!-- 相比使用'#'屏蔽，使用javascript:void(0);可以阻止页面滚动回页头  -->
+      <a th:href="@{${page.prePage} == 0 ? 'javascript:void(0);' : '/account/list?pageNum=' + ${page.prePage}}" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    <li th:each="pageNum : ${page.navigatepageNums}">
+      <a th:href="@{'/account/list?pageNum=' + ${pageNum}}">[[${pageNum}]]</a>
+    </li>
+    <!-- 与Previouse链接类似 -->
+    <li th:class="${page.nextPage} == 0 ? 'disabled' : ''">
+      <a th:href="@{${page.nextPage} == 0 ? 'javascript:void(0);':'/account/list?pageNum=' + ${page.nextPage}}" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+<!--        分页        结束 ↑ -->
+
+</body>
+</html>

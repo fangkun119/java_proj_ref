@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>办公自动化系统</title>
+    <!-- 最新的 Bootstrap 核心 css 文件 -->
+    <!-- 在url上 使用 @标签 可以帮我们 自动加上 contextpath -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script th:src="@{/js/common/jquery-3.4.1.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+</head>
+<body>
+
+<!--  导航栏                      开始  			 ↓ -->
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/index">首页</a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class=""><a href="#">公文流转</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        人力资源 <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/account/list">员工列表</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        系统设置 <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/manager/accountList">账号列表</a></li>
+                        <li><a href="/manager/roleList"> 角色管理</a></li>
+                        <li><a href="/manager/permissionList">权限管理</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <form class="navbar-form navbar-left">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="请输入员工姓名或工号">
+                </div>
+                <button type="submit" class="btn btn-default">搜索</button>
+            </form>
+
+            <!--  未登录用户 -->
+            <ul th:if="${session.account} ==null" class="nav navbar-nav navbar-right">
+                <li><a href="/account/register">注册</a></li>
+                <li><a href="/account/login">登录</a></li>
+            </ul>
+            <!-- 已登录用户    ↓ -->
+            <ul th:if="${session.account} !=null" class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        欢迎你 : [[${session.account.loginName}]] <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/account/profile">个人信息</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/account/logOut">退出登录</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <!-- 已登录用户   ↑ -->
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<!--  导航栏                      结束  			↑       -->
+<h1>修改/添加 权限</h1>
+
+<!--
+    查看
+    [[${permission}]]
+-->
+
+<!-- 用th:value，希望显示出已有的，同时容许修改 -->
+<!-- checkbox 的 id，用来从表单提交数据中区分出哪些被勾选 -->
+<!--
+    从permissionModify跳转过来时，${p}不为空
+    从permissionAdd跳转过来时，${p}为空
+-->
+<!-- TOOD: c,r,u,d数据在update时从后端带过来 -->
+<form id="p">
+    权限名称： <input name="name" type="text" th:value="${p}==null?'':${p.name}"> <br>
+    URI： <input name="uri" type="text" th:value="${p}==null?'':${p.uri}"><br>
+    权限：
+    <input type="checkbox" id="c"/> c
+    <input type="checkbox" id="r"/> r
+    <input type="checkbox" id="u"/> u
+    <input type="checkbox" id="d"/> d
+    <input type="text" name="id" th:value="${p}==null?'':${p.id}">
+    <br>
+    <!-- 调用javascript函数来提交 -->
+    <a class="btn btn-danger" href="javascript:smt();">提交</a>
+</form>
+<br>
+
+<!-- 编写上面的smt()函数 -->
+<script type="text/javascript">
+    function smt() {
+        // 将表单序列化，并填充到对象中
+        var formObject = {};
+        var data = $("#p").serializeArray();
+        $.each(data, function (i, item) {
+            formObject[item.name] = item.value
+        });
+        formObject["c"] = $("#c").is(':checked');
+        formObject["r"] = $("#r").is(':checked');
+        formObject["u"] = $("#u").is(':checked');
+        formObject["d"] = $("#d").is(':checked');
+        // 查看json对象的数据内容
+        console.log("data" + data);
+        console.log("data" + JSON.stringify(data));
+        console.log("formObject" + formObject);
+        console.log("formObject" + JSON.stringify(formObject));
+        // 提交json对象 到controller
+        //  形如 $.post(url, formObject, function (data){console.log(data)}) 的post方法
+        //  无法提交json格式的请求，要用$ajax方法，指明contentType是json，并且把数据序列化成json格式
+        // TODO: 区分根据id来决定调用update还是add
+        var url = "/api/v1/manager/permission/add";
+        $.ajax({
+            type: "post",
+            url: url,
+            contentType: "application/json",
+            data: JSON.stringify(formObject),
+            dataType: "json",
+            success: function (msg) {
+                console.log("sucess:" + JSON.stringify(msg))
+            },
+            error: function (msg) {
+                console.log("error:" + msg)
+            }
+        })
+    }
+</script>
+</body>
+</html>

@@ -10,4 +10,5 @@
 **/.classpath
 **/.project
 **/kf_raw
+**/kf_tool
 /*.sql
