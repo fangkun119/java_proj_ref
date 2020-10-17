@@ -6,12 +6,13 @@
     <!-- 最新的 Bootstrap 核心 css 文件 -->
     <!-- 在url上 使用 @标签 可以帮我们 自动加上 contextpath -->
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/skins/all.css}">
     <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script th:src="@{/js/common/jquery-3.4.1.min.js}"></script>
     <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/js/icheck.min.js}"></script>
 </head>
 <body>
-
 <!--  导航栏                      开始  			 ↓ -->
 <nav class="navbar navbar-default">
     <div class="container-fluid">
@@ -39,7 +40,6 @@
                     </ul>
                 </li>
             </ul>
-
             <ul class="nav navbar-nav">
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
@@ -59,7 +59,6 @@
                 </div>
                 <button type="submit" class="btn btn-default">搜索</button>
             </form>
-
             <!--  未登录用户 -->
             <ul th:if="${session.account} ==null" class="nav navbar-nav navbar-right">
                 <li><a href="/account/register">注册</a></li>
@@ -70,8 +69,7 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                        aria-expanded="false">
-                        欢迎你 : [[${session.account.loginName}]] <span class="caret"></span>
-                    </a>
+                        欢迎你 : [[${session.account.loginName}]] <span class="caret"></span> </a>
                     <ul class="dropdown-menu">
                         <li><a href="/account/profile">个人信息</a></li>
                         <li><a href="#">Another action</a></li>
@@ -85,70 +83,59 @@
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>
-
 <!--  导航栏                      结束  			↑       -->
-<h1>修改/添加 权限</h1>
-
-<!--
-    查看
-    [[${permission}]]
--->
-
-<!-- 用th:value，希望显示出已有的，同时容许修改 -->
-<!-- checkbox 的 id，用来从表单提交数据中区分出哪些被勾选 -->
-<!--
-    从permissionModify跳转过来时，${p}不为空
-    从permissionAdd跳转过来时，${p}为空
--->
-<!-- TOOD: c,r,u,d数据在update时从后端带过来 -->
-<form id="p">
-    权限名称： <input name="name" type="text" th:value="${p}==null?'':${p.name}"> <br>
-    URI： <input name="uri" type="text" th:value="${p}==null?'':${p.uri}"><br>
-    权限：
-    <input type="checkbox" id="c"/> c
-    <input type="checkbox" id="r"/> r
-    <input type="checkbox" id="u"/> u
-    <input type="checkbox" id="d"/> d
-    <input type="text" name="id" th:value="${p}==null?'':${p.id}">
-    <br>
-    <!-- 调用javascript函数来提交 -->
-    <a class="btn btn-danger" href="javascript:smt();">提交</a>
+<h1>角色权限</h1>
+<a class="btn btn-info" href="/manager/role">返回列表</a><br/>
+<form id="permissionForm">
+    <div>角色名称：<input type="text" name="name" th:value="${role}==null?'':${role.name}" disabled="true"></div>
+    <br/>
+    <div>角色ID：<input type="text" name="id" th:value="${role}==null?'':${role.id}"></div>
+    <br/>
+    <div>允许权限：</div>
+    <br/>
+    <div style="display: flex;">
+        <!-- 遍历后端设置到Model中的"pList":List<Permission>，每个item对应一个Permission -->
+	    <span th:each="permission:${pList}">
+            <!-- 为每个Persmission生成一个checkbox控件 -->
+		    <input type="checkbox" th:id="${permission.id}" name="permissions" th:value="${permission.id}">
+            <label>[[${permission.name}]]</label>
+	    </span>
+        <br/>
+    </div>
 </form>
+<a class="btn btn-default" href="javascript:add();">添加</a>
+<!-- $('#input-1, #input-3').iCheck('check'); -->
+<script type="text/javascript" th:inline="javascript">
+    [# th:each = "p :${role.permissions}"]
+    [# th:utext = "'$(\\'#' + ${p.id} + '\\').iCheck(\\'check\\')'" /]
+    [/]
+</script>
 <br>
-
-<!-- 编写上面的smt()函数 -->
-<script type="text/javascript">
-    function smt() {
-        // 将表单序列化，并填充到对象中
-        var formObject = {};
-        var data = $("#p").serializeArray();
-        $.each(data, function (i, item) {
-            formObject[item.name] = item.value
+<script>
+    $(document).ready(function () {
+        $('input').each(function () {
+            var self = $(this),
+                label = self.next(),
+                label_text = label.text();
+            label.remove();
+            self.iCheck({
+                checkboxClass: 'icheckbox_line-red',
+                radioClass: 'iradio_line',
+                insert: '<div class="icheck_line-icon"></div>' + label_text
+            });
         });
-        formObject["c"] = $("#c").is(':checked');
-        formObject["r"] = $("#r").is(':checked');
-        formObject["u"] = $("#u").is(':checked');
-        formObject["d"] = $("#d").is(':checked');
-        // 查看json对象的数据内容
-        console.log("data" + data);
-        console.log("data" + JSON.stringify(data));
-        console.log("formObject" + formObject);
-        console.log("formObject" + JSON.stringify(formObject));
-        // 提交json对象 到controller
-        // TODO: 区分根据id来决定调用update还是add
-        var url = "/api/v1/manager/permission/add";
-        $.ajax({
-            type: "post",
-            url: url,
-            contentType: "application/json",
-            data: JSON.stringify(formObject),
-            dataType: "json",
-            success: function (msg) {
-                console.log("sucess:" + JSON.stringify(msg))
-            },
-            error: function (msg) {
-                console.log("error:" + msg)
+    });
+</script>
+<script type="text/javascript">
+    function add() {
+        var data = $("#permissionForm").serializeArray();
+        console.log(data);
+        console.log(JSON.stringify(data));
+        $.post("/api/v1/manager/role/permission/add", data, function (data) {
+            if (data != '1') {
+                alert(data.message)
             }
+            console.log(data)
         })
     }
 </script>

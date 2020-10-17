@@ -11,7 +11,6 @@
     <script th:src="@{/js/bootstrap.min.js}"></script>
 </head>
 <body>
-
 <!--  导航栏                      开始  			 ↓ -->
 <nav class="navbar navbar-default">
     <div class="container-fluid">
@@ -39,7 +38,6 @@
                     </ul>
                 </li>
             </ul>
-
             <ul class="nav navbar-nav">
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
@@ -59,7 +57,6 @@
                 </div>
                 <button type="submit" class="btn btn-default">搜索</button>
             </form>
-
             <!--  未登录用户 -->
             <ul th:if="${session.account} ==null" class="nav navbar-nav navbar-right">
                 <li><a href="/account/register">注册</a></li>
@@ -70,8 +67,7 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                        aria-expanded="false">
-                        欢迎你 : [[${session.account.loginName}]] <span class="caret"></span>
-                    </a>
+                        欢迎你 : [[${session.account.loginName}]] <span class="caret"></span> </a>
                     <ul class="dropdown-menu">
                         <li><a href="/account/profile">个人信息</a></li>
                         <li><a href="#">Another action</a></li>
@@ -85,41 +81,27 @@
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>
+<!--  导航栏                      结束  			   ↑       -->
 
-<!--  导航栏                      结束  			↑       -->
+<!--  权限设置/添加                开始  			   ↓       -->
+<!-- 用th:checked来保证后端传来的c、r、u、d值可以被设置到前端页面上 -->
 <h1>修改/添加 权限</h1>
-
-<!--
-    查看
-    [[${permission}]]
--->
-
-<!-- 用th:value，希望显示出已有的，同时容许修改 -->
-<!-- checkbox 的 id，用来从表单提交数据中区分出哪些被勾选 -->
-<!--
-    从permissionModify跳转过来时，${p}不为空
-    从permissionAdd跳转过来时，${p}为空
--->
-<!-- TOOD: c,r,u,d数据在update时从后端带过来 -->
 <form id="p">
     权限名称： <input name="name" type="text" th:value="${p}==null?'':${p.name}"> <br>
     URI： <input name="uri" type="text" th:value="${p}==null?'':${p.uri}"><br>
     权限：
-    <input type="checkbox" id="c"/> c
-    <input type="checkbox" id="r"/> r
-    <input type="checkbox" id="u"/> u
-    <input type="checkbox" id="d"/> d
+    <input type="checkbox" id="c" th:checked="${p}==null?'false':${p.c}"> c
+    <input type="checkbox" id="r" th:checked="${p}==null?'false':${p.r}"> r
+    <input type="checkbox" id="u" th:checked="${p}==null?'false':${p.u}"> u
+    <input type="checkbox" id="d" th:checked="${p}==null?'false':${p.d}"/> d
     <input type="text" name="id" th:value="${p}==null?'':${p.id}">
     <br>
-    <!-- 调用javascript函数来提交 -->
     <a class="btn btn-danger" href="javascript:smt();">提交</a>
 </form>
+<!--  权限设置/添加                结束  			   ↑       -->
 <br>
-
-<!-- 编写上面的smt()函数 -->
 <script type="text/javascript">
     function smt() {
-        // 将表单序列化，并填充到对象中
         var formObject = {};
         var data = $("#p").serializeArray();
         $.each(data, function (i, item) {
@@ -129,14 +111,14 @@
         formObject["r"] = $("#r").is(':checked');
         formObject["u"] = $("#u").is(':checked');
         formObject["d"] = $("#d").is(':checked');
-        // 查看json对象的数据内容
+        // 提交json对象 到controller
         console.log("data" + data);
-        console.log("data" + JSON.stringify(data));
         console.log("formObject" + formObject);
         console.log("formObject" + JSON.stringify(formObject));
-        // 提交json对象 到controller
-        // TODO: 区分根据id来决定调用update还是add
-        var url = "/api/v1/manager/permission/add";
+        // Session中有"p"属性（对应后端类型Permission）时，#id（对应上面的text）非空，为update
+        // Session中无"p"属性（对应后端类型Permission）时，#id（对应上面的text）非空，为add
+        // 相比在前端做，这个业务逻辑判断交给后端会更加合适
+        var url = "/api/v1/manager/permission/set";
         $.ajax({
             type: "post",
             url: url,
