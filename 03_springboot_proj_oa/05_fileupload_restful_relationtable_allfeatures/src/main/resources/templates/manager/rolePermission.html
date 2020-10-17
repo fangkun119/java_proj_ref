@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>办公自动化系统</title>
-    <!-- 最新的 Bootstrap 核心 css 文件 -->
-    <!-- 在url上 使用 @标签 可以帮我们 自动加上 contextpath -->
+    <!-- 引入css和js
+        1. 在url上 使用 @标签 可以自动加上 contextpath
+        2. 注意引入的顺序，基础的放在上面，依赖其他css和js的放在下面
+    -->
+    <!-- bootstrap, icheck css，其中的icheck来自http://icheck.fronteed.com/ -->
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/skins/all.css}">
-    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <!-- jquery, bootstrap,icheck js -->
     <script th:src="@{/js/common/jquery-3.4.1.min.js}"></script>
     <script th:src="@{/js/bootstrap.min.js}"></script>
     <script th:src="@{/js/icheck.min.js}"></script>
@@ -86,6 +89,7 @@
 <!--  导航栏                      结束  			↑       -->
 <h1>角色权限</h1>
 <a class="btn btn-info" href="/manager/role">返回列表</a><br/>
+<br/>
 <form id="permissionForm">
     <div>角色名称：<input type="text" name="name" th:value="${role}==null?'':${role.name}" disabled="true"></div>
     <br/>
@@ -93,24 +97,56 @@
     <br/>
     <div>允许权限：</div>
     <br/>
-    <div style="display: flex;">
-        <!-- 遍历后端设置到Model中的"pList":List<Permission>，每个item对应一个Permission -->
-	    <span th:each="permission:${pList}">
-            <!-- 为每个Persmission生成一个checkbox控件 -->
+    <!-- 先在Chrome DevTools上调好样式，再改下面的代码 -->
+    <div style="display:flex;">
+        <!-- 遍历后端设置到Model中的"pList":List<Permission>，为每个permission生成一个<span>标签 -->
+	    <span style="padding-right:5px" th:each="permission:${pList}">
+            <!--
+                为每个Persmission生成一个checkbox控件
+                具体的代码，来自 http://icheck.fronteed.com/ 上Line skin的usage
+                <input type="checkbox">
+                <label>Checkbox 1</label>
+                <input type="checkbox" checked>
+                <label>Checkbox 2</label>
+            -->
 		    <input type="checkbox" th:id="${permission.id}" name="permissions" th:value="${permission.id}">
             <label>[[${permission.name}]]</label>
 	    </span>
-        <br/>
     </div>
+    <br/>
 </form>
+
+<!-- 打印出session中的account的permission来看一下，确认前端页面可以拿到 -->
+<!-- [[${session.account.permissionList}]] -->
+
+<!-- 提交按钮 -->
 <a class="btn btn-default" href="javascript:add();">添加</a>
-<!-- $('#input-1, #input-3').iCheck('check'); -->
+
+<!--
+    来自icheck.fronteed.com文档（搜"Demo"），用来把一组checkbox勾选为check
+    Add checked state to 1 and 3 inputs
+    $('#input-1, #input-3').iCheck('check');
+-->
+<!--
+    th:inline="javascript" 让thymeleaf解析标签内的js，同时与thymeleaf的标签混合使用
+    [# th:each]
+        在循环遍历时，不会生成任何html标签，它生成了一段js （与<span th:each=...>为每个元素生成一个<span>标签不同，）
+        它为每个js为一个permission_id执行一段 $('#permission_id').iCheck('check');代码
+        从而将这个permission对应的checkbox勾选上
+    用Chrome Devtools可以看到这组js
+    [# th:utext]
+        \\是转义符，为了把'加入到生成的字符串中
+        每个''包裹一段字符串，这几段字符串拼接在一起，包裹在""中，作为th:text的值
+-->
 <script type="text/javascript" th:inline="javascript">
     [# th:each = "p :${role.permissions}"]
-    [# th:utext = "'$(\\'#' + ${p.id} + '\\').iCheck(\\'check\\')'" /]
+        [# th:utext = "'$(\\'#' + ${p.id} + '\\').iCheck(\\'check\\')'" /]
     [/]
 </script>
+<!-- 另外用<th:block>写双重循环也可以实现这个功能 -->
 <br>
+
+<!-- 下面的函数是icheck框架的函数，来自http://icheck.fronteed.com/ 上Line skin的usage -->
 <script>
     $(document).ready(function () {
         $('input').each(function () {
@@ -126,6 +162,8 @@
         });
     });
 </script>
+
+<!-- 编写给角色设置权限的异步调用函数 -->
 <script type="text/javascript">
     function add() {
         var data = $("#permissionForm").serializeArray();

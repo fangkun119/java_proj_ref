@@ -19,12 +19,16 @@ public class AccountService {
     AccountMapper accMapper;
 
     public Account findByLoginNameAndPassword(String loginName, String password) {
+        // 不要使用MybatisGenerator为AccountMapper内置的查询方法，因为这些方法是基于单表的
         // AccountExample example = new AccountExample();
-        //  example.createCriteria()
+        // example.createCriteria()
         //	    .andLoginNameEqualTo(loginName)
         //	    .andPasswordEqualTo(password);
+        // List<Account> accountList = accMapper.selectByExample(example);
+        // return null == accountList ? null : accountList.get(0); // loginName unique 索引保证只有一个元素
 
-        // loginName的unique索引保证最多只有一个Account
+        // 改用自定义的findByLoginNameAndPassword方法（对应AccountMapper.xml的<select id="findByLoginNameAndPassword"..>标签）
+        // 这个方法使用联表来查询，返回的Account中填充了roleList和permissionList;
         Account account = accMapper.findByLoginNameAndPassword(loginName, password);
         return account;
     }

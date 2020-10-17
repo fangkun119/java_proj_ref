@@ -95,8 +95,11 @@
     <form action="/account/fileUploadController" method="post" enctype="multipart/form-data">
         <table class="table table-bordered">
             <tr>
+                <!-- 显示该用户的角色 -->
+                <!-- <td>[[${session.account.permissionList}]]</td> -->
                 <td>角色：</td>
                 <td>
+                    <!-- th:block 在循环遍历时、不会生成html标签 -->
                     <th:block th:each="item : ${session.account.permissionList}">
                         <a>[[${item.name}]]</a>
                     </th:block>

@@ -1,6 +1,7 @@
 package com.javaref.springboot.filter;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -13,19 +14,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.javaref.springboot.entity.Account;
+import com.javaref.springboot.entity.Permission;
 import org.springframework.stereotype.Component;
 
-/**
- * 用户权限处理
- */
+// 用户权限处理
 @Component
 @WebFilter(urlPatterns = "/*")
 public class AccountFilter implements Filter {
     // 不需要登录的 URI
     private final String[] IGNORE_URI = {
-            "/index", "/account/validataAccount",
-            "/css/", "/js/", "/account/login", "/images",
-            "/errorPage"
+        "/index", "/account/validataAccount",
+        "/css/", "/js/", "/account/login", "/images",
+        // 记得把/errorPage加到豁免列表中，如果/errorPage没有权限访问，会不断跳转形成死循环
+        "/errorPage"
     };
 
     @Override
@@ -49,31 +50,35 @@ public class AccountFilter implements Filter {
         Account account = (Account) request.getSession().getAttribute("account");
         System.out.println("getSession account:" + account);
         if (null == account) {
-            // 没登录 跳转登录页面
+            // 没登录 跳转登录页面：发302让浏览器访问/account/login
             response.sendRedirect("/account/login");
             return;
         }
 
         // 已登录用户是否有权限访问当前页面
-        //		if(!hasAuth(account.getPermissionList(),uri)) {
-        //			request.setAttribute("msg", "您无权访问当前页面:" + uri);
-        //			request.getRequestDispatcher("/errorPage").forward(request, response);
-        //			return;
-        //		}
+        // getRequestDispatcher是服务器端跳转，不会发302给浏览器，因此浏览器的地址栏也不会发生变化
+        // 不能dispatcher到/error上，因为/error是sprint boot内置的出错页面，要新建一个页面/errorPage
+        /*
+        // 先不检查了，需要把各用户权限在数据库中都配好，才能开启
+        if(!hasAuth(account.getPermissionList(),uri)) {
+            request.setAttribute("msg", "您无权访问当前页面:" + uri);
+            request.getRequestDispatcher("/errorPage").forward(request, response);
+            return;
+        }
+        */
 
         System.out.println("----filter----" + uri);
         chain.doFilter(request, response);
     }
 
-    //	private boolean hasAuth(List<Permission> permissionList, String uri) {
-    //		// TODO Auto-generated method stub
-    //		for (Permission permission : permissionList) {
-    //			if(uri.startsWith(permission.getUri())) {
-    //				return true;
-    //			}
-    //		}
-    //		return false;
-    //	}
+    private boolean hasAuth(List<Permission> permissionList, String uri) {
+        for (Permission permission : permissionList) {
+    		if(uri.startsWith(permission.getUri())) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
 
     private boolean canPassIgnore(String uri) {
         // /index = uri
