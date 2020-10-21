@@ -1,0 +1,25 @@
+.app {
+  background-color: #000;
+  padding: 30px;  
+  height: 100vh;  /*100vh：撑满窗口*/
+  display: flex;  
+  justify-content: center;
+}
+
+.todo-list {
+  width: 600px;
+}
+
+.todo-item {
+  background-color: #333;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15); 
+  padding: 5px 10px;
+  color: #fff ;
+  height: 48px;
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
