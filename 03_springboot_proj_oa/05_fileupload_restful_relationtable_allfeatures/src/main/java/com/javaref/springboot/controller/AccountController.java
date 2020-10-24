@@ -61,7 +61,7 @@ public class AccountController {
             Model model) {
         PageInfo<Account> page = accountSrv.findByPage(pageNum, pageSize);
         model.addAttribute("page", page);
-        return "/account/list";
+        return "account/list";
     }
 
     @RequestMapping("/deleteById")

@@ -6,21 +6,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 
 @Controller
+@RequestMapping("/")
 public class MainController {
-    @RequestMapping("/")
+    @RequestMapping("")
     public String index() {
         return "index";
     }
 
     @RequestMapping("index")
     public String index1() {
-        return "/index";
+        return "index";
     }
 
     @RequestMapping("errorPage")
     public String errorPage(Model model) {
-        return "/errorPage";
+        return "errorPage";
     }
-
-
 }
