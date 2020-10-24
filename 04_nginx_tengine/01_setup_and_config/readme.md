@@ -1,12 +1,8 @@
 
 
-[TOC]
+# Tengine和Nginx
 
-
-
-# Tengine
-
-## Nginx 和 Tengine
+## 介绍
 
 > * Tengine是Nginx的增强版本，淘宝以Nginx为内核，在其基础上增加如健康检查、Lua脚本等内置C语言插件模块，侧重于提升稳定性、可用性、性能、负载
 > * OpenResty是另一个Nginx，侧重于基于LUA的功能增强
@@ -184,9 +180,9 @@ root      7669  1692  0 20:34 pts/0    00:00:00 grep --color=auto nginx
 
 ## 启动服务
 
-### 脚本自启动
+### 准备启动脚本
 
-创建`/etc/init.d/nginx`文件，并拷贝下面的Nginx启动脚本文件内容该文件中，设置可执行权限
+> 拷贝[`../files/nginx`](../files/nginx)到`/etc/init.d/nginx`文件，设置可执行权限
 
 ~~~
 [root@localhost tengine]# cd /etc/init.d/
@@ -196,147 +192,78 @@ functions  netconsole  network  README
 [root@localhost init.d]# chmod +x nginx
 ~~~
 
-#### 服务启动和停止命令
+> * 这个脚本是有人在 [https://www.nginx.com/resources/wiki/start/topics/examples/redhatnginxinit/](https://www.nginx.com/resources/wiki/start/topics/examples/redhatnginxinit/) 的基础上修改得到，主要是对`make_dirs()`函数做了修改，在CentOS 7上可以正常使用
+> * 更多启动脚本：[https://www.nginx.com/resources/wiki/start/topics/examples/initscripts/](https://www.nginx.com/resources/wiki/start/topics/examples/initscripts/)
 
-> * service nginx start # 启动服务
-> * service nginx stop  # 停止
-> * service nginx status# 状态
-> * service nginx reload# 动态重载配置文件
+> 注意: 
+> 
+> * 启动脚本需要知道nginx的bin文件以及配置文件的路径、用来启动nginx
+> * 系统服务通过一个nginx启动时写入的pid文件，来知道nginx的进程id，以便能够发信号给nginx进程执行stop, restart, reload等操作
+
+> 为了让它们保持一致，需要做如下修改 
+> 
+> * nginx配置（`/usr/local/tengine/conf/nginx.conf`）: pid文件与启动脚本约定路径一致
+
+~~~
+pid        /var/run/nginx.pid;
+~~~
+
+> * 启动脚本（`/etc/init.d/nginx`）: bin文件及配置文件指向nginx的安装位置
+
+~~~
+nginx="/usr/local/tengine/sbin/nginx"
+NGINX_CONF_FILE="/usr/local/tengine/conf/nginx.conf"
+~~~
+
+
+### 服务启动和停止命令
+
+> * service nginx start  # 启动服务
+> * service nginx stop   # 停止
+> * service nginx status # 状态
+> * service nginx reload # 动态重载配置文件
+> ...
+> * service nginx help   # 命令列表
 
 ~~~shell
 [root@localhost init.d]# service nginx start
 Starting nginx (via systemctl):  Warning: nginx.service changed on disk. Run 'systemctl daemon-reload' to reload units.
 ~~~
 
-#### 启动脚本内容：
+### 测试
 
 ~~~shell
-#!/bin/sh
-#
-# nginx - this script starts and stops the nginx daemon
-#
-# chkconfig:   - 85 15
-# description:  Nginx is an HTTP(S) server, HTTP(S) reverse \
-#               proxy and IMAP/POP3 proxy server
-# processname: nginx
-# config:      /etc/nginx/nginx.conf
-# config:      /etc/sysconfig/nginx
-# pidfile:     /var/run/nginx.pid
+[root@localhost conf]# service nginx start
+Starting nginx (via systemctl):                            [  OK  ]
+[root@localhost conf]# cat /var/run/nginx.pid
+5771
+[root@localhost conf]# service nginx reload
+Reloading nginx configuration (via systemctl):             [  OK  ]
+[root@localhost conf]# service nginx status
+● nginx.service - SYSV: Nginx is an HTTP(S) server, HTTP(S) reverse proxy and IMAP/POP3 proxy server
+   Loaded: loaded (/etc/rc.d/init.d/nginx; bad; vendor preset: disabled)
+   Active: active (running) since Thu 2020-10-22 15:56:07 CST; 3min 56s ago
+     Docs: man:systemd-sysv-generator(8)
+  Process: 5827 ExecReload=/etc/rc.d/init.d/nginx reload (code=exited, status=0/SUCCESS)
+  Process: 5742 ExecStart=/etc/rc.d/init.d/nginx start (code=exited, status=0/SUCCESS)
+ Main PID: 5771 (nginx)
+    Tasks: 2
+   CGroup: /system.slice/nginx.service
+           ├─5771 nginx: master process /usr/local/tengine/sbin/nginx -c /usr/local/...
+           └─5836 nginx: worker process
 
-# Source function library.
-. /etc/rc.d/init.d/functions
-
-# Source networking configuration.
-. /etc/sysconfig/network
-
-# Check that networking is up.
-[ "$NETWORKING" = "no" ] && exit 0
-
-nginx="/usr/local/tengine/sbin/nginx"
-prog=$(basename $nginx)
-
-NGINX_CONF_FILE="/usr/local/tengine/conf/nginx.conf"
-
-[ -f /etc/sysconfig/nginx ] && . /etc/sysconfig/nginx
-
-lockfile=/var/lock/subsys/nginx
-
-make_dirs() {
-   # make required directories
-   user=`nginx -V 2>&1 | grep "configure arguments:" | sed 's/[^*]*--user=\([^ ]*\).*/\1/g' -`
-   options=`$nginx -V 2>&1 | grep 'configure arguments:'`
-   for opt in $options; do
-       if [ `echo $opt | grep '.*-temp-path'` ]; then
-           value=`echo $opt | cut -d "=" -f 2`
-           if [ ! -d "$value" ]; then
-               # echo "creating" $value
-               mkdir -p $value && chown -R $user $value
-           fi
-       fi
-   done
-}
-
-start() {
-    [ -x $nginx ] || exit 5
-    [ -f $NGINX_CONF_FILE ] || exit 6
-    make_dirs
-    echo -n $"Starting $prog: "
-    daemon $nginx -c $NGINX_CONF_FILE
-    retval=$?
-    echo
-    [ $retval -eq 0 ] && touch $lockfile
-    return $retval
-}
-
-stop() {
-    echo -n $"Stopping $prog: "
-    killproc $prog -QUIT
-    retval=$?
-    echo
-    [ $retval -eq 0 ] && rm -f $lockfile
-    return $retval
-}
-
-restart() {
-    configtest || return $?
-    stop
-    sleep 1
-    start
-}
-
-reload() {
-    configtest || return $?
-    echo -n $"Reloading $prog: "
-    killproc $nginx -HUP
-    RETVAL=$?
-    echo
-}
-
-force_reload() {
-    restart
-}
-
-configtest() {
-  $nginx -t -c $NGINX_CONF_FILE
-}
-
-rh_status() {
-    status $prog
-}
-
-rh_status_q() {
-    rh_status >/dev/null 2>&1
-}
-
-case "$1" in
-    start)
-        rh_status_q && exit 0
-        $1
-        ;;
-    stop)
-        rh_status_q || exit 0
-        $1
-        ;;
-    restart|configtest)
-        $1
-        ;;
-    reload)
-        rh_status_q || exit 7
-        $1
-        ;;
-    force-reload)
-        force_reload
-        ;;
-    status)
-        rh_status
-        ;;
-    condrestart|try-restart)
-        rh_status_q || exit 0
-            ;;
-    *)
-        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload|configtest}"
-        exit 2
-esac
+Oct 22 15:56:07 localhost.localdomain systemd[1]: Starting SYSV: Nginx is an HTTP(S....
+Oct 22 15:56:07 localhost.localdomain nginx[5742]: Starting nginx: [  OK  ]
+Oct 22 15:56:07 localhost.localdomain systemd[1]: Can't open PID file /var/run/ngin...y
+Oct 22 15:56:07 localhost.localdomain systemd[1]: Started SYSV: Nginx is an HTTP(S)....
+Oct 22 15:59:50 localhost.localdomain systemd[1]: Reloading SYSV: Nginx is an HTTP(....
+Oct 22 15:59:50 localhost.localdomain nginx[5827]: nginx: the configuration file /u...k
+Oct 22 15:59:50 localhost.localdomain nginx[5827]: nginx: configuration file /usr/l...l
+Oct 22 15:59:50 localhost.localdomain nginx[5827]: Reloading nginx: [  OK  ]
+Oct 22 15:59:50 localhost.localdomain systemd[1]: Reloaded SYSV: Nginx is an HTTP(S....
+Hint: Some lines were ellipsized, use -l to show in full.
+[root@localhost conf]# service nginx stop
+Stopping nginx (via systemctl):                            [  OK  ]
 ~~~
 
 ## Nginx配置解析
@@ -433,8 +360,9 @@ http {
             proxy_pass https://bulma.zcopy.site/;
         }
         # 配置http用户密码验证，IP访问控制等，这里省略，下面有具体说明  
+
         # 配置访问状态监控
-        location /basic_status {
+        location /conn_status {
             stub_status on;
         }
         
@@ -716,14 +644,6 @@ yum install httpd
 htpasswd -c -d /usr/local/users ${some_user_name}
 ~~~
 
-**nginx访问状态监控**
-
-~~~
-location /basic_status {
-    stub_status on;
-}
-~~~
-
 **反向代理**
 
 > * 通常的代理服务器，只用于代理内部网络对Internet的连接请求，客户机必须指定代理服务器,并将本来要直接发送到Web服务器上的http请求发送到代理服务器中由代理服务器向Internet上的web服务器发起请求，最终达到客户机上网的目的。
@@ -750,13 +670,13 @@ proxy_pass http://192.168.43.152/
 
 **weight(权重)**
 
-> 指定轮询几率，weight和访问比率成正比，用于后端服务器性能不均的情况。
+> 指定轮询几率，weight和访问比率成正比，用于后端服务器性能不均的情况（`=`前后不能加空格）。
 
 ~~~
-upstream httpds {
+upstream some_name {
     server 127.0.0.1:8050       weight=10 down;
     server 127.0.0.1:8060       weight=1;
-     server 127.0.0.1:8060      weight=1 backup;
+    server 127.0.0.1:8060      weight=1 backup;
 }
 ~~~
 
@@ -769,7 +689,7 @@ upstream httpds {
 > 可以根据服务的好坏来设置最大连接数，防止挂掉，比如1000，我们可以设置800
 
 ~~~
-upstream httpds {
+upstream some_name {
     server 127.0.0.1:8050    weight=5  max_conns=800;
     server 127.0.0.1:8060    weight=1;
 }
@@ -782,7 +702,7 @@ upstream httpds {
 > `max_fails=3`, `fail_timeout=30s`代表在30秒内请求某一应用失败3次，认为该应用宕机，后等待30秒，这期间内不会再把新请求发送到宕机应用，而是直接发到正常的那一台，时间到后再有请求进来继续尝试连接宕机应用且仅尝试1次，如果还是失败，则继续等待30秒...以此循环，直到恢复
 
 ~~~
-upstream httpds {
+upstream some_name {
     server 127.0.0.1:8050    weight=1  max_fails=1  fail_timeout=20;
     server 127.0.0.1:8060    weight=1;
 }
@@ -790,11 +710,48 @@ upstream httpds {
 
 **负载均衡算法**
 
-> * 轮询+weight  
-> * ip_hash
-> * url_hash
-> * least_conn
-> * least_time
+> * `轮询+weight`：如上面的演示
+> * `ip_hash`：来自同一IP的请求转发给同一个`node`
+> 
+~~~
+upstream some_name {
+    ip_hash;
+    server 127.0.0.1:8050;
+    server 127.0.0.1:8060;
+}
+~~~
+> 
+> * `uri_hash`：需要编写一个`nginx module`
+> 
+> * `least_conn`：请求发给连接数最少的`node`
+> 
+~~~
+upstream tomcats {
+    least_conn;
+    server 127.0.0.1:8050;
+    server 127.0.0.1:8060;
+}
+~~~
+> 
+> * `least_time`：
+
+**nginx访问状态监控**
+
+~~~
+# 配置访问状态监控
+location /conn_status {
+	stub_status on;
+}
+~~~
+
+> 访问`http://${host}/conn_status`，页面显示类似下面
+
+~~~
+Active connections: 2 
+server accepts handled requests request_time
+ 33 33 361 5460
+Reading: 0 Writing: 1 Waiting: 1 
+~~~
 
 **健康检查模块**
 
@@ -802,9 +759,8 @@ upstream httpds {
 
 ~~~
 location /status {
-            check_status;
- 
-        }
+	check_status;
+}
 ~~~
 
 > 在upstream配置如下
@@ -814,4 +770,7 @@ check interval=3000 rise=2 fall=5 timeout=1000 type=http;
 check_http_send "HEAD / HTTP/1.0\r\n\r\n";
 check_http_expect_alive http_2xx http_3xx;
 ~~~
+
+> 另外nginx编译时需使用`--add-module=./modules/ngx_http_upstream_check_module`： [https://github.com/alibaba/tengine/issues/1307](https://github.com/alibaba/tengine/issues/1307) 
+
 
