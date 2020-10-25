@@ -237,7 +237,7 @@ npm start
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.1/css/bulma.min.css" />
 ~~~
 
-[todo-list/src/app.js](todo-list/src/app.js) and [todo-list/src/app.css](todo-list/src/app.css)
+[todo-list/src/App.js](todo-list/src/App.js) and [todo-list/src/App.css](todo-list/src/App.css)
 
 > `App`: component of this `todo-list app`
 
