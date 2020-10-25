@@ -231,7 +231,7 @@ npm start
 
 [todo-list/public/index.html](todo-list/public/index.html)
 
-> import an css lib for components
+> import an css lib for components, and use component `App` defined in `to-dolist/src/app.js` as the main component of this application
 
 ~~~html
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.1/css/bulma.min.css" />
@@ -239,4 +239,5 @@ npm start
 
 [todo-list/src/app.js](todo-list/src/app.js) and [todo-list/src/app.css](todo-list/src/app.css)
 
-> `App` components used by index.js
+> `App`: component of this `todo-list app`
+

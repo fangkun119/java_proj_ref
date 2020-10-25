@@ -7,7 +7,7 @@
 }
 
 .todo-list {
-  width: 600px;
+  width: 600px; 
 }
 
 .todo-item {
@@ -17,9 +17,34 @@
   color: #fff ;
   height: 48px;
   margin-top: 16px;
-  display: flex;
   align-items: center;
   border-radius: 3px;
   cursor: pointer;
+  /* 让todo内容显示在最左，删除按钮显示在最右 */
+  /* /* https://developer.mozilla.org/zh-CN/docs/Web/CSS/justify-content */
+  display: flex;  /*弹性布局*/
+  justify-content: space-between; /* 均匀排列每个元素, 首个元素放置于起点，末尾元素放置于终点 */
 }
+
+.todo-item-content {
+  display: flex; /*弹性布局*/
+  align-items: center; /*上下居中*/
+}
+
+.icon {
+  margin-right: 10px; /*图标右侧空开10像素*/
+}
+
+/*当鼠标悬停在todo-item上时，更改.todo-item-remove(删除按钮)为显示状态 */
+.todo-item:hover .todo-item-remove {
+  display: block;
+}
+
+/*todo-item-remove: 删除按钮的样式*/
+.todo-item-remove {
+  /* 让删除按钮默认不显示 */
+  display: none;
+}
+
+/**/
 
