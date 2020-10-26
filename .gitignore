@@ -13,3 +13,4 @@
 **/kf_raw
 **/kf_tool
 /*.sql
+/tmp_*
