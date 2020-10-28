@@ -25,6 +25,8 @@ function TodoForm({addTodoItem}) {
   //    destracting assigment for assign variables from an array
   //    * reference: https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
   //    * in this example, "useState" function returns an array
+  // react.useState是React的State Hook，用来在不用写React的情况下初始化React状态
+  // 参考：https://reactjs.org/docs/hooks-reference.html#usestate，https://zh-hans.reactjs.org/docs/hooks-state.html  
   const [value, setValue] = useState('');
 
   // 表单提交之后，页面会刷新，阻止页面刷新的三种方法
@@ -52,8 +54,9 @@ function TodoForm({addTodoItem}) {
         value = {value}
         className="input"
         onChange={(e) => {
-            // consold.log(e); console.log(e.target.value); //调试、查看e的数据
-            setValue(e.target.value)
+            console.log('before: ', value);
+            setValue(e.target.value);       // 异步操作，只会把value变化提交给event loop
+            console.log('after: ', value);  // 输出的仍然是旧的value
         }}
         />
     </form>
@@ -62,7 +65,7 @@ function TodoForm({addTodoItem}) {
 
 // 使用第三方提供的图标，例如 https://www.iconfont.cn/search/index?searchType=icon&q=remove
 // 1. 点击'copy svg'，粘贴到下面的变量之后
-// 2. 把'class'更改为'className'，使用项目自己的CSS "icon"
+// 2. 把'class'更改为'className'以符合JSX的要求（HTML to JSX）
 const removeIcon     = <svg t="1603532667787" className="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1282" width="200" height="200"><path d="M256 810.666667c0 46.933333 38.4 85.333333 85.333333 85.333333h341.333334c46.933333 0 85.333333-38.4 85.333333-85.333333V298.666667H256v512z m105.173333-303.786667l60.373334-60.373333L512 536.96l90.453333-90.453333 60.373334 60.373333L572.373333 597.333333l90.453334 90.453334-60.373334 60.373333L512 657.706667l-90.453333 90.453333-60.373334-60.373333L451.626667 597.333333l-90.453334-90.453333zM661.333333 170.666667l-42.666666-42.666667H405.333333l-42.666666 42.666667h-149.333334v85.333333h597.333334V170.666667z" p-id="1283" fill="#ffffff"></path></svg>
 const completeIcon   = <svg t="1603598348171" className="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10172" data-spm-anchor-id="a313x.7781069.0.i28" width="200" height="200"><path d="M512 85.333333a426.666667 426.666667 0 0 1 426.666667 426.666667 426.666667 426.666667 0 0 1-426.666667 426.666667A426.666667 426.666667 0 0 1 85.333333 512 426.666667 426.666667 0 0 1 512 85.333333m-42.666667 618.666667l298.666667-298.666667-60.16-60.16L469.333333 583.253333l-131.84-131.413333L277.333333 512l192 192z" fill="#ffffff" p-id="10173" data-spm-anchor-id="a313x.7781069.0.i29" className="selected"></path></svg>
 const unCompleteIcon = <svg t="1603598295484" className="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9979" width="200" height="200"><path d="M512 859.61428833A347.61428833 347.61428833 0 1 1 512 164.38571167a347.61428833 347.61428833 0 0 1 0 695.22857666z m0-77.24761979A270.36666854 270.36666854 0 1 0 512 241.63333146a270.36666854 270.36666854 0 0 0 0 540.73333708z" p-id="9980" fill="#ffffff"></path></svg>
@@ -119,7 +122,7 @@ function App() {
 
   // 传给<TodoForm>的3个回调函数
   const removeTodoItem = (e, index) => {
-    e.preventDefault();           //屏蔽默认的url跳转
+    e.preventDefault();           //屏蔽<a>标签默认的url跳转（否则地址栏url会变）
     e.stopPropagation();          //阻止事件向上传递，否则会从<a>向上传递到外层的<div>，触发该<div>的completeTodo回到函数
     // console.log(index);
     const newTodos = [...todos];  //拷贝列表
@@ -129,6 +132,7 @@ function App() {
 
   const completeTodo = (index) => {
     // console.log("in completeTodo"); 
+    // "..." 是ES6的spread语法: https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Spread_syntax 
     const newTodos = [...todos];    //React的状态只能通过框架提供的方法来更改（触发重新渲染等）
     newTodos[index].isComplete = true;
     setTodos(newTodos);
@@ -136,7 +140,9 @@ function App() {
 
   const addTodo = (text) => {
     // {text}等价于{text:text, isComplete:false}, false是boolean的默认值
-    const newTodos = [{text}, ...todos]; //在列表头部插入元素
+    // "..." 是ES6的spread语法，在这里用来把数组展开
+    // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Spread_syntax 
+    const newTodos = [{text}, ...todos]; // 在列表头部插入元素
     setTodos(newTodos);
   }
 
@@ -148,7 +154,7 @@ function App() {
         { 
           todos.map((elem, index) => (
             <TodoItem 
-              key={elem.text} 
+              key={elem.text}  // React使用key来做视图更新，避免不必要的重新渲染
               index={index} 
               todoItem={elem} 
               removeTodoItem={removeTodoItem} 

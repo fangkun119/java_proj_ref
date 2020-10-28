@@ -5,8 +5,8 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 // render a JSX element array: 
-// * the 1st element is <React.StirctMode><App /></React.StrictMode>
-// * the 2nd element is document.getElementById('root'), it is <div id="root"></div> of public/index.html
+//  * the 1st element is <React.StirctMode><App /></React.StrictMode>
+//  * the 2nd element is document.getElementById('root'), it is <div id="root"></div> of public/index.html
 ReactDOM.render(
   <React.StrictMode>
     <App />
