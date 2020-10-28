@@ -1,6 +1,6 @@
 # Docker基本概念和常用命令
 
-## 基本概念
+## 1. 基本概念
 
 1. Docker是容器化平台：应用程序需 <-- Docker引擎 <-- 资源（物理机、虚拟机）
 2. CS体系结构： 
@@ -10,13 +10,13 @@
 
 3. `镜像`：只读文件、提供程序运行的完整资源（集装箱）；`容器`：由Docker创建、容器之间彼此隔离
 
-## 执行流程
+## 2. 执行流程
 
 > * 客户端：`docker build`, `docker pull`, `docker run`, ……
 > * 服务端：`docker deamon`，`containers`，`images`，……
 > * Docker镜像注册中心
 
-## 常用命令
+## 3. 常用命令
 
 > * `docker pull ${image_name} <:tags>`：从远程仓库抽取镜像，tags表示docker的版本，没提供tags时下载最新镜像
 > * `docker images`：查看本地镜像
@@ -25,7 +25,7 @@
 > * `docker rm <-f> ${image_id}`：删除容器，`-f`参数强制删除正在运行的容器
 > * `docker rmi <-f> ${image_name}:<tags>`：删除指定版本的镜像，`-f`参数强制删除存在对应容器的镜像
 
-## 例子：快速部署tomcat
+## 4. 例子：快速部署tomcat
 
 ### (1) 查找镜像：
 

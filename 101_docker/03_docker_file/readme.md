@@ -1,6 +1,6 @@
 # Dockerfile
 
-##1. 了解容器内部结构
+## 1. 了解容器内部结构
 
 (1) 通过镜像的`Dockerfile`查看容器内部结构
 
@@ -160,7 +160,7 @@ root@73e4eb0578ac:/usr/local/tomcat/webapps# find . -type f
 > 
 > 使用宿主机的地址，在宿主机外部的浏览器，也可以访问容器内的tomcat。本例是 `http://192.168.1.170:8001/docker-web/index.html`
 
-#3. 镜像分层
+# 3. 镜像分层
 
 镜像只读；同一镜像的不同容器在其各自内部可读可写、互不影响
 
@@ -188,7 +188,7 @@ Successfully built 1cb2210521e9
 
 > 这些临时容器，是以分层的方式存储和复用的。举例来说，如果另一个镜像构建、前2个step与上面这个镜像相同，那么前两步对应的临时镜像就不需要重复生成、可以直接复用已有的
 
-##4. Dockerfile基础指令
+## 4. Dockerfile基础指令
 
 ### From - 基于基准镜像
 
@@ -235,7 +235,7 @@ RUN ${JAVA_HOME}/bin/java -jar test.jar
 
 > 不仅可以设置容器的环境常量，还可以在Dockerfile的命令中引用该环境常量。应当尽量使用环境常量、提高可维护性
 
-##5. Dockerfile执行指令
+## 5. Dockerfile执行指令
 
 `Dockerfile`有三个执行指令：
 
