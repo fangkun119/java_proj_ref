@@ -1,0 +1,52 @@
+
+@import '~antd/es/style/themes/default.less'; //引入配色主题文件，打开该文件可以看到各种已经配好颜色值的变量
+
+.loginContainer {
+    // 背景图片样式
+    background-image: url('https://gw.alipayobjects.com/zos/rmsportal/TVYTbAXWheQpRcWDaDMu.svg');
+    background-repeat: no-repeat;
+    background-position: center 110px;
+    background-size: 100%;
+    // 高度撑满 
+    height: 100%;
+    .login {
+        padding-top : 200px; //距离上边界200px
+        width : 368px;
+        margin : 0 auto;  //居中
+        // 使用CSS Module之后，会自动给className加hash后缀，就失去了使用全局className的能力
+        // 如果希望使用全局className，则要加上:global
+        :global {
+            // 希望两个tab水平居中，去掉下划线，
+            // 用Chrome Dev Tool查看，发现是antd lib的三个样式在控制，覆盖他们的一些属性
+            .ant-tabs .ant-tabs-nav {
+                margin-bottom: 24px;
+                text-align: center;
+                &:before {
+                    border-bottom: 0;
+                }
+                .ant-tabs-nav-list {
+                    margin: 0 auto;
+                }
+                border-bottom: 0;
+            }
+        }
+        .icon {
+            margin-left: 16px;
+            color: @text-color-secondary; // 在.../theme/default.less文件可看到颜色定义为@text-color-secondary: fade(@black, 45%);
+            font-size: 24px;
+            vertical-align: middle;       // 竖直对齐
+            cursor: pointer;              // 鼠标箭头为可点击样式
+            transition: color 0.3s;       // 动画过度
+            &:hover {
+                color: @primary-color;    // 鼠标悬停时颜色变为主题文件的@primary-color
+            }
+        }
+        .other {
+            margin-top: 24px;
+            line-height: 22px;
+            .register {
+                float: right;
+            }
+        }
+    }
+}

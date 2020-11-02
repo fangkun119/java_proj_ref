@@ -1,0 +1,46 @@
+
+// 引入配色主题文件，打开该文件可以看到各种已经配好颜色值的变量
+@import '~antd/es/style/themes/default.less'; 
+
+.registerContainer {
+    // 背景图片样式
+    background-image: url('https://gw.alipayobjects.com/zos/rmsportal/TVYTbAXWheQpRcWDaDMu.svg');
+    background-repeat: no-repeat;
+    background-position: center 110px;
+    background-size: 100%;
+    // 高度撑满 
+    height: 100%;
+    .register {
+        padding-top : 200px;    // 距离上边界200px
+        width       : 368px;
+        margin      : 0 auto;   // 居中
+    }
+}
+
+.success {
+    color : @success-color;
+    transition: color 0.3s;
+}
+
+.warning {
+    color : @warning-color;
+    transition: color 0.3s;
+}
+
+.error {
+    color : @error-color;
+    transition: color 0.3s;
+}
+
+// .progress-pass > .progress：类似于上面的 .registerContainer > .register
+.progress-pass > .progress {
+    :global {
+        .ant-progress-bg {
+            background-color: @warning-color,
+        }
+    }
+}
+
+.login {
+    float: right; // 右对齐
+}
