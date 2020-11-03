@@ -228,3 +228,11 @@ npm start
 
 > 2. open the project with an IDE, for example Vissual Studio Code 
 > 3. when code is changed, the page will refresed into the browser, we can inspect 
+
+## 6. Code and Comments
+
+`project`: [todo-list/](todo-list/)
+
+`main page`：[todo-list/public/index.html](todo-list/public/index.html)
+
+`App component`：[todo-list/src/App.js](todo-list/src/App.js)及[todo-list/src/App.css](todo-list/src/App.css)
