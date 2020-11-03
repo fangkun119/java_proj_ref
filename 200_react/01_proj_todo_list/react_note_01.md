@@ -146,6 +146,8 @@
 > * 参考：[https://github.com/facebook/react/issues/11527#issuecomment-360119710](https://github.com/facebook/react/issues/11527#issuecomment-360119710)
 > 
 > `funtional component` 函数式编程,  `class component`在16.6 Hook出现之前处于主导地位
+> 
+> 文档：[https://zh-hans.reactjs.org/docs/hooks-state.html](https://zh-hans.reactjs.org/docs/hooks-state.html)
 
 ### (3) `useEffect`钩子 
 
@@ -587,14 +589,97 @@ Render Props：
 | 声明式优于命令式、组合优于继承 | 高阶组件（Higher-Order Components)，Render Props   |  多重抽象导致Warpper Hell   |
 | 借鉴函数式思想（纯粹、职责单一、没副作用、幂等）| Hooks | 写法限制、学习成本等        |
 
-## 7. CSS
+## 7. CSS 布局
 
+### (1) CSS盒模型
 
+> ![](https://mdn.mozillademos.org/files/16560/box-model-devtools.png)
+> [`https://developer.mozilla.org/zh-CN/docs/Learn/CSS/Building_blocks/The_box_model`](https://developer.mozilla.org/zh-CN/docs/Learn/CSS/Building_blocks/The_box_model)
+> 
+> ![http://img.smyhvae.com/2015-10-03-css-27.jpg](http://img.smyhvae.com/2015-10-03-css-27.jpg)
+> ![http://img.smyhvae.com/2015-10-03-css-30.jpg](http://img.smyhvae.com/2015-10-03-css-30.jpg)
 
+### (2) 弹性布局
+
+#### [flex-direction](https://developer.mozilla.org/zh-CN/docs/Web/CSS/flex-direction)
+
+> 主轴方向（即项目排列的方向）
+> 
+> ~~~css
+> .box {
+> 	flex-direction : row | row-reverse | column | column-reverse
+> }
+> ~~~
+
+#### [flex-wrap](https://developer.mozilla.org/zh-CN/docs/Web/CSS/flex-wrap)
+
+> * `no-wrap` (默认）：不换行、单行显式
+> * `wrap`：换行、多行显式，第一行在上方
+> * `wrap-reverse`：换行、多行显式，第一行在下方
+>
+> ~~~css
+> .box {
+> 	flex-wrap : no_wrap | wrap | wrap-reverse 
+> }
+> ~~~
+
+#### [justify-content](https://developer.mozilla.org/zh-CN/docs/Web/CSS/justify-content)
+
+> 项目在主轴上的对齐方式
+> 
+> * `flex-start`：从起始位置开始排列
+> * `flex-end`：从结束开始排列
+> * `center`：居中排列
+> * `space-between`：均匀排列每个元素，首个元素放置于起点，末尾元素放置于终点
+> * `space-around`：均匀排列每个元素，每个元素周围分配相同的空间
+> * ...
+>
+> ~~~css
+> .box {
+> 	justy-content: flex-start | flex-end | center | space-between | space-around
+> }
+> ~~~
+
+#### [align-items](https://developer.mozilla.org/zh-CN/docs/Web/CSS/align-items)
+
+> 项目在侧轴上如何对齐 
+> 
+> * `flex-start`：元素向侧轴起点对齐
+> * `flex-end`：元素向侧轴终点对齐
+> * `center`：元素在侧轴居中。如果元素在侧轴上的高度高于其容器，那么在两个方向上溢出距离相同
+> * `stretch`：弹性元素被在侧轴方向被拉伸到与容器相同的高度或宽度
+> * `baseline`：所有元素向基线对齐
+> * ...
+>
+> ~~~css
+> .box {
+> 	align-items: flex-start | flex-end | center | stretch | baseline
+> }
+> ~~~
+
+#### [align-content](https://developer.mozilla.org/zh-CN/docs/Web/CSS/align-content)
+
+> 项目多根主轴轴线之间的对齐方式
+> 
+> * `flex-start`：从起点位置开始放置主轴轴线
+> * `flex-end`：从终点位置点开始放置主轴轴线
+> * `center`：居中放置
+> * `stretch`：拉伸填满
+> * `space-between`：均匀排列，第一根轴线在起点，最后一根在终点
+> * `space-around`：均匀排列，每根轴线两侧分配相同的空间
+>
+> ~~~css
+> .box {
+> 	align-content: flex-start | flex-end | center | stretch | baseline
+> }
+> ~~~
 
 ## 附录：参考文档
 
 > * JavaScript：[http://javascript.info/](http://javascript.info/)
 > * 解构赋值：[reference/destructing_assignment.pdf](reference/destructing_assignment.pdf)
 > * CSS选择器优先级：[reference/css_selector.pdf](reference/css_selector.pdf)
+> * CSS选择器（含实例操作）：[https://www.runoob.com/cssref/css-selectors.html](https://www.runoob.com/cssref/css-selectors.html)
+> * CSS盒模型（含实例操作）：[https://www.runoob.com/css/css-boxmodel.html](https://www.runoob.com/css/css-boxmodel.html)
+> * CSS弹性布局模型（含实例操作）：[https://www.runoob.com/css3/css3-flexbox.html](https://www.runoob.com/css3/css3-flexbox.html)
 
