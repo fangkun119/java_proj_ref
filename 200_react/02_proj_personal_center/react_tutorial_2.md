@@ -6,7 +6,7 @@
 
 > 用来增加渲染效率，提供一个`key`告诉react两个元素是一样
 > 
-~~~html
+>~~~html
 <ul>
 	<li key="2015">Duke</li>
 	<li key="2016">Villanova</li>
@@ -16,18 +16,18 @@
 >  react再重新渲染的时候，只需要渲染新增的`<li key="2014">Connecticut</li>` 
 >
 >~~~html
-><ul>
->	<li key="2014">Connecticut</li>
->	<li key="2015">Duke</li>
->	<li key="2016">Villanova</li>	
-></ul>
+<ul>
+	<li key="2014">Connecticut</li>
+	<li key="2015">Duke</li>
+	<li key="2016">Villanova</li>	
+</ul>
 >~~~
 > 
 > 不推荐使用index作为key，例如下面代码，list重排时，会导致所有元素全部重新渲染
 > 
-~~~
+>~~~
 <ul>{list.map((v,idx)=><li key={idx}>{v}</li>)}</ul>
-~~~
+>~~~
 >
 
 #### 为什么`setState`是一个异步过程（批量异步化）
@@ -41,7 +41,7 @@
 >
 > 先看的`class component`写法  
 >
-~~~javascript
+>~~~javascript
 import. React, { Component } from 'react';
 export default class Button. extends Component {
 	constructor() {
@@ -65,14 +65,14 @@ export default class Button. extends Component {
 		return <button onClick={this.handleClick}>{buttonText}</button>;
 	}
 }
-~~~
+>~~~
 > 
 > 以前的`functional component`只能用props，没有state也没有生命周期，复杂组件都只能 用`class component`来写
 > 
 > ~~~javascript
-> function Welcome(props) {
-> 	return <h1>Hello, {props.name}</h1>;
-> }
+function Welcome(props) {
+ 	return <h1>Hello, {props.name}</h1>;
+}
 > ~~~
 > 
 >  `functional. compoent`加上`hooks`之后，基本上等同于`class component`。
