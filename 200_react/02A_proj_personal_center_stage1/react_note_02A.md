@@ -1,6 +1,5 @@
-# React Note 02
+# React Note 02A
 
-> 内容：`React-Router`，接口调用，通信协议，`Antd`，`Redux`（全局状态管理工具，用来）
 
 ## 1. [`React Router`](http://reactrouter.com/)
 
@@ -156,6 +155,18 @@ Sample Code：
 `HTTP 1.1` / `HTTPS` / `HTTP/2` / `HTTP/3`协议栈：
 
 > ![https://raw.githubusercontent.com/kenfang119/pics/main/200_react/http123.png](https://raw.githubusercontent.com/kenfang119/pics/main/200_react/http123.jpg)
+
+### (6) 常用HTTP请求方法及含义
+
+> * `GET`：显示请求指定的资源，一般来说应该只用于数据的读取，而不应当用于会产生副作用的非幂等的操作中
+> * `HEAD`：与`GET`方法一样，都是向服务器发出指定资源的请求。但是，服务器在响应HEAD请求时不会回传资源的内容部分，即响应主体。该 方法常被用于客户端查看服务器的性能
+> * `POST`：向指定资源提交数据，请求服务器进行处理，如：表单数据提交、文件上传等；请求数据会被包含在请求体中。POST方法是非幂等的方法（可能会创建新的资源或/和修改现有资源）。
+> * `PUT`：向指定资源位置上传其最新内容，PUT方法是幂等的方法。通过该方法客户端可以将指定资源的最新数据传送给服务器取代指定的资源的内容。
+> * `DELETE`：请求服务器删除所请求URI（统一资源标识符，Uniform Resource Identifier）所标识的资源。DELETE请求后指定资源会被删除，DELETE方法也是幂等的。
+> * `CONNECT`：`HTTP/1.1`协议预留方法，能够将连接改为管道方式的代理服务器。通常用于SSL加密服务器的链接与非加密的HTTP代理服务器的通信。
+> * `OPTIONS`：与HEAD类似，一般也是用于客户端查看服务器的性能。 这个方法会请求服务器返回该资源所支持的所有HTTP请求方法，该方法会用'*'来代替资源名称，向服务器发送OPTIONS请求，可以测试服务器功能是否正常。JavaScript的XMLHttpRequest对象进行CORS跨域资源共享时，就是使用OPTIONS方法发送嗅探请求，以判断是否有对指定资源的访问权限。
+> * `TRACE`：请求服务器回显其收到的请求信息，该方法主要用于HTTP请求的测试或诊断。
+> * `PATCH`：一般用于资源的部分更新，而PUT一般用于资源的整体更新；当资源不存在时，PATCH会创建一个新的资源，而PUT只会对已在资源进行更新。
 
 ## 4. `Ant Design`
 
