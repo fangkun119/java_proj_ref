@@ -1,2 +1,0 @@
-# React Note 02
-
