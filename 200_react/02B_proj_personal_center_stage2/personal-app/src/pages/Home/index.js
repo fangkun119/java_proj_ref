@@ -1,10 +1,11 @@
 import React, {useState} from 'react';
 import { Link } from 'react-router-dom';
-import { Row, Col, Card, Divider, TagList, Avatar} from 'antd';
+import { Row, Col, Card, Divider, Avatar} from 'antd';
 import { ContactsOutlined, ClusterOutlined, HomeOutlined } from '@ant-design/icons'
 import Articles from '../../components/Articles';
 import Projects from '../../components/Projects';
 import Applications from '../../components/Applications';
+import TagList from '../../components/TagList';
 import styles from './index.module.less';
 
 // 后端没有开发好，因此先引入预先构造好的假数据文件，用于调试
@@ -75,6 +76,8 @@ const Home = () => {
                             <div>{currentUser.signature}</div>
                         </div>
                         {renderUserInfo()}
+                        <Divider dashed />
+                        <TagList tags={currentUser.tags} />
                         <Divider dashed />
                         <div className={styles.team}>
                             <div className={styles.teamTitle}>团队</div>

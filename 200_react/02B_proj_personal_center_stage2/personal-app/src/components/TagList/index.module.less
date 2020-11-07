@@ -1,0 +1,19 @@
+@import '~antd/es/style/themes/default.less';
+
+// <div className={styles.tags}>
+.tags {
+    // :global 用来修改（覆盖） antd 自带的 css 的样式
+    :global {
+        .ant-tag {
+            margin-bottom: 8px
+        }    
+    }
+}
+
+// div className={styles.tagsTitle}>标签</div>
+.tagsTitle {
+    margin-bottom: 12px;
+    color: @heading-color;
+    font-weight: 500;
+}
+
