@@ -1,16 +1,19 @@
 import React, {useState} from 'react';
 import { Row, Col, Card } from 'antd';
+import Articles from '../../components/Articles';
+import Projects from '../../components/Projects';
+import Applications from '../../components/Applications';
 import styles from './index.module.less';
 
 const operationTabList = [{
     key: 'articles',
-    tab: <span>文章<span>(8)</span></span>
+    tab: <Articles/>
 },{
     key: 'applications',
-    tab: <span>应用<span>(10)</span></span>
+    tab: <Applications/>
 },{
     key: 'projects',
-    tab: <span>项目<span>(18)</span></span>
+    tab: <Projects/>
 }];
 
 const renderChildrenByTabKey = (tabKey) => {
