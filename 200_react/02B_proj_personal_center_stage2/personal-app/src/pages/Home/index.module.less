@@ -1,5 +1,54 @@
+// 引入样式主题
+@import '~antd/es/style/themes/default.less';
+
+// <div className={styles.container}>
 .container {
     padding: 20px;
     height: 100%;
     background-color: #f0f2f2;
 }
+
+// <div className={styles.avatarHolder}>
+.avatarHolder {
+    margin-bottom: 24px;
+    text-align: center;
+
+    // <img alt="" src={currentUser.avatar} />
+    & > img {
+        width: 104px;
+        height: 104px;
+        margin-bottom: 20px;
+    }
+
+    // <div className={styles.name}>{currentUser.name}</div>
+    .name {
+        margin-bottom: 4px;
+        color: @heading-color; // 使用样式主题中的颜色
+        font-weight: 500;
+        font-size: 20px;
+        line-height: 28px; 
+    }
+}
+
+// <div className={styles.detail} >
+.detail {
+    //  <p> ... </p>
+    p {
+        position: relative;
+        margin-bottom: 8px;
+        padding-left: 26px;
+        // 最后一个child（是<p>标签），底部margin为0
+        & :last-child {
+            margin-bottom: 0;
+        }
+        // <ContactsOutlined className={styles.userInfoIcon} />
+        .userInfoIcon {
+            position: absolute;
+            top: 4px;
+            left: 0;
+            width: 14px;
+            height: 14px;
+        }
+    }
+}
+
