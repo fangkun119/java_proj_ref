@@ -6,49 +6,79 @@
     padding: 20px;
     height: 100%;
     background-color: #f0f2f2;
-}
 
-// <div className={styles.avatarHolder}>
-.avatarHolder {
-    margin-bottom: 24px;
-    text-align: center;
+    // <div className={styles.avatarHolder}>
+    .avatarHolder {
+        margin-bottom: 24px;
+        text-align: center;
 
-    // <img alt="" src={currentUser.avatar} />
-    & > img {
-        width: 104px;
-        height: 104px;
-        margin-bottom: 20px;
+        // <img alt="" src={currentUser.avatar} />
+        & > img {
+            width: 104px;
+            height: 104px;
+            margin-bottom: 20px;
+        }
+
+        // <div className={styles.name}>{currentUser.name}</div>
+        .name {
+            margin-bottom: 4px;
+            color: @heading-color; // 使用样式主题中的颜色
+            font-weight: 500;
+            font-size: 20px;
+            line-height: 28px; 
+        }
     }
 
-    // <div className={styles.name}>{currentUser.name}</div>
-    .name {
-        margin-bottom: 4px;
-        color: @heading-color; // 使用样式主题中的颜色
+    // <div className={styles.detail} >
+    .detail {
+        //  <p> ... </p>
+        p {
+            position: relative;
+            margin-bottom: 8px;
+            padding-left: 26px;
+            // 最后一个child（是<p>标签），底部margin为0
+            & :last-child {
+                margin-bottom: 0;
+            }
+            // <ContactsOutlined className={styles.userInfoIcon} />
+            .userInfoIcon {
+                position: absolute;
+                top: 4px;
+                left: 0;
+                width: 14px;
+                height: 14px;
+            }
+        }
+    }
+
+    // <div className={styles.teamTitle}>团队</div>
+    .teamTitle {
+        margin-bottom: 12px;
+        color: @heading-color;
         font-weight: 500;
-        font-size: 20px;
-        line-height: 28px; 
+    }
+
+    // <div className={styles.team}>
+    .team {
+        :global {
+            .ant-avator {
+                margin-right: 12px;
+            }
+        }
+        a {
+            display: block;          //块显式
+            margin-bottom: 24px;     //每一个<a>的bottom margin是24像素
+            overflow: hidden;        //显示不下的内容容许隐藏
+            color: @text-color;      //来自配色主题的颜色
+            white-space: nowrap;     //不换行
+            text-overflow: ellipsis; //用"..."来替代空间不足无法展示的字符
+            word-break: break-all;   //折行
+            transition: color 0.3s;  //过渡动画、颜色渐变持续0.3秒
+            &:hover {
+                color: @primary-color //鼠标悬停时触发动画效果
+            }
+        }
     }
 }
 
-// <div className={styles.detail} >
-.detail {
-    //  <p> ... </p>
-    p {
-        position: relative;
-        margin-bottom: 8px;
-        padding-left: 26px;
-        // 最后一个child（是<p>标签），底部margin为0
-        & :last-child {
-            margin-bottom: 0;
-        }
-        // <ContactsOutlined className={styles.userInfoIcon} />
-        .userInfoIcon {
-            position: absolute;
-            top: 4px;
-            left: 0;
-            width: 14px;
-            height: 14px;
-        }
-    }
-}
 

@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
-import { Row, Col, Card } from 'antd';
+import { Link } from 'react-router-dom';
+import { Row, Col, Card, Divider, TagList, Avatar} from 'antd';
 import { ContactsOutlined, ClusterOutlined, HomeOutlined } from '@ant-design/icons'
 import Articles from '../../components/Articles';
 import Projects from '../../components/Projects';
@@ -74,6 +75,24 @@ const Home = () => {
                             <div>{currentUser.signature}</div>
                         </div>
                         {renderUserInfo()}
+                        <Divider dashed />
+                        <div className={styles.team}>
+                            <div className={styles.teamTitle}>团队</div>
+                            <Row gutter={36}>
+                                {
+                                    // 图标：大屏(lg)1行1个，超大屏(xl)1行2个
+                                    currentUser.notice && 
+                                    currentUser.notice.map((item) => (
+                                        <Col key={item.id} lg={24} xl={12}>
+                                            <Link to="/setting">
+                                                <Avatar size="small" src={item.logo}/>
+                                                {item.member}
+                                            </Link>
+                                        </Col>
+                                    ))
+                                }
+                            </Row>
+                        </div>
                     </Card> 
                 </Col>
                 <Col lg={17} md={24}>
