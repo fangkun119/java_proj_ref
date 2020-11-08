@@ -12,6 +12,7 @@ import styles from './index.module.less';
 import {currentUser, fakeList} from './data.js';
 const articleList = fakeList(10);
 const applicationList = fakeList(10);
+const projectList = fakeList(10);
 
 const operationTabList = [{
     key: 'articles',
@@ -29,7 +30,7 @@ const renderChildrenByTabKey = (tabKey) => {
         case 'applications':
             return <Applications list={applicationList} />;
         case 'projects': 
-            return <Projects/>;
+            return <Projects list={projectList} />;
         case 'articles': 
         default:
             return <Articles list={articleList} />;
@@ -57,7 +58,7 @@ const renderUserInfo = () => (
 );
 
 const Home = () => {
-    const [tabKey, setTabKey] = useState('applications');
+    const [tabKey, setTabKey] = useState('projects');
     const onTabChange = (key) => {
         setTabKey(key);
     }
