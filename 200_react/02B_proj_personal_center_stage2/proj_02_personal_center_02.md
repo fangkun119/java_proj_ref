@@ -23,6 +23,14 @@
 > 代码中栅格的属性：`lg`-表示大屏时所占的栅格；`md`-表示中小屏时所占的栅格</br>
 > * 关于`antd`响应式栅格的熔断点（尺寸切换阈值），见文档[https://ant.design/components/grid-cn/](https://ant.design/components/grid-cn/) ，他们拓展自[`boostrap`的规则](https://getbootstrap.com/docs/4.0/layout/overview/#responsive-breakpoints)
 
+> 平板设备布局：
+> 
+> * 在横屏状态下
+> 	* 大多可以直接使用桌面布局，或只进行一些细微的调整
+> 	* 还有常用的左右双栏布局是非常适合横屏模式下的平板
+> * 竖屏模式下，通常有两种常用解决方案：
+> 	* 一是设计为较窄的双栏模式；
+> 	* 二是将桌面端的布局由左右调整为上下，实现宽屏内容的竖向填充。 
 
 ### 11.2 右侧`<Card>`内的`<Tab>`导航栏
 
@@ -38,7 +46,7 @@
 > * [src/components/Projects/index.js](https://github.com/fangkun119/java_proj_ref/blob/a779bb0833d67a8685cd4c62a5684c0982a4bc50/200_react/02B_proj_personal_center_stage2/personal-app/src/components/Projects/index.js)
 > * [src/components/Articles/index.js](https://github.com/fangkun119/java_proj_ref/blob/a779bb0833d67a8685cd4c62a5684c0982a4bc50/200_react/02B_proj_personal_center_stage2/personal-app/src/components/Articles/index.js)
 
-### 11.3 左侧`<Card>`：
+### 11.3 左侧`<Card>`：用户信息展示、用户team标签、用户个人标签
 
 #### 11.3.1 用户信息展示
 
@@ -70,6 +78,54 @@
 > 
 > * [git commit](https://github.com/fangkun119/java_proj_ref/commit/142a7363cf6a4a0350aef1e3624beccfcd2e5a0d#diff-d662d58efdfce16c06bda8ac500bf86f2384fd6a7b33a7c97dfb69b1453720fa) 
 > * [src/components/TagList/index.js](https://github.com/fangkun119/java_proj_ref/blob/142a7363cf6a4a0350aef1e3624beccfcd2e5a0d/200_react/02B_proj_personal_center_stage2/personal-app/src/components/TagList/index.js)
+
+### 11.4 右侧`Card`：文章选项卡、应用选项卡、项目选项卡
+
+#### 11.4.1 文章选项卡
+
+> 代码
+> 
+> * [git commit](https://github.com/fangkun119/java_proj_ref/commit/adeb607a4d02ffe0c9647c96fa402266713872d8#diff-40a13f60b39d0c791105efc4e0187ba1bb14f36074708cba318015c5a3c78311) 
+> 
+> Components updated
+> 
+> * [src/components/Articles/index.js](https://github.com/fangkun119/java_proj_ref/blob/adeb607a4d02ffe0c9647c96fa402266713872d8/200_react/02B_proj_personal_center_stage2/personal-app/src/components/Articles/index.js)
+> * [src/components/Articles/index.module.less](https://github.com/fangkun119/java_proj_ref/blob/adeb607a4d02ffe0c9647c96fa402266713872d8/200_react/02B_proj_personal_center_stage2/personal-app/src/components/Articles/index.module.less)
+> * [src/components/ArticalListContent/index.js](https://github.com/fangkun119/java_proj_ref/blob/adeb607a4d02ffe0c9647c96fa402266713872d8/200_react/02B_proj_personal_center_stage2/personal-app/src/components/ArticalListContent/index.js)
+> * [src/components/ArticalListContent/index.module.less](https://github.com/fangkun119/java_proj_ref/blob/adeb607a4d02ffe0c9647c96fa402266713872d8/200_react/02B_proj_personal_center_stage2/personal-app/src/components/ArticalListContent/index.module.less)
+> 
+> Bug Fix
+> 
+> * `200_react/02B_proj_personal_center_stage2/personal-app/src/components/TagList/index.js`
+> * `200_react/02B_proj_personal_center_stage2/personal-app/src/pages/Home/index.js`
+> * `200_react/02B_proj_personal_center_stage2/personal-app/src/pages/Home/index.module.less`
+> * `200_react/02B_proj_personal_center_stage2/personal-app/src/pages/Home/index.module.less`
+
+#### 11.4.2 应用选项卡
+
+> 代码
+> 
+> * [git commit](https://github.com/fangkun119/java_proj_ref/commit/a5d04569badc5995aa66c90ef3d428bb29e25744#diff-40a13f60b39d0c791105efc4e0187ba1bb14f36074708cba318015c5a3c78311) 
+> * [src/components/Applications/index.js](https://github.com/fangkun119/java_proj_ref/blob/a5d04569badc5995aa66c90ef3d428bb29e25744/200_react/02B_proj_personal_center_stage2/personal-app/src/components/Applications/index.js)
+> * [src/components/Applications/index.module.less](https://github.com/fangkun119/java_proj_ref/blob/a5d04569badc5995aa66c90ef3d428bb29e25744/200_react/02B_proj_personal_center_stage2/personal-app/src/components/Applications/index.module.less)
+
+#### 11.4.3 项目选项卡
+
+> 代码
+> 
+> * [git commit](https://github.com/fangkun119/java_proj_ref/commit/38976c4898c992eeb0ce1605f36d8dbc0936f537#diff-40a13f60b39d0c791105efc4e0187ba1bb14f36074708cba318015c5a3c78311) 
+> * [src/components/Projects/index.js](https://github.com/fangkun119/java_proj_ref/blob/38976c4898c992eeb0ce1605f36d8dbc0936f537/200_react/02B_proj_personal_center_stage2/personal-app/src/components/Projects/index.js)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
