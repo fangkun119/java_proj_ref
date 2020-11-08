@@ -11,6 +11,7 @@ import styles from './index.module.less';
 // 后端没有开发好，因此先引入预先构造好的假数据文件，用于调试
 import {currentUser, fakeList} from './data.js';
 const articleList = fakeList(10);
+const applicationList = fakeList(10);
 
 const operationTabList = [{
     key: 'articles',
@@ -26,7 +27,7 @@ const operationTabList = [{
 const renderChildrenByTabKey = (tabKey) => {
     switch (tabKey) {
         case 'applications':
-            return <Applications/>;
+            return <Applications list={applicationList} />;
         case 'projects': 
             return <Projects/>;
         case 'articles': 
@@ -56,7 +57,7 @@ const renderUserInfo = () => (
 );
 
 const Home = () => {
-    const [tabKey, setTabKey] = useState('articles');
+    const [tabKey, setTabKey] = useState('applications');
     const onTabChange = (key) => {
         setTabKey(key);
     }
