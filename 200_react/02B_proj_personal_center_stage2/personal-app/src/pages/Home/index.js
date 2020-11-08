@@ -10,28 +10,28 @@ import styles from './index.module.less';
 
 // 后端没有开发好，因此先引入预先构造好的假数据文件，用于调试
 import {currentUser, fakeList} from './data.js';
+const articleList = fakeList(10);
 
 const operationTabList = [{
     key: 'articles',
-    tab: <Articles/>
+    tab: <span>文章<span>(10)</span></span>
 },{
     key: 'applications',
-    tab: <Applications/>
+    tab: <span>应用<span>(12)</span></span>
 },{
     key: 'projects',
-    tab: <Projects/>
+    tab: <span>项目<span>(18)</span></span>
 }];
 
 const renderChildrenByTabKey = (tabKey) => {
     switch (tabKey) {
-        case 'articles': 
-            return <Articles/>
         case 'applications':
-            return <Applications/>
+            return <Applications/>;
         case 'projects': 
-            return <Projects/>
+            return <Projects/>;
+        case 'articles': 
         default:
-            return <p></p>
+            return <Articles list={articleList} />;
     }
 };
 
@@ -100,7 +100,7 @@ const Home = () => {
                 </Col>
                 <Col lg={17} md={24}>
                     <Card 
-                        boarded={false} 
+                        bordered={false} 
                         tabList={operationTabList} 
                         activeTabKey={tabKey}
                         onTabChange={onTabChange}

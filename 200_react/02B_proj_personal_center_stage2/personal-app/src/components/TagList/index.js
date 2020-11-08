@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import { Tag, Input } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import styles from './index.module.less';
-import SkeletonInput from 'antd/lib/skeleton/Input';
 
 // 传参时使用解构赋值，传入一个object，得到object的属性tags
 const TagList = ({ tags }) => {
