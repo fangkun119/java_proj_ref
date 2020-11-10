@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'redux-react-hook'; 
 import { Input, Form, Button, Row, Col, message } from 'antd';
+import { getCaptcha } from '../../actions/register';
 import styles from './index.module.less';
 
 //React.forwardRef: 引用传递
@@ -13,9 +15,17 @@ const InputItem = React.forwardRef((props, ref) => {
     const {name, rules, ...rest} = props; // 解构赋值 + 数组展开语法
     // console.log(name);  // 例子： username
     // console.log(rest);  // 例子： {prefix: {…}, placeholder: "用户名", size: "large"}
-
     const [timing, setTiming] = useState(false);                  // 状态钩子：是否在倒计时
     const [count,  setCount ] = useState(props.countDown || 60);  // 状态钩子：倒计时秒数
+
+    // react-redux的钩子，从Redux Store返回一个分发函数，用于分发action
+    const dispatch =  useDispatch();
+
+    const handleClickCaptcha = () => {
+        message.success('成功获取验证码'); 
+        dispatch(getCaptcha());  // 被分发的action写在src/actions/register.js中
+        setTiming(true); 
+    };
 
     // Effect钩子：
     // * 参数2是监听的状态变量、如果留空则useEffect会在每次重新渲染之后执行、如果传入空数组那么useEffect只会在初始化时执行一次；
@@ -48,11 +58,6 @@ const InputItem = React.forwardRef((props, ref) => {
         //      instead of useState and read 'props.countDown' in the reducer react-hooks/exhaustive-deps
         [timing, props.countDown]
     );
-
-    const handleClickCaptcha = () => {
-        message.success('成功获取验证码'); 
-        setTiming(true); 
-    };
 
     if (name === 'captcha') {
         // 想让<Input>和<Button>显式在一行：(1)可以用css flex布局；（2)可以用Ant Design的栅格布局

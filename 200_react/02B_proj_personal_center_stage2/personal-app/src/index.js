@@ -6,8 +6,8 @@ import thunk from 'redux-thunk'; //异步操作中间件
 import { StoreContext, storeContext } from 'redux-react-hook'; //连接react和redux的桥
 
 import App from './App';
-import reducers from './reducers';
-import './index.less'; 
+import reducer from './reducers'; 
+import './index.less';   
 
 const store = createStore(
   reducer, //注入src/reducers/index.js中编写的reducers
