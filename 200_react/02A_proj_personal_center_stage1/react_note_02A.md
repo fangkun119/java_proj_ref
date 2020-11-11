@@ -1,7 +1,7 @@
 # React Note 02A
 
 
-## 1. [`React Router`](http://reactrouter.com/)
+## 01. [`React Router`](http://reactrouter.com/)
 
 ### (1) 介绍
 
@@ -76,9 +76,9 @@ Sample Code：
 > 6.	关闭HTTP连接
 > 7. 浏览器解析
 
-## 2. 接口调用
+## 02. 接口调用
 
-## 3. 通信协议：HTTP 1/2/3 以及 HTTPS
+## 03. 通信协议：HTTP 1/2/3 以及 HTTPS
 
 ### (1) 状态码
 
@@ -168,7 +168,7 @@ Sample Code：
 > * `TRACE`：请求服务器回显其收到的请求信息，该方法主要用于HTTP请求的测试或诊断。
 > * `PATCH`：一般用于资源的部分更新，而PUT一般用于资源的整体更新；当资源不存在时，PATCH会创建一个新的资源，而PUT只会对已在资源进行更新。
 
-## 4. `Ant Design`
+## 04. `Ant Design`
 
 ### (1) 特点
 
@@ -270,11 +270,11 @@ onFinishFailed = ({ errorFields }) => {
 > 	* notification: [https://ant.design/components/notification-cn/](https://ant.design/components/notification-cn/)
 > * `<Row gutter={8}><Col>...</Col>...</Row>`，24格栅格系统，界面随着屏幕大小变化（Responsive），margin等属性值也都自动计算好（bootstrap是12格、antd是24格，用12或24是因为相除比较方便），gutter是Col之间间隔的像素值
 
-## 5. `Redux`
+## 05. `Redux`
 
 > 用途：之前项目中（[` ../01_proj_todo_list/todo-list/src/App.js`]( ../01_proj_todo_list/todo-list/src/App.js)），回调函数`completeTodo`要定义在`App`这一层（因为要操作`App`的状态）、但却要一路传递给`TodoItem`来使用。`Readux`作为一个全局状态管理工具，用来解决此类问题
 
-## 6. CSS预处理器
+## 06. CSS预处理器
 
 ### (1) 用途
 
@@ -380,7 +380,7 @@ onFinishFailed = ({ errorFields }) => {
 > 
 > (4) 现在项目已经支持`LESS`了，可以把代码中的全局`antd.css`替换成`antd.less`
 
-## 7. 样式按需加载，避免全局引入
+## 07. 样式按需加载，避免全局引入
 
 > 使用`babel-plugin-import`来让`antd`按需加载
 > 
@@ -409,7 +409,7 @@ onFinishFailed = ({ errorFields }) => {
 > )
 >~~~
 
-## 8. 使用`CSS modules`避免全局样式污染
+## 08. 使用`CSS modules`避免全局样式污染
 
 不使用`CSS Modules`
 > 
@@ -446,7 +446,186 @@ onFinishFailed = ({ errorFields }) => {
 > 
 > 缺点是对代码的侵入性比较大
 
-## 附录
+## 09. 栅格系统 
+
+> * `Antd`: 24格；`bootstrap`：12格
+> * 布局layout实现方便，responsive响应式
+> * 12/24这类数字有很多约数
+
+> 可以用`span`指定占多少个栅格
+> 
+> ~~~javascript
+> <Row>
+> 	<Col span={6}>
+>		<Select size='large' value={prefix} onChange={(value)=>setPrefix(value)} style={{width:'100%'}}>
+>			<Select.Option value="86">+86</Select.Option>
+>          		<Select.Option value="87">+87</Select.Option>
+>		</Select>
+>	</Col>
+>    <Col span={18}>
+>    		<InputItem name="mobile" placeholder="手机号" size="large"  rules={[
+>                                     {required: true, message: '请输入手机号'},
+>                                     {pattern: /^\d{11}/, message: '手机号格式错误'}
+>                                 ]}
+>		/>
+>	</Col>
+></Row>
+> ~~~
+> 
+> 也可以使用类似`flex 布局`里面的`justify`和`align`
+> 
+> ~~~javascript
+> <Row justify="space-between" align="middle">
+>     <Col span={8}>
+>          <SubmitButton>注册</SubmitButton>
+>     </Col>
+>     <Col span={16}>
+>          <Link className={styles.login} to="/login">使用已有账户登录</Link>
+>     </Col>
+> </Row>
+> ~~~
+
+## 10. effect钩子
+
+> ~~~javascript
+>     // Effect钩子：
+>     // * 参数2是监听的状态变量、如果留空则useEffect会在每次重新渲染之后执行、如果传入空数组那么useEffect只会在初始化时执行一次；
+>     // * 参数1是状态变量发生变化时执行的操作
+>     useEffect(() => {
+>             // timeing被handleClickCaptcha置为true时，被会生成一个计时器，每一秒更新一次状态变量`count`
+>             let interval = 0; // 变量
+>             if (timing) {
+>                 // 开启计时器，该计时器每秒（1000毫秒）唤醒一次并执行检查函数
+>                 interval = window.setInterval(() => {
+>                     // 设置react状态(setCount)：如果传入是一个函数，函数参数就是state的旧值，返回的是stete的新值
+>                     setCount((preSecond) => {
+>                         if (preSecond <= 1) {
+>                             setTiming(false);              // 设置react状态(timing)，为false表示倒计时结束
+>                             clearInterval(interval);       // 停止每秒唤醒一次的计时器
+>                             return props.countDown || 60;  // 重置count为初始值
+>                         } else {
+>                             return preSecond - 1;  // 倒计时未结束，preSecond减1
+>                         }
+>                     })
+>                 }, 1000);
+>             } 
+>             // 末尾的返回函数 () => clearInterval(timer) 会在组件被销毁时执行，用于清除计时器
+>             // * timing被倒计时结束时的setTiming设置为false时，会错过clearInterval(interval)调用
+>             // * 如果不用其他代码清除计时器，会造成内存泄漏
+>             // 下面的这个函数会在组件unmount时被执行，从而确保计时器一定被清楚
+>             return () => clearInterval(interval);
+>         }, 
+>         // Effect钩子要求把用到的props属性也添加到监听列表中，否则会报下面的Warning
+>         //      React Hook useEffect has a missing dependency: 'props.countDown'. 
+>         //      Either include it or remove the dependency array. 
+>         //      If 'setCount' needs the current value of 'props.countDown', you can also switch to useReducer 
+>         //      instead of useState and read 'props.countDown' in the reducer react-hooks/exhaustive-deps
+>         [timing, props.countDown]
+>     );
+> ~~~
+
+## 12. Promise
+
+> API：`resolve(then)`, `reject(catch)`, `race`（传入一个Promise数组，任意一个执行完毕就可以继续），`all`（传入一个Promise数组，全部执行完毕才可以继续）
+> 
+> 状态：`pending`，`resolve(fullfilled)`，`rejected` 
+
+手写一个Promise的polyfill（补丁：假定某种浏览器不支持Promise，手写一个来支持）
+
+> [https://juejin.im/post/6844904022223110151](https://juejin.im/post/6844904022223110151) 
+
+## 13. 如何在大组件重新渲染时，避免内部的小组件重新渲染
+
+> 默认大组件重新渲染时、内部的小组件会一起重新渲染。如果想让小组件不会联动渲染，可以在`export`时用`memo`包裹。这样内部小组件是否重新渲染，只取决于小组件的state、props是否发生变化。例如：
+> 
+> ~~~javascript
+> const SmallComponent = () => {
+> 	...
+> }
+> export default memo(SmallComponent)
+> ~~~
+> 
+> 这相当于`class component`时代时的`PureComponent` 
+
+## 99. 其他
+
+### 99.1 其他功能点
+
+注册框密码、密码校验两个控件的交叉验证（改“密码校验”时触发验证，改“密码”时触发验证）
+
+> [src/pages/Register/index.js](../../02B_proj_personal_center_stage2/personal-app/src/pages/Register/index.js)
+
+注册框密码强度检验
+
+> [src/pages/Register/index.js](../../02B_proj_personal_center_stage2/personal-app/src/pages/Register/index.js)
+
+### 99.2 用存JS实现计时器
+
+#### 99.2.1 `setTimeout`实现计时器
+
+> 错误方法
+> 
+> ~~~javascript
+> // 只能打印出5个5，不能打印1，2，3，4，5
+> for (var i = 0; i < 5; i++)  {
+> 	setTimeout(
+> 		function() {console.log(i);}, 
+> 		i * 1000 
+> 	);
+> }
+> ~~~
+> 
+> 正确方法
+> 
+> ~~~javascript
+> for (var i = 0; i < 5; i ++) {
+>    // 借助匿名函数立即执行，把传入的i值固定下来，分别为1，2，3，4，5
+> 	(function(i) {
+> 		setTimeout(
+> 			function() {console.log(i);}, 
+> 			i * 1000
+>		);}
+>	)(i);  // 匿名函数立即执行：(function f(){...})()
+> }
+> ~~~
+
+#### 99.2.2 用`setInterval`实现计时器
+
+> ~~~javascript
+> var count = 0;
+> var a = setInterval(function() {
+> 	console.log(count++)
+> 	if (count == 5) {
+> 		clearInterval(count);
+> 	}
+> }, 1000); 
+> ~~~
+> 
+> 但是如果count不是普通变量而是`react state`，就不能用这种方法，因为react state的更新是异步的，无法拿到count的最新值。此时仍然需要 [/src/components/InputItem/index.js](personal-app/src/components/InputItem/index.js) 中所使用的方法
+
+#### 99.2.3 用`promise`实现计时器
+
+> ~~~javascript
+> fn = (i) => {
+> 	return new Promise((resolve, reject) => {
+> 		setTimeout(() => {
+> 			resolve(i);
+> 		}, i + 1000)
+> 	})
+> }
+> 
+> Fn = async () => {
+> 	for (let i =. 0; i <. 5; i++) {
+> 		const rest = await fn(i);
+> 		console.log(res);
+> 	}
+> }
+> 
+> Fn()
+> ~~~
+
+
+## 参考：
 
 1. [https://bundlephobia.com/](https://bundlephobia.com/)：查看一个包大小
 2. React Router：[https://reactrouter.com/web/example/nesting](https://reactrouter.com/web/example/nesting)

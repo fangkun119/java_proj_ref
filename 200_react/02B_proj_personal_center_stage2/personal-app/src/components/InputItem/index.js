@@ -10,7 +10,7 @@ import styles from './index.module.less';
 //  例如某些input组件，需要控制其focus，本来是可以使用ref来控制，但是因为该input已被包裹在组件中，这时就需要使用Ref forward来透过组件获得该input的引用
 //  https://www.jianshu.com/p/fac884647720
 // Refs 使用场景：
-// 处理焦点、文本选择或者媒体的控制，触发必要的动画，集成第三方 DOM 库
+// 处理焦点、文本选择或者媒体的控制，触发必要的动画，集成第三方 DOM 
 const InputItem = React.forwardRef((props, ref) => {
     const {name, rules, ...rest} = props; // 解构赋值 + 数组展开语法
     // console.log(name);  // 例子： username
@@ -34,12 +34,13 @@ const InputItem = React.forwardRef((props, ref) => {
             // timeing被handleClickCaptcha置为true时，被会生成一个计时器，每一秒更新一次状态变量`count`
             let interval = 0; // 变量
             if (timing) {
-                // 开启计时，每1秒（1000毫秒）唤醒一次运行检查函数
+                // 开启计时器，该计时器大约每秒（1000毫秒）唤醒一次并执行检查函数
                 interval = window.setInterval(() => {
+                    // 设置react状态(setCount)：如果传入是一个函数，函数参数就是state的旧值，返回的是stete的新值
                     setCount((preSecond) => {
                         if (preSecond <= 1) {
-                            setTiming(false);              // 倒计时结束
-                            clearInterval(interval);       // 异步停止计时
+                            setTiming(false);              // 设置react状态(timing)，为false表示倒计时结束
+                            clearInterval(interval);       // 停止每秒唤醒一次的计时器
                             return props.countDown || 60;  // 重置count为初始值
                         } else {
                             return preSecond - 1;  // 倒计时未结束，preSecond减1
@@ -47,8 +48,11 @@ const InputItem = React.forwardRef((props, ref) => {
                     })
                 }, 1000);
             } 
-            // timing被倒计时结束时的setTiming设置为false时，计时器也应该被清除，否则会造成内存泄漏
-            // 最后的返回函数 () => clearInterval(timer) 会在组件被销毁时执行，用于清除计时器
+            
+            // 末尾的返回函数 () => clearInterval(timer) 会在组件被销毁时执行，用于清除计时器
+            // * timing被倒计时结束时的setTiming设置为false时，会错过clearInterval(interval)调用
+            // * 如果不用其他代码清除计时器，会造成内存泄漏
+            // 下面的这个函数会在组件unmount时被执行，从而确保计时器一定被清楚
             return () => clearInterval(interval);
         }, 
         // Effect钩子要求把用到的props属性也添加到监听列表中，否则会报下面的Warning

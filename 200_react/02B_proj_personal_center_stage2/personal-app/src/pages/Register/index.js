@@ -43,7 +43,8 @@ const Register = () => {
         if (!visible) {
             setVisible(true); //显式popOver
         }
-        // 改变一下状态触发重新渲染（为了更新进度条）
+        // 因为密码强度检验进度条使用的数据，是通过form来获取（而不是通过状态），不会触发重新渲染
+        // 因此在这里改变一个状态，来让触发组件重新渲染，进而带动组件内进度条的重新渲染
         // popover定义在<Register>组件内的，是<Register>组件的state，当popover被更新之后，触发<Register>以及其下所有子组件(包括<Popover>和<Progress>)的重新渲染
         setPopOver(!popOver); 
         // 如果confirm也非空，触发confirm框的重新校验
@@ -145,7 +146,7 @@ const Register = () => {
                                     {pattern: /^\d{11}/, message: '手机号格式错误'}
                                 ]}
                             />
-                        </Col>
+                        </Col>  
                     </Row>
                     <InputItem 
                         name="captcha" 

@@ -116,7 +116,73 @@
 > * [git commit](https://github.com/fangkun119/java_proj_ref/commit/38976c4898c992eeb0ce1605f36d8dbc0936f537#diff-40a13f60b39d0c791105efc4e0187ba1bb14f36074708cba318015c5a3c78311) 
 > * [src/components/Projects/index.js](https://github.com/fangkun119/java_proj_ref/blob/38976c4898c992eeb0ce1605f36d8dbc0936f537/200_react/02B_proj_personal_center_stage2/personal-app/src/components/Projects/index.js)
 
+## 12. Redux，Axios安装、引入和使用
 
+### 12.1. 安装redux及axios
+
+~~~bash
+# redux
+# redux-thunk : 一个常用的redux-thunk插件、实现异步
+# redux-react-hook：用来衔接redux和react
+# -S:相当于--save，安装到编译依赖中
+npm install redux redux-thunk redux-react-hook -S
+
+
+# 用来发HTTP请求
+npm install axios -S 
+~~~
+
+### 12.2. 引入redux
+
+> 代码
+> 
+> * [git commit](https://github.com/fangkun119/java_proj_ref/commit/3c5223199e856aea58732d839cd12e6ab9a3d50d) 
+> * [src/reducers/index.js](https://github.com/fangkun119/java_proj_ref/commit/3c5223199e856aea58732d839cd12e6ab9a3d50d#diff-b9adb04f532c44638ffb071704c8b21aa11f161ef14923ba9677c4c8e8ec9a78)
+> * [src/index.js](https://github.com/fangkun119/java_proj_ref/commit/3c5223199e856aea58732d839cd12e6ab9a3d50d#diff-2007805909cb3390d4f809d61f799b77caf51527b17150a87024e5d69fac047c)
+> * [src/index.js (bug fix)](https://github.com/fangkun119/java_proj_ref/commit/d77a5e9cc563ea69f640886f2f377af18b7b52d7#diff-2007805909cb3390d4f809d61f799b77caf51527b17150a87024e5d69fac047c)
+
+### 12.3. 使用`redux`, `axio`实现验证码请求
+
+> 代码：
+> 
+> * [git commit](https://github.com/fangkun119/java_proj_ref/commit/d77a5e9cc563ea69f640886f2f377af18b7b52d7) 
+> 
+> * [最外层（src/components/InputItem/index.js）：用redux分发action](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/components/InputItem/index.js) 
+> * [注册action：src/actions/register.js](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/actions/register.js)
+> * [注册action使用的api：src/api/register.js](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/api/register.js)
+> * [公用，Axios封装：src/utils/ajax.js ](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/utils/ajax.js)
+> * [公用，常量：src/constants/index.js](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/constants/index.js)
+>
+> 备注：也可以只使用`axio`来发起请求，出于规范，将他们统一纳入`redux`框架中来实现
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 
 
 
