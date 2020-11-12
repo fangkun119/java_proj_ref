@@ -19,17 +19,12 @@ export function getCaptcha(payload = {}) {
 
 export function register(payload = {}) {
     return async () =>  {
-        console.log('send request to register')
-        const result = await api.register(payload);
-        console.log(result);
-        /*
         const {data: {code, message:msg}} = await api.register(payload);
-        if (code === 20020) {
+        if (code === 20023) {
             message.success(`${msg}`);
         } else {
             message.error(`${msg}`);
         }
-        */
     }
 }
 
