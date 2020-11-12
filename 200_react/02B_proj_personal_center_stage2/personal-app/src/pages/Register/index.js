@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'redux-react-hook'; 
+import { getCaptcha } from '../../actions/register';
 import InputItem from '../../components/InputItem';
 import SubmitButton from '../../components/SubmitButton';
 import styles from './index.module.less';
@@ -7,6 +9,8 @@ import { Form, Popover, Progress, Row, Col, Select } from 'antd';
 
 // 注册页面
 const Register = () => {
+    // react-redux的钩子，从Redux Store返回一个分发函数，用于分发action
+    const dispatch =  useDispatch();
     // antd Form 提供的钩子，用来拿到表单中的数据
     const [form] = Form.useForm(); 
     // 控制“popOver提示气泡”是否展示的状态钩子
@@ -91,6 +95,15 @@ const Register = () => {
         pass : (<div className={styles.warning}>强度：中</div>),
         poor : (<div className={styles.error}>强度：太短</div>),
     }
+
+    const handleClickCaptcha = () => {
+        form.validateFields(['username', 'email', 'password']) //提交之前先验证表单项
+            .then(() => {
+                console.log(form.getFieldsValue(['username', 'email', 'password']));
+                dispatch(getCaptcha(form.getFieldsValue(['username', 'email', 'password'])));
+            })
+    }
+
     return (
         <div className={styles.registerContainer}>
             <div className={styles.register}>
@@ -99,7 +112,12 @@ const Register = () => {
                     onFinish={handleFinish} 
                 > 
                     <InputItem
-                        name="mail" placeholder="邮箱" size="large" rules={[
+                        name="username" placeholder="用户名" size="large" rules={[
+                         {required: true, message: "请输入用户名"}
+                        ]}
+                    />
+                    <InputItem
+                        name="email" placeholder="邮箱" size="large" rules={[
                          {required: true, message: "请输入邮箱"},
                          {type:'email', message: "请填写正确的邮箱格式"}
                         ]}
@@ -155,6 +173,7 @@ const Register = () => {
                             {required: true, message: "请输入验证码"}
                         ]} 
                         placeholder="验证码"
+                        onClick={handleClickCaptcha} 
                     />
                     <Row justify="space-between" align="middle">
                         <Col span={8}>

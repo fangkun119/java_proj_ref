@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'redux-react-hook'; 
 import { Input, Form, Button, Row, Col, message } from 'antd';
-import { getCaptcha } from '../../actions/register';
 import styles from './index.module.less';
 
 //React.forwardRef: 引用传递
@@ -12,20 +10,15 @@ import styles from './index.module.less';
 // Refs 使用场景：
 // 处理焦点、文本选择或者媒体的控制，触发必要的动画，集成第三方 DOM 
 const InputItem = React.forwardRef((props, ref) => {
-    const {name, rules, ...rest} = props; // 解构赋值 + 数组展开语法
+    const {name, rules, onClick, ...rest} = props; // 解构赋值 + 数组展开语法
     // console.log(name);  // 例子： username
     // console.log(rest);  // 例子： {prefix: {…}, placeholder: "用户名", size: "large"}
     const [timing, setTiming] = useState(false);                  // 状态钩子：是否在倒计时
-    const [count,  setCount ] = useState(props.countdown || 60);  // 状态钩子：倒计时秒数
-
-    // react-redux的钩子，从Redux Store返回一个分发函数，用于分发action
-    const dispatch =  useDispatch();
-
-    const handleClickCaptcha = () => {
-        message.success('成功获取验证码'); 
-        dispatch(getCaptcha());  // 被分发的action写在src/actions/register.js中
-        setTiming(true); 
-    };
+    const [count,  setCount ] = useState(props.countdown || 10);  // 状态钩子：倒计时秒数
+    const handleClickCatpcha = () => {
+        onClick();       // 外部传入回调函数，用来发请求给后端
+        setTiming(true); // 设置短信验证码按钮的计时器
+    }
 
     // Effect钩子：
     // * 参数2是监听的状态变量、如果留空则useEffect会在每次重新渲染之后执行、如果传入空数组那么useEffect只会在初始化时执行一次；
@@ -41,7 +34,7 @@ const InputItem = React.forwardRef((props, ref) => {
                         if (preSecond <= 1) {
                             setTiming(false);              // 设置react状态(timing)，为false表示倒计时结束
                             clearInterval(interval);       // 停止每秒唤醒一次的计时器
-                            return props.countdown || 60;  // 重置count为初始值
+                            return props.countdown || 10;  // 重置count为初始值
                         } else {
                             return preSecond - 1;  // 倒计时未结束，preSecond减1
                         }
@@ -76,7 +69,7 @@ const InputItem = React.forwardRef((props, ref) => {
                         <Button 
                             className={styles.getCaptcha} 
                             size="large" 
-                            onClick={handleClickCaptcha}
+                            onClick={handleClickCatpcha}
                             disabled={timing} 
                         >
                             {timing ? `${count}秒` : '获取验证码'}
