@@ -10,3 +10,8 @@ import { HOST } from '../constants';
 export function getCaptcha(params) {
     return ajax.post(`${HOST}/user/getCaptcha`, {data: params});
 }
+
+export function register(params) {
+    return ajax.post(`${HOST}/user/register`, { data: params});
+}
+

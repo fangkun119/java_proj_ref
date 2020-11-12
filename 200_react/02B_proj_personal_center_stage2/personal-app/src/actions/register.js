@@ -6,6 +6,7 @@ export function getCaptcha(payload = {}) {
         // 出于代码规范考虑，api定义在src/api/register.js，与action相对应
         // 用解构赋值把返回的result里面的 data:{code, message，data{captcha}} 提取出来，并将message重命名为msg
         const response = await api.getCaptcha(payload);
+        console.log(response);
         const {data: {code, message:msg}} = response;
         if (code === 20020) {
             const {data: {data : { captcha }}} = response;
@@ -15,3 +16,20 @@ export function getCaptcha(payload = {}) {
         }
     }
 }
+
+export function register(payload = {}) {
+    return async () =>  {
+        console.log('send request to register')
+        const result = await api.register(payload);
+        console.log(result);
+        /*
+        const {data: {code, message:msg}} = await api.register(payload);
+        if (code === 20020) {
+            message.success(`${msg}`);
+        } else {
+            message.error(`${msg}`);
+        }
+        */
+    }
+}
+

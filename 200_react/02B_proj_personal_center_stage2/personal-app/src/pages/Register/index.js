@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'redux-react-hook'; 
-import { getCaptcha } from '../../actions/register';
+import { getCaptcha, register } from '../../actions/register';
 import InputItem from '../../components/InputItem';
 import SubmitButton from '../../components/SubmitButton';
 import styles from './index.module.less';
@@ -20,11 +20,6 @@ const Register = () => {
     // 状态钩子，用于选择手机号码的区号
     const [prefix, setPrefix] = useState(86);
 
-    // 表单提交时的回调函数
-    const handleFinish = (values) => {
-        console.log(values);
-    };
-
     // 两个用来给自定义validator做密码验证的函数，
     // 参数1：当前表单项规则，'_'表示不关心其取值
     // 参数2：表单项的值
@@ -36,6 +31,7 @@ const Register = () => {
         }
         return promise.resolve();
     }
+
     const checkPassword = (_, value) => {
         const promise = Promise; 
         // Password框：没有value、value为空串时
@@ -96,12 +92,19 @@ const Register = () => {
         poor : (<div className={styles.error}>强度：太短</div>),
     }
 
+    // 点击“获取验证码”按钮时用到的回调函数
     const handleClickCaptcha = () => {
         form.validateFields(['username', 'email', 'password']) //提交之前先验证表单项
             .then(() => {
                 console.log(form.getFieldsValue(['username', 'email', 'password']));
                 dispatch(getCaptcha(form.getFieldsValue(['username', 'email', 'password'])));
             })
+    }
+
+    // 表单提交时的回调函数（不需要往button上绑定onClick回调函数了）
+    const handleFinish = (values) => {
+        console.log(values);
+        dispatch(register(values));
     }
 
     return (
