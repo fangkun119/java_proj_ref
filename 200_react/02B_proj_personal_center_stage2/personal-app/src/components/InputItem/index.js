@@ -16,7 +16,7 @@ const InputItem = React.forwardRef((props, ref) => {
     // console.log(name);  // 例子： username
     // console.log(rest);  // 例子： {prefix: {…}, placeholder: "用户名", size: "large"}
     const [timing, setTiming] = useState(false);                  // 状态钩子：是否在倒计时
-    const [count,  setCount ] = useState(props.countDown || 60);  // 状态钩子：倒计时秒数
+    const [count,  setCount ] = useState(props.countdown || 60);  // 状态钩子：倒计时秒数
 
     // react-redux的钩子，从Redux Store返回一个分发函数，用于分发action
     const dispatch =  useDispatch();
@@ -41,7 +41,7 @@ const InputItem = React.forwardRef((props, ref) => {
                         if (preSecond <= 1) {
                             setTiming(false);              // 设置react状态(timing)，为false表示倒计时结束
                             clearInterval(interval);       // 停止每秒唤醒一次的计时器
-                            return props.countDown || 60;  // 重置count为初始值
+                            return props.countdown || 60;  // 重置count为初始值
                         } else {
                             return preSecond - 1;  // 倒计时未结束，preSecond减1
                         }
@@ -56,11 +56,11 @@ const InputItem = React.forwardRef((props, ref) => {
             return () => clearInterval(interval);
         }, 
         // Effect钩子要求把用到的props属性也添加到监听列表中，否则会报下面的Warning
-        //      React Hook useEffect has a missing dependency: 'props.countDown'. 
+        //      React Hook useEffect has a missing dependency: 'props.countdown'. 
         //      Either include it or remove the dependency array. 
-        //      If 'setCount' needs the current value of 'props.countDown', you can also switch to useReducer 
-        //      instead of useState and read 'props.countDown' in the reducer react-hooks/exhaustive-deps
-        [timing, props.countDown]
+        //      If 'setCount' needs the current value of 'props.countdown', you can also switch to useReducer 
+        //      instead of useState and read 'props.countdown' in the reducer react-hooks/exhaustive-deps
+        [timing, props.countdown]
     );
 
     if (name === 'captcha') {
@@ -71,7 +71,7 @@ const InputItem = React.forwardRef((props, ref) => {
         return (
             <Form.Item name={name} rules={rules}>
                 <Row gutter={8}>
-                    <Col span={16}><Input countDown={60} {...rest} /></Col>
+                    <Col span={16}><Input countdown={60} {...rest} /></Col>
                     <Col span={8}>
                         <Button 
                             className={styles.getCaptcha} 
