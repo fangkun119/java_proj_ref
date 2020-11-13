@@ -7,9 +7,9 @@ export function getCaptcha(payload = {}) {
         // 用解构赋值把返回的result里面的 data:{code, message，data{captcha}} 提取出来，并将message重命名为msg
         const response = await api.getCaptcha(payload);
         console.log(response);
-        const {data: {code, message:msg}} = response;
+        const {code, message:msg} = response; // 未使用拦截器时的代码：const {data: {code, message:msg}} = response;
         if (code === 20020) {
-            const {data: {data : { captcha }}} = response;
+            const { data : { captcha } } = response; // 未使用拦截器时的代码： const {data: {data : { captcha }}} = response;
             message.success(`${msg}, 验证码为${captcha}`);
         } else {
             message.error(`${msg}`);
@@ -19,7 +19,7 @@ export function getCaptcha(payload = {}) {
 
 export function register(payload = {}) {
     return async () =>  {
-        const {data: {code, message:msg}} = await api.register(payload);
+        const {code, message:msg} = await api.register(payload); // 未使用拦截器时的代码： const {data: {code, message:msg}} = await api.register(payload);
         if (code === 20023) {
             message.success(`${msg}`);
         } else {
