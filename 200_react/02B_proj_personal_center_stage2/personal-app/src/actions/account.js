@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import * as api from '../api/register'; //为何要用* as
+import * as api from '../api/account'; //为何要用* as
 
 export function getCaptcha(payload = {}) {
     return async () =>  {

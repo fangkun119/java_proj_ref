@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'redux-react-hook'; 
-import { getCaptcha, register } from '../../actions/register';
+import { getCaptcha, register } from '../../actions/account';
 import InputItem from '../../components/InputItem';
 import SubmitButton from '../../components/SubmitButton';
 import styles from './index.module.less';
