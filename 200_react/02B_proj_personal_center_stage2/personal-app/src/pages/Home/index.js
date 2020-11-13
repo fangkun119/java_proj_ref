@@ -1,15 +1,16 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Link } from 'react-router-dom';
 import { Row, Col, Card, Divider, Avatar} from 'antd';
+import { useDispatch } from 'redux-react-hook';
 import { ContactsOutlined, ClusterOutlined, HomeOutlined } from '@ant-design/icons'
 import Articles from '../../components/Articles';
 import Projects from '../../components/Projects';
 import Applications from '../../components/Applications';
 import TagList from '../../components/TagList';
+import {currentUser, fakeList} from './data.js'; // 后端没有开发好时，先引入预先构造好的假数据文件，用于前端调试
+import { getUserProfile } from '../../actions/profile';
 import styles from './index.module.less';
 
-// 后端没有开发好，因此先引入预先构造好的假数据文件，用于调试
-import {currentUser, fakeList} from './data.js';
 const articleList = fakeList(10);
 const applicationList = fakeList(10);
 const projectList = fakeList(10);
@@ -58,11 +59,19 @@ const renderUserInfo = () => (
 );
 
 const Home = () => {
+    const dispatch = useDispatch();
     const [tabKey, setTabKey] = useState('projects');
     const onTabChange = (key) => {
         setTabKey(key);
     }
-
+    
+    // 文档: https://zh-hans.reactjs.org/docs/hooks-effect.html
+    // * 如果想执行只运行一次的 effect（仅在组件挂载和卸载时执行），可以传递一个空数组（[]）作为第二个参数。这就告诉 React 你的 effect 不依赖于 props 或 state 中的任何值，所以它永远都不需要重复执行。这并不属于特殊情况 —— 它依然遵循依赖数组的工作方式。
+    // * 如果你传入了一个空数组（[]），effect 内部的 props 和 state 就会一直拥有其初始值。尽管传入 [] 作为第二个参数更接近大家更熟悉的 componentDidMount 和 componentWillUnmount 思维模式，但我们有更好的方式来避免过于频繁的重复调用 effect。除此之外，请记得 React 会等待浏览器完成画面渲染之后才会延迟调用 useEffect，因此会使得额外操作很方便。
+    useEffect(() => {
+        dispatch(getUserProfile());
+    }, []);
+    
     // <Row><Col>：用'antd'栅格来排版
     // * <Row gutter={24}>: <Col>之间间隔是24px
     // * <Col lg={7} md={24}>: 没有用span={7}，是为了屏幕自适应，大屏是占7个栅格，中屏小屏时把24个栅格都占满

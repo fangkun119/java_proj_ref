@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import * as api from '../api/account'; //为何要用* as
+import * as api from '../api/account'; // ES Module语法：https://juejin.im/post/6844903993462751239
 
 export function getCaptcha(payload = {}) {
     return async () =>  {

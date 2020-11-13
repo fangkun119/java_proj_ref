@@ -1,4 +1,4 @@
-//对axio的封装
+// 对axio的封装：src/utils/ajax.js
 // export default {
 //     get: makeGet(),
 //     post: makePost()
