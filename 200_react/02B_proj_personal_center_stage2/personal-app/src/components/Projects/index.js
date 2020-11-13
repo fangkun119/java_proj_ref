@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, List } from 'antd';
-import Item from 'antd/lib/list/Item';
 import moment from 'moment';
 
 const Projects = ({ list }) => {
@@ -15,7 +14,7 @@ const Projects = ({ list }) => {
                         hoverable  
                         cover={<img alt={item.title} src={item.cover} />} 
                     >
-                        <Card.Meta title={<a>{item.title}</a>} description={item.subDescription} />
+                        <Card.Meta title={<a href="/">{item.title}</a>} description={item.subDescription} />
                         <div><span>{moment(item.updateAt).fromNow()}</span></div>
                     </Card>
                 </List.Item>

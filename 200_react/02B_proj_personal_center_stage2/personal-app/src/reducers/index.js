@@ -3,8 +3,7 @@
 // 用来把多层reducer组合起来
 import { combineReducers } from 'redux';
 
-const rootReducer = combineReducers({
-
+const rootReducer = combineReducers({ 
 });
 
 // export出去，由入口文件index.js来import

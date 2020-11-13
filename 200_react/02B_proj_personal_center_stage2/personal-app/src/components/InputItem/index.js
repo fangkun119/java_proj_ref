@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Input, Form, Button, Row, Col, message } from 'antd';
+import { Input, Form, Button, Row, Col } from 'antd';
 import styles from './index.module.less';
 
 //React.forwardRef: 引用传递

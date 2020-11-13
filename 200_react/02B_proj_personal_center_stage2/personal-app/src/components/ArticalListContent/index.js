@@ -10,7 +10,7 @@ const ArticalListContent = ({
         <div>{content}</div>
         <div className={sytles.extra} >
             <Avatar src={avatar} size="small" />
-            <a href={href}>{owner}</a>发布在<a href={href}></a>
+            <a href={href}>{owner}</a>发布在<a href={href}>{href}</a>
             <em>{moment(updateAt).format('YYYY-MM-DD HH:mm')}</em>
         </div>
     </div>

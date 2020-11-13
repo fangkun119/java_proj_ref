@@ -34,5 +34,5 @@ function makePost() {
 
 export default {
     get: makeGet(),
-    post: makePost()
+    post: makePost(),
 };
