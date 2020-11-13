@@ -9,8 +9,25 @@ const responseInterceptors = [
     }
 ];
 
+// 用来处理request的拦截器，用数组存储，可以配多个
+const requestInterceptors = [
+    {
+        name: 'addHttpRequestHeader',
+        success(config) {
+            // 与后端协商http header中添加的token格式
+            config.headers['Authorization'] = `Bearer ${window.localStorage.getItem('personal-app-token')}`;
+            return config;
+        },
+        fail(err) {
+            console.error('request error: ', err);
+            return Promise.reject(err);
+        }
+    }
+];
+
 const interceptors = {
-    response : responseInterceptors
+    response : responseInterceptors,
+    request : requestInterceptors
 };
 
 function doInstall(instance, options = {}) {
@@ -26,11 +43,14 @@ function doInstall(instance, options = {}) {
             instance.interceptors[type].use(success, fail);
         }
     )
-}
+};
 
 // 参数：instance = ajax.create()
 export function install(instance, options = {}) {
     doInstall(instance, {
         type: 'response'
-    })
-}
+    });
+    doInstall(instance, {
+        type: 'request'
+    });
+};

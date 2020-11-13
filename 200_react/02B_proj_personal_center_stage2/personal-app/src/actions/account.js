@@ -33,8 +33,11 @@ export function login(payload = {}) {
         // data:{token} = {} 用来处理data为空的情况
         const {code, message:msg, data:{token}={}} = await api.login(payload); 
         if (code === 0) {
-            message.success(`${msg}`);
-            console.log(token);
+            // 将token保存在浏览器本地缓存中（也可以保存在cookies中等）
+            // message.success(`${msg}`);
+            window.localStorage.setItem('personal-app-token', token); 
+            // 登录成功后跳转到首页
+            window.location.href="/";
         } else {
             message.error(`${msg}`);
         }
