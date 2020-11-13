@@ -28,3 +28,15 @@ export function register(payload = {}) {
     }
 }
 
+export function login(payload = {}) {
+    return async () => {
+        // data:{token} = {} 用来处理data为空的情况
+        const {code, message:msg, data:{token}={}} = await api.login(payload); 
+        if (code === 0) {
+            message.success(`${msg}`);
+            console.log(token);
+        } else {
+            message.error(`${msg}`);
+        }
+    }
+}

@@ -6,20 +6,22 @@ import {
     MailTwoTone, AlipayCircleOutlined, TaobaoCircleOutlined,
     WeiboCircleOutlined
 } from '@ant-design/icons'; // 为啥要用@
+import { useDispatch } from 'redux-react-hook';
 import InputItem from '../../components/InputItem';
 import SubmitButton from '../../components/SubmitButton';
-
+import { login } from '../../actions/account';
 import styles from './index.module.less';  
 
 const { TabPane } = Tabs;   // 解构赋值，将Tabs.TabPane赋给变量TabPane
 
 const Login = () => {
-    // Ant Design Lib的Form组件的自定义钩子（用use开头的函数表示钩子）
+    const dispatch = useDispatch();
     const [autoLogin, setAutoLogin] = useState(true);
-    const [form] = Form.useForm();
+    const [form] = Form.useForm(); // Ant Design Lib的Form组件的自定义钩子（用use开头的函数表示钩子）
     const handleFinish = (values) => {
         console.log(values);
-    }
+        dispatch(login(values));
+    };
     return (
         // 1. Tab控件的代码参考来自：https://ant.design/components/tabs-cn/
         // 2. {}里面用驼峰式、是JS的规范; 内容用来在.less文件中定位样式
