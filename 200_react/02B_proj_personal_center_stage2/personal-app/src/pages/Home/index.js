@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { Link } from 'react-router-dom';
 import { Row, Col, Card, Divider, Avatar} from 'antd';
-import { useDispatch } from 'redux-react-hook';
+import { useDispatch, useMappedState } from 'redux-react-hook';
 import { ContactsOutlined, ClusterOutlined, HomeOutlined } from '@ant-design/icons'
 import Articles from '../../components/Articles';
 import Projects from '../../components/Projects';
@@ -11,9 +11,14 @@ import {currentUser, fakeList} from './data.js'; // 后端没有开发好时，�
 import { getUserProfile } from '../../actions/profile';
 import styles from './index.module.less';
 
+// 假数据、在后端开发完成之前调成前端用
 const articleList = fakeList(10);
 const applicationList = fakeList(10);
 const projectList = fakeList(10);
+
+// 真数据、使用全局state中的profile部分
+// 后续代码使用redux的useMappedState从中提取后端返回的数据
+const mapState = (state) => (state.profile); 
 
 const operationTabList = [{
     key: 'articles',
@@ -59,7 +64,19 @@ const renderUserInfo = () => (
 );
 
 const Home = () => {
+    // 用来从view分发getUserProfile这个action
     const dispatch = useDispatch();
+    
+    // 用来从全局store/state中提取数据渲染view
+    // 其中useMappedState用来订阅reducer里的状态到mapState中
+    // 要使用的是rootReducer.profile.user (在reducers/profile.js中定义)
+    // * 在mappedState中：制定了使用state.profile
+    // * 在这里用解构赋值进一步制定使用state.profile.user
+    const { user } = useMappedState(mapState);
+    // 打印日志、确认已经能拿到后端数据
+    console.log(user);
+
+    // 页面上有三个标签页、用来控制显示那个标签页的状态
     const [tabKey, setTabKey] = useState('projects');
     const onTabChange = (key) => {
         setTabKey(key);
