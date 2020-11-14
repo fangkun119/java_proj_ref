@@ -6,6 +6,16 @@ const responseInterceptors = [
             // 只需要response的data字段，其他字段丢弃
             return response.data; 
         }
+    },
+    {
+        name: 'handleError', 
+        success(response) {
+            if (response.code === 70006 /*token失效的code*/) {
+                window.location.href = '/login'; //跳转到登录页
+            } else {
+                return response;
+            }
+        }
     }
 ];
 
