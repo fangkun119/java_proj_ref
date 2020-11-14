@@ -7,7 +7,7 @@ import Articles from '../../components/Articles';
 import Projects from '../../components/Projects';
 import Applications from '../../components/Applications';
 import TagList from '../../components/TagList';
-import {currentUser, fakeList} from './data.js'; // 后端没有开发好时，先引入预先构造好的假数据文件，用于前端调试
+import { currentUser, fakeList } from './data.js'; // 后端没有开发好时，先引入预先构造好的假数据文件，用于前端调试
 import { getUserProfile } from '../../actions/profile';
 import styles from './index.module.less';
 
@@ -45,20 +45,20 @@ const renderChildrenByTabKey = (tabKey) => {
 
 // () => (<JSX_ELEM/>) 相当于 () => {return (<JSX_ELEM/>)}
 // <p><图标/>文字</p>
-const renderUserInfo = () => (
+const renderUserInfo = (user) => (
     <div className={styles.detail} >
         <p>
             <ContactsOutlined className={styles.userInfoIcon} />
-            {currentUser.title} 
+            {user.title} 
         </p>
         <p>
             <ClusterOutlined className={styles.userInfoIcon} />
-            {currentUser.group}
+            {user.group}
         </p>
         <p>
             <HomeOutlined className={styles.userInfoIcon} /> 
-            {(currentUser.geographic || { province: {label: ''}}).province.label}
-            {(currentUser.geographic || { city: {label: ''}}).city.label}
+            {(user.geographic || { province: {label: ''}}).province.label}
+            {(user.geographic || { city: {label: ''}}).city.label}
         </p>  
     </div>
 );
@@ -74,8 +74,12 @@ const Home = () => {
     // * 在这里用解构赋值进一步制定使用state.profile.user
     // "user = {}"给数据一个初始值、避免后端返回数据之前发生undefined error
     const { user = {} } = useMappedState(mapState);
-    // 打印日志、确认已经能拿到后端数据
-    console.log(user);
+    console.log(user);        // 打印日志、查看后端返回的数据
+    console.log(currentUser); // 对比查看前端调试用的假数据
+    
+    // 切换数据源
+    const userToRender = currentUser; //currentUser: 调试用假数据
+    // const userToRender = user;     //user: 后端返回数据
 
     // 页面上有三个标签页、用来控制显示那个标签页的状态
     const [tabKey, setTabKey] = useState('projects');
@@ -101,21 +105,21 @@ const Home = () => {
                 <Col lg={7} md={24}>
                     <Card bordered={false} style={{marginBottom:24}}>
                         <div className={styles.avatarHolder}>
-                            <img alt="" src={currentUser.avatar} />
-                            <div className={styles.name}>{currentUser.name}</div>
-                            <div>{currentUser.signature}</div>
+                            <img alt="" src={userToRender.avatar} />
+                            <div className={styles.name}>{userToRender.name}</div>
+                            <div>{userToRender.signature}</div>
                         </div>
-                        {renderUserInfo()}
+                        {renderUserInfo(userToRender)}
                         <Divider dashed />
-                        <TagList tags={currentUser.tags} />
+                        <TagList tags={userToRender.tags} />
                         <Divider dashed />
                         <div className={styles.team}>
                             <div className={styles.teamTitle}>团队</div>
                             <Row gutter={36}>
                                 {
                                     // 图标：大屏(lg)1行1个，超大屏(xl)1行2个
-                                    currentUser.notice && 
-                                    currentUser.notice.map((item) => (
+                                    userToRender.notice && 
+                                    userToRender.notice.map((item) => (
                                         <Col key={item.id} lg={24} xl={12}>
                                             <Link to="/setting">
                                                 <Avatar size="small" src={item.logo}/>
