@@ -72,7 +72,8 @@ const Home = () => {
     // 要使用的是rootReducer.profile.user (在reducers/profile.js中定义)
     // * 在mappedState中：制定了使用state.profile
     // * 在这里用解构赋值进一步制定使用state.profile.user
-    const { user } = useMappedState(mapState);
+    // "user = {}"给数据一个初始值、避免后端返回数据之前发生undefined error
+    const { user = {} } = useMappedState(mapState);
     // 打印日志、确认已经能拿到后端数据
     console.log(user);
 
