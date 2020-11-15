@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import ajax from '../../utils/ajax';
+import { useDispatch } from 'redux-react-hook';
+import { getHomeTimeline } from '../../actions/timeline';
 
 const Home = () => {
+    const dispatch = useDispatch();
+
     useEffect(() => {
-        ajax.get(
-            //'https://api.weibo.com/2/statuses/public_timeline.json',
-            '/proxy/2/statuses/public_timeline.json'
-        );
+        dispatch(getHomeTimeline())
     }, []);
 
     return(
