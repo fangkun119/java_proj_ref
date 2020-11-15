@@ -1,0 +1,47 @@
+@import '../../styles/mixin.scss';
+@import '../../styles/variable.scss';
+
+.post {
+    padding: 15px 12px 0;
+    border-bottom: .5px solid #e6e6e6;
+    .user {
+        display: flex;
+        .avatar {
+            @include round-shape(32px);
+        }
+        .userInfo {
+            margin-left: 8px;
+            font-size: $NORMAL_SIZE;
+            .extra {
+                font-size: $SMALL_SIZE;
+                color: $TEXT_GREY_COLOR;
+            }
+        }
+    }
+    .content {
+        .text {
+            margin-bottom: 10px;
+        }
+        .images {
+            display: flex;
+            flex-wrap: wrap;
+            .imgWrapper {
+                box-sizing: border-box;
+                width: 33%;
+                padding-right: 5px;
+                padding-bottom: 5px;
+                .imgContainer {
+                    padding-bottom: 100%;
+                    height: 0;
+                    position: relative;
+                    img {
+                        @include square-shape(100%);
+                        position: absolute;
+                        object-fit: cover;
+                    }
+                }
+            }
+        }
+    }
+}
+

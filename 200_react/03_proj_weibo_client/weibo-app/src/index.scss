@@ -1,0 +1,5 @@
+// 修改<ul>,<li>标签默认的html样式，去掉无需列表项头部的“·”
+ul, li {
+    list-style: none;
+    padding: 0;
+}
