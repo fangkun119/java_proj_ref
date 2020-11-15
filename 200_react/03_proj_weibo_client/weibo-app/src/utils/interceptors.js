@@ -3,7 +3,10 @@ import { ACCESS_TOKEN } from '../constants';
 
 // Response 拦截器数组
 const responseInterceptors = [
-    /* { name: 'name', success(response) { return response; } }, */
+    { 
+        name: 'getResponseData', 
+        success(response) { return response.data; } 
+    }, 
 ];
 
 // Request拦截器数组
