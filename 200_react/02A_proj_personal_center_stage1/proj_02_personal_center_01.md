@@ -39,6 +39,9 @@ ReactDOM.render(
   document.getElementById('root')
 );
 ~~~
+> 
+> 备注：如果是从git获取的代码，需要手动运行`npm install react-app-rewired customize-cra -D`
+
 
 ## 3. 使用`React Router`
 

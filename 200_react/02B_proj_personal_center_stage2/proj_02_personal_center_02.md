@@ -116,7 +116,7 @@
 > * [git commit](https://github.com/fangkun119/java_proj_ref/commit/38976c4898c992eeb0ce1605f36d8dbc0936f537#diff-40a13f60b39d0c791105efc4e0187ba1bb14f36074708cba318015c5a3c78311) 
 > * [src/components/Projects/index.js](https://github.com/fangkun119/java_proj_ref/blob/38976c4898c992eeb0ce1605f36d8dbc0936f537/200_react/02B_proj_personal_center_stage2/personal-app/src/components/Projects/index.js)
 
-## 12. Redux，Axios安装、引入和使用
+## 12. Redux，Axios安装、引入和使用 (1) 
 
 ### 12.1. 安装redux及axios
 
@@ -145,20 +145,242 @@ npm install axios -S
 
 > 代码：
 > 
-> * [git commit](https://github.com/fangkun119/java_proj_ref/commit/d77a5e9cc563ea69f640886f2f377af18b7b52d7) 
+> * [git commit 1](https://github.com/fangkun119/java_proj_ref/commit/d77a5e9cc563ea69f640886f2f377af18b7b52d7) 
 > 
-> * [最外层（src/components/InputItem/index.js）：用redux分发action](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/components/InputItem/index.js) 
-> * [注册action：src/actions/register.js](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/actions/register.js)
-> * [注册action使用的api：src/api/register.js](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/api/register.js)
-> * [公用，Axios封装：src/utils/ajax.js ](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/utils/ajax.js)
-> * [公用，常量：src/constants/index.js](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/constants/index.js)
+> 	* [view层（src/components/InputItem/index.js）：分发action](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/components/InputItem/index.js) 
+> 	* [注册action：src/actions/register.js](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/actions/register.js)
+> 	* [注册action使用的api：src/api/register.js](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/api/register.js)
+> 	* [公用，Axios封装：src/utils/ajax.js ](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/utils/ajax.js)
+> 	* [公用，常量：src/constants/index.js](https://github.com/fangkun119/java_proj_ref/blob/d77a5e9cc563ea69f640886f2f377af18b7b52d7/200_react/02B_proj_personal_center_stage2/personal-app/src/constants/index.js)
 >
-> 备注：也可以只使用`axio`来发起请求，出于规范，将他们统一纳入`redux`框架中来实现
+> * [git commit 2: bug fix](https://github.com/fangkun119/java_proj_ref/commit/c477f930edcf336e269a43f6104e660218b280db)
+> * [git commit 3: bug fix](https://github.com/fangkun119/java_proj_ref/commit/754bfee1f634b3e13cbb7e6503280c8d7ad00227)
 
+### 12.4. 继续实现用户注册功能
 
+> 代码：
+> 
+> * [git commit 1](https://github.com/fangkun119/java_proj_ref/commit/f7391c64a5717174de0b330c123ec1749b4b187f)
+> 
+> 	* [view层、分发action：src/pages/Register/index.js](https://github.com/fangkun119/java_proj_ref/blob/f7391c64a5717174de0b330c123ec1749b4b187f/200_react/02B_proj_personal_center_stage2/personal-app/src/pages/Register/index.js)
+> 	* [action：src/actions/register.js](https://github.com/fangkun119/java_proj_ref/blob/f7391c64a5717174de0b330c123ec1749b4b187f/200_react/02B_proj_personal_center_stage2/personal-app/src/actions/register.js)
+> 	* [api: src/api/register.js](https://github.com/fangkun119/java_proj_ref/blob/f7391c64a5717174de0b330c123ec1749b4b187f/200_react/02B_proj_personal_center_stage2/personal-app/src/api/register.js)
+> 
+> * [git commit 2: 注册结果页面提示](https://github.com/fangkun119/java_proj_ref/commit/8924b58c2baa180b22beaee5c19cf891c79d8f8f) 
 
+## 13. 使用`Ajax`拦截器从后端Response中选取需要的数据
 
+> 代码：
+> 
+> * [git commit 1：功能实现](https://github.com/fangkun119/java_proj_ref/commit/80c85d3180a1e04cf7598f8df871eac8d09954a5)
+> 
+> 	* [拦截器代码：src/utils/interceptors.js](https://github.com/fangkun119/java_proj_ref/blob/80c85d3180a1e04cf7598f8df871eac8d09954a5/200_react/02B_proj_personal_center_stage2/personal-app/src/utils/interceptors.js)
+> 	* [安装拦截器：src/utils/ajax.js](https://github.com/fangkun119/java_proj_ref/blob/80c85d3180a1e04cf7598f8df871eac8d09954a5/200_react/02B_proj_personal_center_stage2/personal-app/src/utils/ajax.js)
+> 	* [使用拦截器之后的效果：src/actions/register.js](https://github.com/fangkun119/java_proj_ref/blob/80c85d3180a1e04cf7598f8df871eac8d09954a5/200_react/02B_proj_personal_center_stage2/personal-app/src/actions/register.js)
+>
+> * [git commit 2：文件重命名](https://github.com/fangkun119/java_proj_ref/commit/65d8d2f2bcf9da712713744d3b3558fdf899439c)
+> 
+> ~~~bash
+> 	renamed:    src/actions/register.js -> src/actions/account.js
+>	renamed:    src/api/register.js -> src/api/account.js
+>	modified:   src/pages/Register/index.js 
+> ~~~	
 
+## 14.登录功能实现
+
+### (1) 用`Redux`、`Ajax`发送登录请求并获取token
+
+> 代码：
+> 
+> * [git commit](https://github.com/fangkun119/java_proj_ref/commit/6faeaf1659cd71e8382b098dfa233f9c9388bfb5) 
+> 
+> 	* [view: src/pages/Login/index.js](https://github.com/fangkun119/java_proj_ref/blob/6faeaf1659cd71e8382b098dfa233f9c9388bfb5/200_react/02B_proj_personal_center_stage2/personal-app/src/pages/Login/index.js)
+> 	* [actions：src/actions/account.js](https://github.com/fangkun119/java_proj_ref/blob/6faeaf1659cd71e8382b098dfa233f9c9388bfb5/200_react/02B_proj_personal_center_stage2/personal-app/src/actions/account.js)
+> 	* [API：src/api/account.js](https://github.com/fangkun119/java_proj_ref/blob/6faeaf1659cd71e8382b098dfa233f9c9388bfb5/200_react/02B_proj_personal_center_stage2/personal-app/src/api/account.js)
+
+### (2) 用`拦截器`将token添加到http请求头中，并跳转到首页
+
+> 代码：
+> 
+> * [git commit](https://github.com/fangkun119/java_proj_ref/commit/336ba45a755c88610f593f5da04e0c0bdab8b610)
+> 	* [/src/actions/account.js](https://github.com/fangkun119/java_proj_ref/blob/336ba45a755c88610f593f5da04e0c0bdab8b610/200_react/02B_proj_personal_center_stage2/personal-app/src/actions/account.js)
+> 	* [/src/utils/interceptors.js](https://github.com/fangkun119/java_proj_ref/blob/336ba45a755c88610f593f5da04e0c0bdab8b610/200_react/02B_proj_personal_center_stage2/personal-app/src/utils/interceptors.js)
+> 
+> 查看存储在localStorage中的token
+> 
+> ~~~javascript
+> localStorage
+> Storage {todos: "[{"text":"ccc"},{"text":"bbb","isComplete":true},{"text":"aaa"}]", personal-app-token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiO…I0NH0.I1pZcnY7SfkiquzY1pGNtW0NJLbmvZiujdOPDiOP9-A", length: 2}
+~~~
+> 
+> HTTP Header中增加的token
+> 
+> ~~~txt
+> Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiI4ZmJkNTViMi0yZGEwLTRiYTItOTgwMS1hOTZlYTRkNjVlZGUiLCJzdWIiOiJ0ZXN0MzIxIiwiaXNzIjoiMDk4ZjZiY2Q0NjIxZDM3M2NhZGU0ZTgzMjYyN2I0ZjYiLCJpYXQiOjE2MDUyNTQyNDQsImF1ZCI6Imp6c2YiLCJleHAiOjE2MDY0NjM4NDQsIm5iZiI6MTYwNTI1NDI0NH0.I1pZcnY7SfkiquzY1pGNtW0NJLbmvZiujdOPDiOP9-A
+~~~
+
+## 15.用`Redux`、`Ajax`完成用户信息页展示
+
+### (1) `view`触发`action`执行、从后端获取数据
+
+> `view` (trigger the action) -> `action` (retrieve data from backend)
+>
+> 代码：
+> 
+> * [git commit](https://github.com/fangkun119/java_proj_ref/commit/3ec2895d31324715cd6ab6c98016738f06f0aede) 
+> 
+> 	* [view: /src/pages/Home/index.js](https://github.com/fangkun119/java_proj_ref/blob/3ec2895d31324715cd6ab6c98016738f06f0aede/200_react/02B_proj_personal_center_stage2/personal-app/src/pages/Home/index.js)
+> 	* [actions: /src/actions/profile.js](https://github.com/fangkun119/java_proj_ref/blob/3ec2895d31324715cd6ab6c98016738f06f0aede/200_react/02B_proj_personal_center_stage2/personal-app/src/actions/profile.js)
+> 	* [api: /src/api/profile.js](https://github.com/fangkun119/java_proj_ref/blob/3ec2895d31324715cd6ab6c98016738f06f0aede/200_react/02B_proj_personal_center_stage2/personal-app/src/api/profile.js) 
+> 
+> * [git commit 2: fix bug and warnings](https://github.com/fangkun119/java_proj_ref/commit/72f740aae54f9135aa6fb5955190e0c4a8e009c7) 
+> * [git commit 3: fix bug and warnings](https://github.com/fangkun119/java_proj_ref/commit/8180af40213736d127a02e80e9b005142db25903)
+> 
+> 在console中打印出的后端Response
+> 
+>  ~~~txt
+> {code: 0, message: "操作成功", data: {…}}
+> 	code: 0
+> 	data: {username: "test321", userTagList: Array(1), articleList: Array(2)}
+> 	message: "操作成功"
+> 	__proto__: Object
+>  ~~~
+
+### (2) 将`action`获取的数据`dispatch`给`reducer`进行加工
+
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/d3e0026c060c6b9a8410b586d80b98297830d17b)
+> 
+> Root Reducer用于挂载所有的Sub Reducer，分成多个`Sub Reducer`是为了便于数据的分类和存取，被`Store`包裹的组件下的所有子组件都可以通过`Root Reducer`来获取各个`Sub Reducer`的数据
+> 
+>  [Root Reducer: /src/reducer/index.js](https://github.com/fangkun119/java_proj_ref/blob/d3e0026c060c6b9a8410b586d80b98297830d17b/200_react/02B_proj_personal_center_stage2/personal-app/src/reducers/index.js) 
+> 
+> ~~~javascript
+> import { combineReducers } from 'redux'; // 用来把多层reducer组合起来
+> import profile from './profile';
+> const rootReducer = combineReducers({
+>     profile, // 用于展示个人主页的reducer
+> });
+> // export出去，由入口文件index.js来import
+> export default rootReducer;
+> ~~~
+> 
+> [Profile Reducer: /src/reducers/profile.js，挂载在root reducer下](https://github.com/fangkun119/java_proj_ref/commit/d3e0026c060c6b9a8410b586d80b98297830d17b) 
+> 
+> ~~~javascript
+> import {
+>     GET_PROFILE 
+> } from '../constants/actions';
+> 
+> const initState = {};
+> 
+> export default function reducer(state = initState, action) {
+>     switch (action.type) {
+>         case GET_PROFILE:
+>             console.log('reducers/profile invoked'); // 临时代码，检查这个reducer函数是否被执行
+>             return {
+>                 ...state,
+>                 user: action.payload,
+>             }
+>         default:
+>             return state;
+>     }
+> }
+~~~
+> 
+> Profile Reducer的数据是由对应的Profile Action来dispatch得到
+> 
+> [Profile Action: /src/actions/profile.js](/personal-app/src/actions/profile.js) 
+> 
+> ~~~javascript
+> import { message } from 'antd';
+> import * as api from '../api/profile'; 
+> import { GET_PROFILE } from '../constants/actions';
+> export function getUserProfile(payload = {}) {
+>     return async (dispatch /* dispatch从参数传入 */) =>  {
+>         const {
+>             code, 
+>             message:msg, 
+>             data,
+>         } = await api.getUserProfile(payload); 
+>         if (code === 0) {
+>             dispatch({
+>                 type: GET_PROFILE,
+>                 payload: data
+>             })
+>         } else {
+>             message.error(`${msg}`);
+>         }
+>     }
+> }
+> ~~~
+
+### (3) 安装dev插件、查看reducer中的数据
+
+> ~~~bash
+> # -S:  虽然是开发工具、但是因为代码中要引入它、因此还是要放到生产环境的dependency中
+> npm install redux-devtools-extension -S
+> ~~~
+> 
+> 同时修改`src/index.js`中创建`store`的代码，用dev tool extension来包裹reducer 
+> 
+> [git commit](https://github.com/fangkun119/java_proj_ref/commit/881e67ea4972e84e2d7640dcbac589c77c6d2e04) 
+> 
+> ~~~javascript
+> ...
+> import { composeWithDevTools } from 'redux-devtools-extension';
+> ...
+> const store = createStore(
+>   // 注入src/reducers/index.js中编写的root reducers
+>   reducer, 
+>   // 用Dev Tools包裹：可以加一个判断，仅在开发环境才用Dev Tools包裹
+>   composeWithDevTools (
+>     applyMiddleware(thunk) // 异步中间件
+>   )
+> ~~~
+> 
+> 同时还需要安装一个Chrome插件，才能在开发环境查看reducer的数据
+
+### (4) 让`store/state`订阅`reducer`的数据
+
+> [git commit 1](https://github.com/fangkun119/java_proj_ref/commit/ddbef4e0a5340ddc166c0e8d3e33298d61687ae9)
+>
+> * [src/pages/Home/index.js](https://github.com/fangkun119/java_proj_ref/blob/ddbef4e0a5340ddc166c0e8d3e33298d61687ae9/200_react/02B_proj_personal_center_stage2/personal-app/src/pages/Home/index.js)
+> 
+> [git commit 2: bug fix](https://github.com/fangkun119/java_proj_ref/commit/6df38dcbffe6bc77fb74a4e2334cc3e5a33f6c27)
+>
+> ~~~javascript
+> ...
+> import { useDispatch, useMappedState } from 'redux-react-hook';
+> ...
+> // 使用全局state中的profile部分，后续代码使用redux的useMappedState从中提取后端返回的数据
+> const mapState = (state) => (state.profile); 
+> ...
+> const Home = () => {
+>     // 用来从view分发getUserProfile这个action
+>     const dispatch = useDispatch();
+> 
+>     // 用来从全局store/state中提取数据渲染view
+>     // 其中useMappedState用来订阅reducer里的状态到mapState中
+>     // 要使用的是rootReducer.profile.user (在reducers/profile.js中定义)
+>     // * 在mappedState中：制定了使用state.profile
+>     // * 在这里用解构赋值进一步制定使用state.profile.user
+>     // "user = {}"给数据一个初始值、避免后端返回数据之前发生undefined error
+>     const { user = {} } = useMappedState(mapState);
+>     // 打印日志、确认已经能拿到后端数据
+>     console.log(user);
+> 	...
+> ~~~
+
+### (5) 切换页面渲染数据源到`store/state` (演示）
+
+> [git commit](https://github.com/fangkun119/java_proj_ref/commit/b7de088ba69f6c4faf0587aac4a80c5836f79cd9) 
+
+## 16 `token`失效时跳转到登录页
+
+> token失效时后端会返回一个约定好的code，可以在拦截器中捕捉并处理
+> 
+> [git commit](https://github.com/fangkun119/java_proj_ref/commit/d24694282f50e0e7c7dde2e5afd82219dc697c11) 
+> 
 
 
 
