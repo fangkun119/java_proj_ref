@@ -29,14 +29,18 @@ const Post = ({
     reposts_count,      // 转帖数
     attitudes_count,    // 点赞数
     comments_count,     // 评论数 
+    retweeted_status,   // 原贴（如果是转帖）
+    type,               // 帖子类型，对于转帖，原贴的actions为空
 }) => {
+    // Ant Design的<Card/>有内置的type="inner"样式
     return (
         <Card 
+            type={type} 
             className={styles.post} 
             bordered={false} 
             hoverable 
             title={getPostTitle(user,created_at,source)}
-            actions={[ 
+            actions={type ? [] : [ 
                 <div>
                     <RetweetOutlined key="retweet"/>
                     <span>{reposts_count || ''}</span>
@@ -54,6 +58,10 @@ const Post = ({
             <div className={styles.content}>
                 <div className={styles.text}>
                     {text}
+                    {
+                        retweeted_status && 
+                        <Post type="inner" {...retweeted_status}/>
+                    }
                 </div>
                 <ul className={styles.images}> 
                     {
