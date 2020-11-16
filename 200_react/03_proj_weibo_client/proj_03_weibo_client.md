@@ -317,14 +317,14 @@ URL：步骤`3`用[https://open.weibo.com/tools/console](https://open.weibo.com/
 
 > ~~~bash
 > __________________________________________________________________
-> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/200_react/03_proj_weibo_client/weibo-app/
+> > $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/200_react/03_proj_weibo_client/weibo-app/
 > $ cat config-overrides.js
-> const { override, fixBabelImports } = require('customize-cra')
+> const { override, fixBabelImports } = require('customize-cra');
 > 
 > module.exports = override(
 >     fixBabelImports('antd', {
->         libraryDirectory : 'es',
->         sytle: 'css',
+>         libraryDirectory: 'es',
+>         style: 'css',
 >     })
 > )
 > ~~~
@@ -341,6 +341,79 @@ URL：步骤`3`用[https://open.weibo.com/tools/console](https://open.weibo.com/
 > ~~~
 
 (2) 修改样式：
+
+> [git commit](https://github.com/fangkun119/java_proj_ref/commit/aae15268e09ef6408edae9266f2f1d729a13852b)
+> 
+> * [/config-overrides.js](https://github.com/fangkun119/java_proj_ref/blob/aae15268e09ef6408edae9266f2f1d729a13852b/200_react/03_proj_weibo_client/weibo-app/config-overrides.js)
+> * [/src/pages/Home/index.js](https://github.com/fangkun119/java_proj_ref/blob/aae15268e09ef6408edae9266f2f1d729a13852b/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/index.js) 
+> * [/src/pages/Home/index.module.scss](https://github.com/fangkun119/java_proj_ref/blob/aae15268e09ef6408edae9266f2f1d729a13852b/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/index.module.scss)
+
+## 10. 显式转帖
+
+### (1) 从`Home`组件中抽离一个单独的`Post`组件
+
+> 代码： [git commit](https://github.com/fangkun119/java_proj_ref/commit/61a7d3b09d6d5f8334db2eb51ceb09e544302121) 
+> 
+> * [/src/pages/Home/components/post/index.js](https://github.com/fangkun119/java_proj_ref/blob/61a7d3b09d6d5f8334db2eb51ceb09e544302121/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/components/post/index.js)，[/src/pages/Home/components/post/index.module.scss](https://github.com/fangkun119/java_proj_ref/blob/61a7d3b09d6d5f8334db2eb51ceb09e544302121/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/components/post/index.module.scss)：`Post`组件代码来自之前的`Home`组件
+> * [/src/pages/Home/index.js](https://github.com/fangkun119/java_proj_ref/blob/61a7d3b09d6d5f8334db2eb51ceb09e544302121/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/index.js)，[/src/pages/Home/index.module.scss](https://github.com/fangkun119/java_proj_ref/blob/61a7d3b09d6d5f8334db2eb51ceb09e544302121/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/index.module.scss)：拆分之后的`Home`组件
+> * [/src/api/timeline.js](https://github.com/fangkun119/java_proj_ref/blob/61a7d3b09d6d5f8334db2eb51ceb09e544302121/200_react/03_proj_weibo_client/weibo-app/src/api/timeline.js)：修一个bug，从获取广场微博，改为获取关注账号的微博，同时更容易看到转帖
+
+### (2) 对于转帖的帖子，用一个`inner Card`显式原贴 
+
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/ff96107ec2742ba52f70074243d13a50f8d5fe3d) 
+> 
+> * [/src/pages/Home/components/post/index.js](https://github.com/fangkun119/java_proj_ref/blob/ff96107ec2742ba52f70074243d13a50f8d5fe3d/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/components/post/index.js)
+
+## 11. 支持自动翻页、滚动加载
+
+### (1) 查看微博API是否支持翻页
+
+微博API文档： [https://open.weibo.com/wiki/2/statuses/home_timeline](https://open.weibo.com/wiki/2/statuses/home_timeline) 
+
+> 可用参数包括：`access_token`、`since_id`、`max_id`、`count`、`page`、`base_app`、`feature`、`trim_user`
+
+### (2) 安装`react-infinite-scroller`库
+
+> `react-infinite-scroller`能够监控滚动条，在滚动条滚动到底部时触发一些事件
+>
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/200_react/03_proj_weibo_client/weibo-app/
+> $ npm install react-infinite-scroller -S
+> ...
+> + react-infinite-scroller@1.2.4
+> ...
+> ~~~
+
+### (3) 用`react-infinite-scroller`触发微博加载
+
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/9744cc173a8f3a2674ee8a32656353ebe67f8ea8)
+> 
+> * [/src/pages/Home/index.js](https://github.com/fangkun119/java_proj_ref/blob/9744cc173a8f3a2674ee8a32656353ebe67f8ea8/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/index.js)
+> 
+> 测试：滚动条拖到底部时、可以触发微博API调用，获取更多的微博，但是不能渲染在页面上，需要继续增加显示功能
+
+### (4) 把`page`参数加入到`redux`单向链路
+
+把`page`参数加入到`redux`单向链路，使得`scroller`每次滚动到底部时、可以请求再下一页
+
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/51b66171aaaa0d0d69a7c2ec65b7cc763fe68243) 
+> 
+> * [/src/pages/Home/index.js](https://github.com/fangkun119/java_proj_ref/blob/51b66171aaaa0d0d69a7c2ec65b7cc763fe68243/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/index.js)：view
+> * [/src/actions/timeline.js](https://github.com/fangkun119/java_proj_ref/blob/51b66171aaaa0d0d69a7c2ec65b7cc763fe68243/200_react/03_proj_weibo_client/weibo-app/src/actions/timeline.js)：action
+> * [/src/reducers/timeline.js](https://github.com/fangkun119/java_proj_ref/blob/51b66171aaaa0d0d69a7c2ec65b7cc763fe68243/200_react/03_proj_weibo_client/weibo-app/src/reducers/timeline.js)：reducer
+
+### (5) 修复`Ajax`传参bug
+
+代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/b006e40e811a2483a6c280f0757bc1204fa18286)
+
+>~~~javascript
+>import ajax from "../utils/ajax";
+> export function getHomeTimeline(params) {
+>     return ajax.get('/proxy/2/statuses/home_timeline.json', {params}); // not {data: params}
+> }
+> ~~~
+
 
 
 
