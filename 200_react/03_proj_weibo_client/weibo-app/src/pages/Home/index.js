@@ -6,17 +6,22 @@ import Post from './components/post';
 import styles from './index.module.scss';
 
 const Home = () => {
-    const { 
-        home = [] /*初始值为空，更新值从store中获取，其中会用到下面设置的函数来挑选与“信息流”有关的数据*/
-    } =  useMappedState((state) => (state.timeline));
+    // (1) 对应于哪个reducer的数据格式
+    //     step1：下面“useMappedState((state) => (state.timeline))”中看到是使用了RootReducer的timeline属性
+    //     step2：“/src/reducers/index.js"中看到“import timeline from './timeline'”
+    //     step3：“/src/reducers/timeline.js”就是对应的reducer
+    // (2) posts 使用缺省值[]，home使用缺省值{}，避免初始空值时object undefine的错误
+    //     另一种方式，在定义reducer时设置默认值，见src/reducers/timeline.js
+    const { home: { posts = [], page } = {} } = useMappedState((state) => (state.timeline));
 
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(getHomeTimeline())
+        dispatch(getHomeTimeline({ page: 1 })) //跟随函数调用查看代码，传参之前已经写好，传入的{page:1}可以被一路传递到ajax post操作发送给weibo后端
     }, [dispatch]); //依赖
-    
+
     const handleInfiniteOnLoad = () => {
-        dispatch(getHomeTimeline())
+        console.log(page);
+        dispatch(getHomeTimeline({ page: page + 1 }));
     };
 
     return(
@@ -28,7 +33,7 @@ const Home = () => {
                 hasMore={true} //总是可以向下滚动
             >
             {
-                home.map(({
+                posts.map(({
                     id, 
                     ...rest
                 }) => (
