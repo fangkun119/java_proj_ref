@@ -21,6 +21,7 @@
     .content {
         .text {
             margin-bottom: 10px;
+            word-break: break-all; //遇到链接之类的长串时、容许在行中间折行，而不是强制换行在来获得显显示空间
         }
         .images {
             display: flex;

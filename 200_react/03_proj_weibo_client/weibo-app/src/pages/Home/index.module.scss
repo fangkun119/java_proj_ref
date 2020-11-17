@@ -2,5 +2,22 @@
 
 .container {
     background-color: $BACKGROUND_GRAY_COLOR;
+    .appbar {
+        background-color: #fff;
+        padding: 5px 12px;
+        a {
+            // 几个<Link>组件的线条color，
+            // 通过Chrome Dev Tool发现是<SVG>包裹在<a>标签中，因此样式加在a上面 
+            color: $TEXT_BLACK_COLOR ;
+        }
+        .appTitle {
+            color: $TEXT_BLACK_COLOR;
+            font-size: $X_LARGE_SIZE;
+            font-weight: 800;
+        }
+        .icon {
+            font-size: 24px;
+        }
+    }
 }
 
