@@ -1,10 +1,11 @@
 import React from 'react';
 import { UserOutlined, EditOutlined } from '@ant-design/icons';
+import { useDispatch, useMappedState } from 'redux-react-hook';
+import InfiniteScroll from 'react-infinite-scroller';
 import { Row } from 'antd';
 import { Link } from 'react-router-dom';
 import { getHomeTimeline } from '../../actions/timeline';
-import InfiniteScroll from 'react-infinite-scroller';
-import { useDispatch, useMappedState } from 'redux-react-hook';
+import { LOGIN_URL } from '../../constants';
 import Post from './components/post';
 import styles from './index.module.scss';
 
@@ -32,7 +33,7 @@ const Home = () => {
                 justify="space-between" 
                 align="middle"
             >
-                <Link><UserOutlined className={styles.icon}/></Link>
+                <a href={LOGIN_URL}><UserOutlined className={styles.icon}/></a>
                 <div className={styles.appTitle}>Weibo APP</div>
                 <Link to="/new"><EditOutlined className={styles.icon}/></Link>
             </Row>
