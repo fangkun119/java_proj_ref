@@ -11,7 +11,7 @@ export default function reducer(state = initState, action) {
             return {
                 ...state,
                 home: {
-                    posts : statuses, 
+                    posts : [...state.home.posts,  ...statuses], 
                     page,
                 },
             }
