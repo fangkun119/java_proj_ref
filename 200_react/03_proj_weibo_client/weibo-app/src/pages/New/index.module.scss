@@ -1,0 +1,32 @@
+@import '../../styles/variable.scss';
+
+.container {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    .appbar {
+        background-color: $BACKGROUND_GRAY_COLOR;
+        padding: 5px 12px;
+        border-bottom: 1px solid $BORDER_GREY_COLOR;
+        a {
+            // 几个<Link>组件的线条color，
+            // 通过Chrome Dev Tool发现是<SVG>包裹在<a>标签中，因此样式加在a上面 
+            color: $TEXT_BLACK_COLOR ;
+        }
+        .send {
+            font-size: $LARGE_SIZE;
+            color: $THEME_COLOR;
+        }
+    }
+    .content {
+        height: 100%;
+        .textarea {
+            height: 100%;
+            font-size: $LARGE_SIZE;
+            padding: 18px 14px;
+            resize: none;
+        }
+    }
+}
+
