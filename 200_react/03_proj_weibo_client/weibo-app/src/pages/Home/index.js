@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { getHomeTimeline } from '../../actions/timeline';
 import InfiniteScroll from 'react-infinite-scroller';
 import { useDispatch, useMappedState } from 'redux-react-hook';
@@ -12,22 +12,20 @@ const Home = () => {
     //     step3：“/src/reducers/timeline.js”就是对应的reducer
     // (2) posts 使用缺省值[]，home使用缺省值{}，避免初始空值时object undefine的错误
     //     另一种方式，在定义reducer时设置默认值，见src/reducers/timeline.js
-    const { home: { posts = [], page } = {} } = useMappedState((state) => (state.timeline));
+    const { home: { posts = [], page = 0} = {} } = useMappedState((state) => (state.timeline));
 
     const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(getHomeTimeline({ page: 1 })) //跟随函数调用查看代码，传参之前已经写好，传入的{page:1}可以被一路传递到ajax post操作发送给weibo后端
-    }, [dispatch]); //依赖
 
     const handleInfiniteOnLoad = () => {
-        console.log(page);
         dispatch(getHomeTimeline({ page: page + 1 }));
     };
+    // <InfiniteScroll> 改为 initialLoad={true}，不再需要靠useEffect来完成初始加载
+    // useEffect(() => {dispatch(getHomeTimeline({ page:1 }));}, []); 
 
     return(
         <div className={styles.container}>
             <InfiniteScroll
-                initialLoad={false} //已经用了dispatch来初始加载、不需要为true
+                initialLoad={true} //已经用了dispatch来初始加载、不需要为true
                 pageStart={1} 
                 loadMore={handleInfiniteOnLoad} //滚动到底部时触发的事件
                 hasMore={true} //总是可以向下滚动
