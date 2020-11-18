@@ -51,8 +51,9 @@ const Home = () => {
                     ...rest
                 }) => (
                     <Post 
-                        key={id} 
-                        {...rest}
+                        key={id}  
+                        id={id} 
+                        {...rest} 
                     />
                 ))
             }

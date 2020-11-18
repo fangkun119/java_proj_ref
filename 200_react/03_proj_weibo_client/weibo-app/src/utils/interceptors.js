@@ -4,8 +4,21 @@ import { ACCESS_TOKEN } from '../constants';
 // Response 拦截器数组
 const responseInterceptors = [
     { 
-        name: 'getResponseData', 
-        success(response) { return response.data; } 
+        name: 'formatResponse', 
+        success(response) { 
+            if (response.status === 200) {
+                return response.data; 
+            } else {
+                return Promise.reject(response);
+            }
+        },  
+        fail(err) {
+            // console.log(err.response); 查看err.response的结构
+            return Promise.reject({
+                code: err.response.data.error_code, 
+                message: err.response.data.error,
+            });
+        }
     }, 
 ];
 

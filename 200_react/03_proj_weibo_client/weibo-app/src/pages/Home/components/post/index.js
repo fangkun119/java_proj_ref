@@ -21,9 +21,10 @@ const getPostTitle = (user, created_at, source) => (
 );
 
 const Post = ({
+    id,
     text, 
     user, 
-    created_at, 
+    created_at,  
     source, 
     pic_urls,
     reposts_count,      // 转帖数
@@ -32,6 +33,12 @@ const Post = ({
     retweeted_status,   // 原贴（如果是转帖）
     type,               // 帖子类型，对于转帖，原贴的actions为空
 }) => {
+    const handleClickComment = () => {
+        if (!comments_count) {
+            window.location.href = `/comments/${id}`;
+        }
+    };
+
     // Ant Design的<Card/>有内置的type="inner"样式
     return (
         <Card 
@@ -49,7 +56,7 @@ const Post = ({
                     <LikeOutlined key="like"/>
                     <span>{attitudes_count || ''}</span>
                 </div>,
-                <div>
+                <div onClick={handleClickComment}>
                     <MessageOutlined key="message"/>
                     <span>{comments_count || ''}</span>
                 </div>
