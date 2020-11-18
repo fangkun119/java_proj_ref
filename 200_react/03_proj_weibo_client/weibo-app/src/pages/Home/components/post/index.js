@@ -3,8 +3,9 @@ import { Card } from 'antd';
 import { RetweetOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { useDispatch } from 'redux-react-hook';
-// import { getComments } from '../../../../actions/comments';
-// import { getComments } from 'actions/comments'; // jsconfig.json中配了 "baseUrl":"src"
+// 因为在/jsconfig.json中配置了"baseUrl":"src"，下面两种导入方式等价
+// import { getComments } from '../../../../actions/comments';  // 默认的import方式
+// import { getComments } from 'actions/comments';              // 借助jsconfig.json配置的import方式
 import styles from './index.module.scss'
 
 const getPostTitle = (user, created_at, source) => (
@@ -41,7 +42,7 @@ const Post = ({
         if (!comments_count) {
             window.location.href = `/comments/${id}`;
         } else {
-            // dispatch(getComments({id}));
+            // dispatch(getComments({id})); // 迁移到Detail页面组件中
             window.location.href = `/details/${id}`;
         }
     };

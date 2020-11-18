@@ -12,3 +12,17 @@ export function getHomeTimeline(params = {}) {
         })
     }
 }
+
+export function getPost(params = {}) {
+    return async (dispatch) => {
+        const result = await api.getPost(params);
+        console.log(result);
+        /*
+        dispatch({
+            type: GET_HOME_TIMELINE,
+            payload: result,
+            params, //把params一路传下去，这样在redux单向链路的各步中就可以知道请求到第几页了
+        })
+        */
+    }
+}

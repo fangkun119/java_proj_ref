@@ -13,7 +13,7 @@ const { TextArea } = Input;
 //  // 从URL`/comments/${id}`传入参数id位于props.match.id
 //  console.log(props); 
 //}
-const New = ({match}) => { //用解构赋值提取props.match
+const New = ({match}) => { //用解构赋值提取props.match，props是react router设置的
     const dispatch = useDispatch();
     const { params: { id }} = match;        //用解构赋值提取id
     const [value, setValue] = useState(''); //微博内容或评论内容

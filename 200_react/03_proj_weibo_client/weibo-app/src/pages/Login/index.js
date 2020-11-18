@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import queryString from 'query-string';
 
 // 微博授权机制Wiki：https://open.weibo.com/wiki/%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6#.E6.8E.88.E6.9D.83.E6.9C.89.E6.95.88.E6.9C.9F
