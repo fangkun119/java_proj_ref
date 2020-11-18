@@ -348,7 +348,7 @@ URL：步骤`3`用[https://open.weibo.com/tools/console](https://open.weibo.com/
 > * [/src/pages/Home/index.js](https://github.com/fangkun119/java_proj_ref/blob/aae15268e09ef6408edae9266f2f1d729a13852b/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/index.js) 
 > * [/src/pages/Home/index.module.scss](https://github.com/fangkun119/java_proj_ref/blob/aae15268e09ef6408edae9266f2f1d729a13852b/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/index.module.scss)
 
-## 10. 显式转帖
+## 10. 完整显示转帖内容
 
 ### (1) 从`Home`组件中抽离一个单独的`Post`组件
 
@@ -414,6 +414,150 @@ URL：步骤`3`用[https://open.weibo.com/tools/console](https://open.weibo.com/
 > }
 > ~~~
 
+### (6) 将两个`action dispatch`合并成一个
 
+> 代码中有两处可以触发`action`：一处是使用`useEffect`、一处使用`InfiniteScroll`；将它们统一合并在一处 
+> 
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/e2175627c52d9e23d70c984cdeefeeed6b481671) 
 
+### (7) 合并新旧信息流
+
+> 目前的代码，滚动到页面底部、触发自动翻页信息流获取后。`下一页的微博`会替换`当前微博`。修改`reducer`中的代码，使其改为`下一页的微博`追加在`当前微博`之后
+> 
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/bb586f46ce86150491e8e79edb04f7347faf219f) 
+
+## 12 顶部的`App Header Bar`
+
+### (1) `App Header Bar`样式 
+
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/ad67ecc62002a30bb0e1f7a94844abb8551dba3f). 
+> 
+> 包含一个`<UserOutlined>`将用作登录按钮，`Weibo APP`标题，以及一个`<EditOutlined>`将用作发微博的按钮 
+> 
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/200_react/header_bar.jpg)
+
+### (2) OAuth登录1：登录按钮跳转
+
+> 点击登录按钮后，跳转到微博的登录界面，登录后跳转到开发平台指定的页面 
+
+	// 微博授权机制Wiki：https://open.weibo.com/wiki/%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6#.E6.8E.88.E6.9D.83.E6.9C.89.E6.95.88.E6.9C.9F
+	// 1. 引导需要授权的用户到如下地址：
+	https://api.weibo.com/oauth2/authorize?client_id=${APP_KEY}&response_type=code&redirect_uri=${REDIRECT_URL}`
+
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/ca81a279b4fc0512965f97fcec4d81d8a0ecd591) 
+> 
+> 登录后会跳转到`redirect_uri`参数所指向的页面（`login`），该页面目前还没有，第14步中添加
+
+### (3) `App Header Bar`顶部固定
+
+> 可以用`position:'fixed'`等来调CSS样式，也可以用`antd`组件`<Affix>`，下面使用`<Affix>`
+> 
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/7d7848d9fcff87e79955bf662cfcbc2afce6f481)
+
+## 13 `new post`页面
+
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/b06243b1ccc0aeda76113efc5ad2eee45f58bf4c)
+> 
+> * [/src/pages/New/index.js](https://github.com/fangkun119/java_proj_ref/blob/b06243b1ccc0aeda76113efc5ad2eee45f58bf4c/200_react/03_proj_weibo_client/weibo-app/src/pages/New/index.js)，[/src/pages/New/index.module.scss](https://github.com/fangkun119/java_proj_ref/blob/b06243b1ccc0aeda76113efc5ad2eee45f58bf4c/200_react/03_proj_weibo_client/weibo-app/src/pages/New/index.module.scss)：`new post`页面
+> * [/src/router/index.js](https://github.com/fangkun119/java_proj_ref/blob/b06243b1ccc0aeda76113efc5ad2eee45f58bf4c/200_react/03_proj_weibo_client/weibo-app/src/router/index.js)：注册到`react router`中
+
+##  14 `OAuth`登录2：获取weibo返回的登录`code`
+
+> 该`code`后续可用于换取`Access Token`
+
+(1) 安装`query-string`：用来提取url参数
+
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/200_react/03_proj_weibo_client/weibo-app/
+> $ npm install query-string -S
+> ...
+> + query-string@6.13.7
+> ...
+> ~~~
+
+(2) 代码
+
+> [git commit](https://github.com/fangkun119/java_proj_ref/commit/9babaeb0f52a474599ab18ca48ba903a9154316b) 
+> 
+> * [/src/pages/Login/index.js](https://github.com/fangkun119/java_proj_ref/blob/9babaeb0f52a474599ab18ca48ba903a9154316b/200_react/03_proj_weibo_client/weibo-app/src/pages/Login/index.js)：登录跳转页
+> * [/src/router/index.js](https://github.com/fangkun119/java_proj_ref/commit/9babaeb0f52a474599ab18ca48ba903a9154316b) ：将登录跳转页添加到`react router`中
+
+## 15. 发送微博评论功能
+
+(1) 后端API
+
+> Weibo API发评论接口：[https://open.weibo.com/wiki/2/comments/create](https://open.weibo.com/wiki/2/comments/create) 
+> 
+> 参数包括：`access_token`，`comment`（评论内容），`id` （被评论的微博id），`comment_ori`（如果是转发微博、是否评论给原微博），`rip`（开发者上报操作用户的真实IP）
+
+(2) 发送添加评论请求到后端
+
+代码：[git comment](https://github.com/fangkun119/java_proj_ref/commit/9f96ad7743eadd3013fac079bdbb3c81fd73ef50) 
+
+> * [/src/actions/comments.js](https://github.com/fangkun119/java_proj_ref/blob/9f96ad7743eadd3013fac079bdbb3c81fd73ef50/200_react/03_proj_weibo_client/weibo-app/src/actions/comments.js)：action
+> * [/src/api/comments.js](https://github.com/fangkun119/java_proj_ref/blob/9f96ad7743eadd3013fac079bdbb3c81fd73ef50/200_react/03_proj_weibo_client/weibo-app/src/api/comments.js)：api
+> * [/src/pages/New/index.js](https://github.com/fangkun119/java_proj_ref/blob/9f96ad7743eadd3013fac079bdbb3c81fd73ef50/200_react/03_proj_weibo_client/weibo-app/src/pages/New/index.js)：view、复用发微博的组件
+> * [/src/router/index.js](https://github.com/fangkun119/java_proj_ref/blob/9f96ad7743eadd3013fac079bdbb3c81fd73ef50/200_react/03_proj_weibo_client/weibo-app/src/router/index.js)：修改react router，发微博和发评论使用不同的url，但映射到相同的组件
+> * [/src/pages/Home/index.js](https://github.com/fangkun119/java_proj_ref/blob/9f96ad7743eadd3013fac079bdbb3c81fd73ef50/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/index.js)，[/src/pages/Home/components/post/index.js](https://github.com/fangkun119/java_proj_ref/blob/9f96ad7743eadd3013fac079bdbb3c81fd73ef50/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/components/post/index.js)：传入帖子id给用于发评论的组件
+> * [/src/setupProxy.js](https://github.com/fangkun119/java_proj_ref/blob/9f96ad7743eadd3013fac079bdbb3c81fd73ef50/200_react/03_proj_weibo_client/weibo-app/src/setupProxy.js)：调试过程中尝试修改了proxy发送到微博后端的http header，但最终未使用该修改
+> * [/src/utils/interceptors.js](https://github.com/fangkun119/java_proj_ref/blob/9f96ad7743eadd3013fac079bdbb3c81fd73ef50/200_react/03_proj_weibo_client/weibo-app/src/utils/interceptors.js)：对拦截器的修改，使请求成功/失败时的用户提示更友好
+
+## 16. 微博评论列表页面
+
+### (1) 请求后端获取评论列表（以便知道评论的格式），在`react router`中添加空的评论列表页面
+
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/5ccb0b58b9c5c590f7813821d3f3451c53422c6e) 
+> 
+> * [/src/actions/comments.js](https://github.com/fangkun119/java_proj_ref/blob/5ccb0b58b9c5c590f7813821d3f3451c53422c6e/200_react/03_proj_weibo_client/weibo-app/src/actions/comments.js)：action
+> * [/src/api/comments.js](https://github.com/fangkun119/java_proj_ref/blob/5ccb0b58b9c5c590f7813821d3f3451c53422c6e/200_react/03_proj_weibo_client/weibo-app/src/api/comments.js)：api
+> * [/jsconfig.json](https://github.com/fangkun119/java_proj_ref/blob/5ccb0b58b9c5c590f7813821d3f3451c53422c6e/200_react/03_proj_weibo_client/weibo-app/jsconfig.json)：用来缩短import的长度 
+> 
+>~~~json
+>{
+>     "_comment_1" : "配置文件，减少import文件时的路径长度，修改后重启生效",
+>     "_comment_2" : "例如 /src/pages/Home/components/post/index.js 文件中的 import { getComments } from 'actions/comments';", 
+>     "compilerOptions": {
+>         "baseUrl":"src"
+>     },
+>     "include":["src"]
+> }
+>~~~
+>
+> * [/src/pages/Home/components/post/index.js](https://github.com/fangkun119/java_proj_ref/blob/5ccb0b58b9c5c590f7813821d3f3451c53422c6e/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/components/post/index.js)：因为使用了`jsconfig.json`，下面两种import是等价的
+> 
+> ~~~javascript
+> ...
+> // import { getComments } from '../../../../actions/comments';
+> import { getComments } from 'actions/comments'; 
+> ...
+> const Post = ({ id, text,  user,  created_at,  source,  pic_urls, reposts_count,  attitudes_count, comments_count,  retweeted_status,  type
+}) => {
+>     const dispatch = useDispatch();
+>     const handleClickComment = () => {
+>         if (!comments_count) {
+>             window.location.href = `/comments/${id}`;
+>         } else {
+>             dispatch(getComments({id}));  //解除这行的注释，可以触发action，看到后端返回数据的格式
+>             window.location.href = `/details/${id}`;
+>         }
+>     };
+>     ...
+> }
+> ~~~
+> 
+> * [/src/pages/Details/index.js](https://github.com/fangkun119/java_proj_ref/blob/5ccb0b58b9c5c590f7813821d3f3451c53422c6e/200_react/03_proj_weibo_client/weibo-app/src/pages/Details/index.js)：空的评论列表页面（还未添加样式组件）
+> * [/src/router/index.js](https://github.com/fangkun119/java_proj_ref/blob/5ccb0b58b9c5c590f7813821d3f3451c53422c6e/200_react/03_proj_weibo_client/weibo-app/src/router/index.js)：将评论列表页面添加到`react router`中
+
+### (2) 根据id获取微博原文、以便展示在评论列表页上
+
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/75e0df13c058d7b620acf44d06bab344924db30d) 
+> 
+> * [/src/actions/timeline.js](https://github.com/fangkun119/java_proj_ref/blob/75e0df13c058d7b620acf44d06bab344924db30d/200_react/03_proj_weibo_client/weibo-app/src/actions/timeline.js)：action
+> * [/src/api/timeline.js](https://github.com/fangkun119/java_proj_ref/blob/75e0df13c058d7b620acf44d06bab344924db30d/200_react/03_proj_weibo_client/weibo-app/src/api/timeline.js)：api
+> * [/src/pages/Details/index.js](https://github.com/fangkun119/java_proj_ref/blob/75e0df13c058d7b620acf44d06bab344924db30d/200_react/03_proj_weibo_client/weibo-app/src/pages/Details/index.js): view 
+> 
+> 测试时发现这个API只有授权用户才可以用，先暂停评论页面开发，转到其他功能
+
+## 17. `OAuth`登录3：
 
