@@ -1,0 +1,8 @@
+{
+    "_comment_1" : "配置文件，减少import文件时的路径长度，修改后重启生效",
+    "_comment_2" : "例如 /src/pages/Home/components/post/index.js 文件中的 import { getComments } from 'actions/comments';", 
+    "compilerOptions": {
+        "baseUrl":"src"
+    },
+    "include":["src"]
+}

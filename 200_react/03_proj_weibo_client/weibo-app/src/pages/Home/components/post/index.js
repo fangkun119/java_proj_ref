@@ -2,6 +2,9 @@ import React from 'react';
 import { Card } from 'antd';
 import { RetweetOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons';
 import moment from 'moment';
+import { useDispatch } from 'redux-react-hook';
+// import { getComments } from '../../../../actions/comments';
+// import { getComments } from 'actions/comments'; // jsconfig.json中配了 "baseUrl":"src"
 import styles from './index.module.scss'
 
 const getPostTitle = (user, created_at, source) => (
@@ -33,9 +36,13 @@ const Post = ({
     retweeted_status,   // 原贴（如果是转帖）
     type,               // 帖子类型，对于转帖，原贴的actions为空
 }) => {
+    const dispatch = useDispatch();
     const handleClickComment = () => {
         if (!comments_count) {
             window.location.href = `/comments/${id}`;
+        } else {
+            // dispatch(getComments({id}));
+            window.location.href = `/details/${id}`;
         }
     };
 

@@ -14,3 +14,10 @@ export function createComment(params = {}) {
         }
     }
 }
+
+export function getComments(params = {}) {
+    return async () => {
+        const result = await api.getComments(params);
+        // console.log(result); //用来知道API的返回格式
+    }
+}

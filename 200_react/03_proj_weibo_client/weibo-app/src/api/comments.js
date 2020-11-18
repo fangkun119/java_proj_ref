@@ -1,6 +1,7 @@
 import ajax from '../utils/ajax';
 
 export function createComment(params) {
+    // 接口文档：https://open.weibo.com/wiki/2/comments/create
     return ajax.post('/proxy/2/comments/create.json', {
         // 后端返回：{"error":"miss required parameter (comment), see doc for more info.","error_code":1001
         // 1.与PostMan可以成功发送的请求对比，差别在于Content Type不一样
@@ -13,5 +14,12 @@ export function createComment(params) {
         data: params, 
         // params, 
         // headers: {'content-type':'application/x-www-form-urlencoded'}
+    });
+}
+
+export function getComments(params) {
+    // 接口文档：https://open.weibo.com/wiki/2/comments/show 
+    return ajax.get('/proxy/2/comments/show.json', {
+        params,
     });
 }
