@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import queryString from 'query-string';
+import { useDispatch } from 'redux-react-hook';
+import { getAccess } from 'actions/account';
 
 // 微博授权机制Wiki：https://open.weibo.com/wiki/%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6#.E6.8E.88.E6.9D.83.E6.9C.89.E6.95.88.E6.9C.9F
 // 1. 引导需要授权的用户到如下地址（/src/constants/index.js)：
@@ -10,7 +12,14 @@ import queryString from 'query-string';
 //    使用queryString.parseUrl可以提取出url中的参数code
 
 const Login = () => {
+    const dispatch = useDispatch();
     const {query: {code}} = queryString.parseUrl(window.location.href);
+    useEffect(() => {
+        if (code) {
+            dispatch(getAccess({code}));
+        }
+    }, [code, dispatch]);
+    
     return <div>{code}</div>;
 }
 

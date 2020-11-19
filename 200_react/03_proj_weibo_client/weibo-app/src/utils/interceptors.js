@@ -1,5 +1,4 @@
-// 因为登录功能还没有开发、暂时先把ACCESS_TOKEN写到常量中
-import { ACCESS_TOKEN } from '../constants';
+import { ACCESS_TOKEN_KEY } from '../constants';
 
 // Response 拦截器数组
 const responseInterceptors = [
@@ -33,7 +32,7 @@ const requestInterceptors = [
         // 注：所有的微博开放平台接口都部署在weibo.com域下，仅有移动端的授权接口在open.weibo.cn域。
         name: 'addHttpRequestHeader', 
         success(req) { 
-            req.headers['Authorization'] = `OAuth2 ${ACCESS_TOKEN}`
+            req.headers['Authorization'] = `OAuth2 ${localStorage.getItem(ACCESS_TOKEN_KEY)}`
             return req; 
         },
         fail(err) {
