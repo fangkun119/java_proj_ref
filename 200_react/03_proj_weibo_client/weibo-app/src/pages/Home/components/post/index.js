@@ -37,14 +37,18 @@ const Post = ({
     comments_count,     // 评论数 
     retweeted_status,   // 原贴（如果是转帖）
     type,               // 帖子类型，对于转帖，原贴的actions为空
+    isCommentsExpanded, // 评论列表是否展开
 }) => {
-    const dispatch = useDispatch();    
+    const dispatch = useDispatch();
+
     const handleClickComment = () => {
         if (!comments_count || 0 === comments_count) {
             window.location.href = `/comments/${id}`;
         } else {
-            dispatch(setCurrentPost({ id }))
-            dispatch(getComments({ id }));
+            dispatch(setCurrentPost({ id : isCommentsExpanded ? null : id })) // 评论列表未展开时、设置currentPost让列表展开；展开时重置为null使其关闭
+            if ( isCommentsExpanded ) {
+                dispatch(getComments({ id })); // 如果已经展开、那么现在是要关闭，就不必获取评论列表了
+            }
         }
     };
 

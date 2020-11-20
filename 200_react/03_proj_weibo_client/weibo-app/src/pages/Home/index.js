@@ -58,8 +58,9 @@ const Home = () => {
                 }) => (
                     <div key={id}>
                         <Post 
-                            key={id}  
+                            key={id} 
                             id={id} 
+                            isCommentsExpanded={current === id} 
                             {...rest} 
                         />
                         {
