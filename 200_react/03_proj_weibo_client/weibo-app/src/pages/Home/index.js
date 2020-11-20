@@ -61,7 +61,7 @@ const Home = () => {
                         />
                         {
                             current === id && 
-                            <CommentsList />
+                            <CommentsList id={id} />
                         }
                     </div>
                 ))

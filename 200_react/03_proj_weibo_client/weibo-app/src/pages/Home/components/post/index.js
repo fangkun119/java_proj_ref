@@ -3,9 +3,6 @@ import { Card } from 'antd';
 import { RetweetOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { useDispatch, useMappedState } from 'redux-react-hook';
-// 因为在/jsconfig.json中配置了"baseUrl":"src"，下面两种导入方式等价
-// import { getComments } from '../../../../actions/comments';  // 默认的import方式
-import { getComments } from 'actions/comments';   // 借助jsconfig.json配置的import方式
 import { setCurrentPost } from 'actions/timeline'; 
 import styles from './index.module.scss'
 
@@ -46,10 +43,6 @@ const Post = ({
             window.location.href = `/comments/${id}`;
         } else {
             dispatch(setCurrentPost({ id : isCommentsExpanded ? null : id })) // 评论列表未展开时、设置currentPost让列表展开；展开时重置为null使其关闭
-            // 仅当comment列表处于关闭状态时、点击才会获取数据以便展开评论列表
-            if ( ! isCommentsExpanded ) {
-                dispatch(getComments({ id, page : 1 })); 
-            }
         }
     };
 
