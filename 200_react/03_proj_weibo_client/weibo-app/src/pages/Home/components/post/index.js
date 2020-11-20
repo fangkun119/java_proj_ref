@@ -46,8 +46,9 @@ const Post = ({
             window.location.href = `/comments/${id}`;
         } else {
             dispatch(setCurrentPost({ id : isCommentsExpanded ? null : id })) // 评论列表未展开时、设置currentPost让列表展开；展开时重置为null使其关闭
-            if ( isCommentsExpanded ) {
-                dispatch(getComments({ id })); // 如果已经展开、那么现在是要关闭，就不必获取评论列表了
+            // 仅当comment列表处于关闭状态时、点击才会获取数据以便展开评论列表
+            if ( ! isCommentsExpanded ) {
+                dispatch(getComments({ id, page : 1 })); 
             }
         }
     };
@@ -63,15 +64,15 @@ const Post = ({
             actions={type ? [] : [ 
                 <div>
                     <RetweetOutlined key="retweet"/>
-                    <span>{reposts_count || ''}</span>
+                    <span> {reposts_count || ''}</span>
                 </div>,
                 <div>
                     <LikeOutlined key="like"/>
-                    <span>{attitudes_count || ''}</span>
+                    <span> {attitudes_count || ''}</span>
                 </div>,
                 <div onClick={handleClickComment}>
                     <MessageOutlined key="message"/>
-                    <span>{comments_count || ''}</span>
+                    <span> {comments_count || ''}</span>
                 </div>
             ]}
         >
