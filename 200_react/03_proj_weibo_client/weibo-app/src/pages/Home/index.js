@@ -2,12 +2,12 @@ import React from 'react';
 import { UserOutlined, EditOutlined } from '@ant-design/icons';
 import { useDispatch, useMappedState } from 'redux-react-hook';
 import InfiniteScroll from 'react-infinite-scroller';
-import { Row, Affix, List, Avatar, Card } from 'antd';
+import { Row, Affix } from 'antd';
 import { Link } from 'react-router-dom';
-import moment from 'moment';
-import { getHomeTimeline } from '../../actions/timeline';
+import { getHomeTimeline } from 'actions/timeline';
 import { LOGIN_URL } from '../../constants';
 import Post from './components/post';
+import CommentsList from './components/commentsList';
 import styles from './index.module.scss';
 
 const Home = () => {
@@ -65,29 +65,7 @@ const Home = () => {
                         />
                         {
                             current === id && 
-                            // 代码来自：https://ant.design/components/list-cn/
-                            <Card>
-                                <List
-                                    dataSource={comments}
-                                    // 用解构赋值提取item的属性，减少内部代码取这些属性值时的复杂度
-                                    renderItem={({user = {}, id, text, created_at}) => (
-                                        <List.Item key={id}>
-                                            <List.Item.Meta
-                                                avatar={<Avatar src={user.avatar_hd}/>}
-                                                title={
-                                                    <div>
-                                                        <span>{user.name}</span>
-                                                        <span className={styles.extra}>
-                                                            {moment(created_at).fromNow()}
-                                                        </span>
-                                                    </div>
-                                                }
-                                                description={text}
-                                            />
-                                        </List.Item>
-                                    )}
-                                />
-                            </Card>
+                            <CommentsList />
                         }
                     </div>
                 ))
