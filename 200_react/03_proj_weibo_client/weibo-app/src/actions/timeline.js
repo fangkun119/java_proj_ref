@@ -1,5 +1,5 @@
 import * as api from '../api/timeline';
-import { GET_HOME_TIMELINE } from '../constants/actions';
+import { GET_HOME_TIMELINE, SET_CURRENT_POST } from '../constants/actions';
 
 export function getHomeTimeline(params = {}) {
     return async (dispatch) => {
@@ -13,16 +13,11 @@ export function getHomeTimeline(params = {}) {
     }
 }
 
-export function getPost(params = {}) {
+export function setCurrentPost(payload = {}) {
     return async (dispatch) => {
-        const result = await api.getPost(params);
-        console.log(result);
-        /*
         dispatch({
-            type: GET_HOME_TIMELINE,
-            payload: result,
-            params, //把params一路传下去，这样在redux单向链路的各步中就可以知道请求到第几页了
+            type: SET_CURRENT_POST, 
+            payload,
         })
-        */
     }
 }

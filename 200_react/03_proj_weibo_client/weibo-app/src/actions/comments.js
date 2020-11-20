@@ -1,5 +1,6 @@
 import { message } from 'antd';
-import * as api from '../api/comments';
+import * as api from 'api/comments';
+import { GET_COMMENTS } from 'constants/actions';
 
 export function createComment(params = {}) {
     return async () => {
@@ -16,8 +17,12 @@ export function createComment(params = {}) {
 }
 
 export function getComments(params = {}) {
-    return async () => {
-        const result = await api.getComments(params);
-        // console.log(result); //用来知道API的返回格式
+    return async (dispatch) => {
+        // console.log(await api.getComments(params)); 
+        const {comments = []} = await api.getComments(params); 
+        dispatch({
+            type: GET_COMMENTS, 
+            payload: comments,
+        })
     }
 }
