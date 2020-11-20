@@ -22,10 +22,6 @@ const Home = () => {
     //     另一种方式，在定义reducer时设置默认值，见src/reducers/timeline.js
     const { home: { posts = [], page = 0} = {}, current } = useMappedState((state) => (state.timeline));
 
-    // 点击某条微博下面的评论时得到的该条微博的comment列表
-    // (1) 这个状态是有子组件<Post>触发action获取的，通过react单向链路，所有组件（包括它的父组件Home）都可以获取
-    const { comments = [] } = useMappedState((state) => (state.comments)); 
-
     const handleInfiniteOnLoad = () => {
         dispatch(getHomeTimeline({ page: page + 1 }));
     };
