@@ -28,7 +28,10 @@ const New = ({match}) => { //用解构赋值提取props.match，props是react ro
             param.append('id', id);         // 被评论的微博id，来自url参数
             param.append('comment', value); // 评论内容
             dispatch(createComment(param));
-        } 
+        } else {
+            // 可能是出于安全考虑，weibo没有开放发微博的API，
+            // 这里只做一个界面，并不会真正调用
+        }
     }
 
     return  (
