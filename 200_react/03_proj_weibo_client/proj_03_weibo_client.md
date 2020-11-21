@@ -503,7 +503,7 @@ URL：步骤`3`用[https://open.weibo.com/tools/console](https://open.weibo.com/
 > * [/src/setupProxy.js](https://github.com/fangkun119/java_proj_ref/blob/9f96ad7743eadd3013fac079bdbb3c81fd73ef50/200_react/03_proj_weibo_client/weibo-app/src/setupProxy.js)：调试过程中尝试修改了proxy发送到微博后端的http header，但最终未使用该修改
 > * [/src/utils/interceptors.js](https://github.com/fangkun119/java_proj_ref/blob/9f96ad7743eadd3013fac079bdbb3c81fd73ef50/200_react/03_proj_weibo_client/weibo-app/src/utils/interceptors.js)：对拦截器的修改，使请求成功/失败时的用户提示更友好
 
-## 16. 微博评论列表页面
+## 16. 微博评论列表页面（1）
 
 ### (1) 请求后端获取评论列表（以便知道评论的格式），在`react router`中添加空的评论列表页面
 
@@ -559,5 +559,134 @@ URL：步骤`3`用[https://open.weibo.com/tools/console](https://open.weibo.com/
 > 
 > 测试时发现这个API只有授权用户才可以用，先暂停评论页面开发，转到其他功能
 
-## 17. `OAuth`登录3：
+## 17. `OAuth`登录3：用`login code`换取`access token`以使用其他API
+
+> 代码：[git commit 1](https://github.com/fangkun119/java_proj_ref/commit/f2240d400d78d4b2845e69630d9e1cfa157883e5) 
+> 
+> * [/src/pages/Login/index.js](https://github.com/fangkun119/java_proj_ref/blob/f2240d400d78d4b2845e69630d9e1cfa157883e5/200_react/03_proj_weibo_client/weibo-app/src/pages/Login/index.js)：view，触发action
+> * [/src/actions/account.js](https://github.com/fangkun119/java_proj_ref/blob/f2240d400d78d4b2845e69630d9e1cfa157883e5/200_react/03_proj_weibo_client/weibo-app/src/actions/account.js)：action
+> * [/src/api/account.js](https://github.com/fangkun119/java_proj_ref/blob/f2240d400d78d4b2845e69630d9e1cfa157883e5/200_react/03_proj_weibo_client/weibo-app/src/api/account.js)：api
+> * [/src/utils/interceptors.js](https://github.com/fangkun119/java_proj_ref/blob/f2240d400d78d4b2845e69630d9e1cfa157883e5/200_react/03_proj_weibo_client/weibo-app/src/utils/interceptors.js)：获取的access token由拦截器加入到每个http请求中
+> * [/src/constants/index.js](https://github.com/fangkun119/java_proj_ref/blob/f2240d400d78d4b2845e69630d9e1cfa157883e5/200_react/03_proj_weibo_client/weibo-app/src/constants/index.js)：常量
+> 
+> ~~~javascript
+> // 微博授权机制Wiki：https://open.weibo.com/wiki/%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6#.E6.8E.88.E6.9D.83.E6.9C.89.E6.95.88.E6.9C.9F
+> // 1. 引导需要授权的用户到如下地址：
+> export const LOGIN_URL = `https://api.weibo.com/oauth2/authorize?client_id=${APP_KEY}&response_type=code&redirect_uri=${REDIRECT_URL}`
+> // 2. 如果用户同意授权，页面跳转至 YOUR_REGISTERED_REDIRECT_URI/?code=CODE
+> // 3. 换取Access Token，URL：
+> //    https://api.weibo.com/oauth2/access_token?client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET&grant_type=authorization_code&redirect_uri=YOUR_REGISTERED_REDIRECT_URI&code=CODE
+> export const accessTokenUrl = (code) => (
+>     `/proxy/oauth2/access_token?client_id=${APP_KEY}&client_secret=${APP_SECRET}&grant_type=authorization_code&redirect_uri=${REDIRECT_URL}&code=${code}` //有跨域问题、要使用proxy
+> );
+> // 4. 使用获得的Access Token调用API
+> ~~~
+> 
+> 代码：[git commit 2](https://github.com/fangkun119/java_proj_ref/commit/d8fc9543caac3bdcd461fa8d32b39f46027e7e56) ，bug fix，写入localStorage时使用的key与拦截器保持一致
+
+## 18. 微博评论列表页面（2）
+
+> 因为没有获取单条微博的API权限，放弃`16. 微博评论列表页面`中用一个单独页面展示单条微博及其评论的方法，改为在`Home`页面下将评论列表展开显示
+
+### (1) 点击数量大于0的“评论按钮”时，可以获取并展开评论列表
+
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/37e739d15fbc6a17ae0695d33985caef58bbfa36)
+> 
+> * [/src/pages/Home/components/post/index.js](https://github.com/fangkun119/java_proj_ref/blob/37e739d15fbc6a17ae0695d33985caef58bbfa36/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/components/post/index.js)：view (`Post`)，点击Post组件的评论按钮、并且评论数大于0时，会触发两个action：(1) `getComments`获取评论列表 (2) `setCurrentPost`标记哪条微博要展开评论列表 
+> * [/src/actions/comments.js](https://github.com/fangkun119/java_proj_ref/blob/37e739d15fbc6a17ae0695d33985caef58bbfa36/200_react/03_proj_weibo_client/weibo-app/src/actions/comments.js)：action从后端拿到comment列表后，继续dispatch给reducer
+> * [/src/actions/timeline.js](https://github.com/fangkun119/java_proj_ref/blob/37e739d15fbc6a17ae0695d33985caef58bbfa36/200_react/03_proj_weibo_client/weibo-app/src/actions/timeline.js)：
+> 	* 删除之前的`getPost` action，没有获取单条微博API的权限
+> 	* 替换为`setCurrentPost` action，该action不访问后端，只是将上游代码传入的post id分发给reducer，用来标记用户是想展开哪条微博的评论列表
+> * [/src/reducers/comments.js](https://github.com/fangkun119/java_proj_ref/blob/37e739d15fbc6a17ae0695d33985caef58bbfa36/200_react/03_proj_weibo_client/weibo-app/src/reducers/comments.js)，[/src/reducers/index.js](https://github.com/fangkun119/java_proj_ref/blob/37e739d15fbc6a17ae0695d33985caef58bbfa36/200_react/03_proj_weibo_client/weibo-app/src/reducers/index.js)：用来处理`getComments`和`setCurrentPost`的两个reducer，处理数据并存入store
+> * [/src/reducers/index.js](https://github.com/fangkun119/java_proj_ref/blob/37e739d15fbc6a17ae0695d33985caef58bbfa36/200_react/03_proj_weibo_client/weibo-app/src/reducers/index.js)：向root reducer中加入新建的reducer
+> * [/weibo-app/src/pages/Home/index.js](https://github.com/fangkun119/java_proj_ref/blob/37e739d15fbc6a17ae0695d33985caef58bbfa36/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/index.js)：view（`Home`），从`store/state`中拿到评论列表、以及评论所属的微博id，为该条微博展开评论列表
+
+### (2) 关闭评论列表功能
+
+> 评论列表展开状态下，再次点击评论按钮，可以关闭评论列表
+
+> 代码：[git commit 1](https://github.com/fangkun119/java_proj_ref/commit/e964d6b479e06edfe858223f307d17f8c6a769b0)
+> 
+> * [/src/pages/Home/components/post/index.js](https://github.com/fangkun119/java_proj_ref/blob/e964d6b479e06edfe858223f307d17f8c6a769b0/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/components/post/index.js)：view，根据评论列表是否展开、在点击评论按钮时触发不同的action
+> * [/src/pages/Home/index.js](https://github.com/fangkun119/java_proj_ref/blob/e964d6b479e06edfe858223f307d17f8c6a769b0/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/index.js)：外层组件、传参给`Post`组件使其可以知道评论列表是否处于展开状态（因为现实评论列表是在`Home`组件中实现的
+> 
+> 代码：[git commit 2](https://github.com/fangkun119/java_proj_ref/commit/9d5e06c6bc98fb6a930dc9b50e4236e14ee03c78), bug fix
+
+### (3) 将`Home`组件中与评论列表相关的代码拆分到专用的`commentsList`组件
+
+> 代码：[git commit 1](https://github.com/fangkun119/java_proj_ref/commit/8159878d6617e3e6e98f0572e1fbbdada0353963) 
+> 
+> * [/src/pages/Home/components/commentsList/index.js](https://github.com/fangkun119/java_proj_ref/blob/8159878d6617e3e6e98f0572e1fbbdada0353963/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/components/commentsList/index.js)，[/Home/components/commentsList/index.module.scss](https://github.com/fangkun119/java_proj_ref/blob/8159878d6617e3e6e98f0572e1fbbdada0353963/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/components/commentsList/index.module.scss)：`commentsList`组件
+> * [/src/pages/Home/index.js](https://github.com/fangkun119/java_proj_ref/blob/8159878d6617e3e6e98f0572e1fbbdada0353963/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/index.js)，[/src/pages/Home/index.module.scss](https://github.com/fangkun119/java_proj_ref/blob/8159878d6617e3e6e98f0572e1fbbdada0353963/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/index.module.scss)：`Home`组件
+> 
+> 代码：[git commit 2](https://github.com/fangkun119/java_proj_ref/commit/b85012a1021eac523b237c68199a1e34e8f84040)，清理遗留的代码（已迁移到commentsList)
+
+### (4) 将`Post`组件中与评论列表相关的代码迁移到`commentsList`组件中
+
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/913c49c9b9f9e27934da470b7fe7c087065e0e4f) 
+
+### (5) 评论分页加载功能
+
+> 评论展开后、每页最多增加5条评论，如果还有更多评论未展示，底部会显示一个“加载更多”按钮
+> 
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/3d5cffebf6e793d28a6c6534f8f2e763a571690a) 
+> 
+> * [/src/actions/comments.js](https://github.com/fangkun119/java_proj_ref/blob/3d5cffebf6e793d28a6c6534f8f2e763a571690a/200_react/03_proj_weibo_client/weibo-app/src/actions/comments.js)：获取评论列表的action，在params中增加当前请求第几页`page`，另外增加总评论条数`total_number` 
+> * [/src/reducers/comments.js](https://github.com/fangkun119/java_proj_ref/blob/3d5cffebf6e793d28a6c6534f8f2e763a571690a/200_react/03_proj_weibo_client/weibo-app/src/reducers/comments.js)：处理评论列表的reducer，合并并去重微博评论，传递page，total参数
+> * [/Home/components/commentsList/index.js](https://github.com/fangkun119/java_proj_ref/blob/3d5cffebf6e793d28a6c6534f8f2e763a571690a/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/components/commentsList/index.js)：触发评论加载的action，从store/state中取数据渲染评论列表
+
+### (6) Fix Compile Warnings
+
+> 代码：[git commit](https://github.com/fangkun119/java_proj_ref/commit/80fa291ed51b12bf21d312a8af852bfbcd8ad2f0) 
+> 
+> ~~~javascript
+>     // action获取评论列表后，会由reducer处理并存储在store/state中，这里从store/state提取评论列表
+>     const { comments = [], page = 0, total } = useMappedState((state) => (state.comments)); 
+>     
+>     // dispatch
+>     const dispatch = useDispatch();        
+>     
+>     // 滚动条滚到到底部时，触发获取下一页评论列表的action
+>     // useCallback(() => {...}, [dispatch, id, page])
+>     //    把内联回调函数及依赖项数组作为参数传入 useCallback，它将返回该回调函数的 memoized 版本，该回调函数仅在某个依赖项改变时才会更新
+>     //    对这个例子：当disaptch,id,page之一发生变化时，该回调函数也会发生变化
+>     // 参考（HookAPI索引）: https://zh-hans.reactjs.org/docs/hooks-reference.html#usecallback
+>     const handleInfiniteOnLoad = useCallback(() => { // add 'useCallback' for fix warning "The 'handleInfiniteOnLoad' function makes the dependencies of useEffect Hook (at line 23) change on every render. To fix this, wrap the definition of 'handleInfiniteOnLoad' in its own useCallback() Hook"
+>         dispatch(getComments({ id, page : page + 1, count: COMMENT_PAGESIZE }));
+>     }, [dispatch, id, page]); // add dependencies for error "React Hook useCallback does nothing when called with only one argument. Did you forget to pass an array of dependencies?"
+> 
+>     // CommentList组件加载时，触发获取评论列表的action
+>     useEffect(() => {
+>         handleInfiniteOnLoad();
+>     }, []);  
+>     // }, [handleInfiniteOnLoad]); 
+>     // 不希望 handleInfiniteOnLoad 发生变化时，加载下一页评论，将其从useEffect依赖中移除
+>     // 否则会造成死循环（调用handleInfiniteOnLoad会更新page，而更新page会导致handleInfiniteOnLoad发生变化）
+> ~~~
+
+### (7) Fix Bug：当点击另一条微博的评论按钮时、重置`state/store`中的`comment list`
+
+> 代码：[git comment](https://github.com/fangkun119/java_proj_ref/commit/187e3801bd6a797f4f982b64c2d780387f0f31ad) 
+> 
+> * [/src/actions/comments.js](https://github.com/fangkun119/java_proj_ref/blob/187e3801bd6a797f4f982b64c2d780387f0f31ad/200_react/03_proj_weibo_client/weibo-app/src/actions/comments.js)：增加`resetComments` action
+> * [/src/reducers/comments.js](https://github.com/fangkun119/java_proj_ref/blob/187e3801bd6a797f4f982b64c2d780387f0f31ad/200_react/03_proj_weibo_client/weibo-app/src/reducers/comments.js)：reducer中增加对`resetComments` action的处理
+> * [/src/actions/timeline.js](https://github.com/fangkun119/java_proj_ref/blob/187e3801bd6a797f4f982b64c2d780387f0f31ad/200_react/03_proj_weibo_client/weibo-app/src/actions/timeline.js)：由`setCurrentPost` action来触发`resetComments` action
+> 
+> ~~~javascript
+> export function setCurrentPost(payload = {}) {
+>     return async (dispatch) => {
+>         // 组件更新顺序为
+>         // 1. 用户点击“评论”按钮，触发setCurrentPost action
+>         // 2. await dispatch(resetComments())：先将评论列表清空
+>         // 3. dispatch payload，更新current的值为被点击的帖子的post_id
+>         // 4. Home组件渲染时，在id === current的<Post>组件下方挂载<CommentsList>组件
+>         // 5. CommentList组件触发getComments action获取评论列表
+>         await dispatch(resetComments()); // 阻塞等待异步reset完成后，再dispatch payload
+>         dispatch({
+>             type: SET_CURRENT_POST, 
+>             payload,
+>         })
+>     }
+> }
+> ~~~
 
