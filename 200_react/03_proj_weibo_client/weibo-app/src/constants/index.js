@@ -23,4 +23,7 @@ export const accessTokenUrl = (code) => (
 // 4. 使用获得的Access Token调用API
 
 
+// 展开评论时、每页展开多少条
+export const COMMENT_PAGESIZE = 5;
+
 

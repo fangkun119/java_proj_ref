@@ -19,10 +19,15 @@ export function createComment(params = {}) {
 export function getComments(params = {}) {
     return async (dispatch) => {
         // console.log(await api.getComments(params)); 
-        const {comments = []} = await api.getComments(params); 
+        // 解构赋值、从response中取出comments和total_number
+        const {comments = [], total_number = 0 } = await api.getComments(params); 
         dispatch({
             type: GET_COMMENTS, 
-            payload: comments,
+            payload: {
+                comments, 
+                params, 
+                total: total_number, 
+            }   
         })
     }
 }

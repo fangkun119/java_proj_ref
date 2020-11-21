@@ -1,14 +1,22 @@
 import { GET_COMMENTS } from "../constants/actions";
 
-const initState = {};
+const initState = {
+    comments: []
+};
 
 export default function reducer(state = initState, action) {
     switch (action.type) {
         case GET_COMMENTS:
-            const comments = action.payload || {};
+            const { comments, params: {page} = {}, total } = action.payload || {};
             return {
                 ...state,
-                comments,
+                // 合并新加载和已有的评论
+                // 有时候因新评论加入影响page参数分页、会导致出现重复评论，需要去重
+                comments: [...new Set([...state.comments, ...comments])], 
+                // 已经加载到评论列表第几页
+                page, 
+                // 总共有多少
+                total, 
             }
         default: 
             return state;

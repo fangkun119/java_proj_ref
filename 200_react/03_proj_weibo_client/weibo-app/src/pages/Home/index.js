@@ -52,9 +52,9 @@ const Home = () => {
                     id, 
                     ...rest
                 }) => (
-                    <div key={id}>
+                    <div key={"div_" + id}>
                         <Post 
-                            key={id} 
+                            key={"post_" + id} 
                             id={id} 
                             isCommentsExpanded={current === id} 
                             {...rest} 

@@ -1,33 +1,46 @@
 import React, { useEffect } from 'react';
-import { List, Avatar, Card } from 'antd';
+import { List, Avatar, Card, Button } from 'antd';
 import { useDispatch, useMappedState } from 'redux-react-hook';
 import moment from 'moment';
 // 因为在/jsconfig.json中配置了"baseUrl":"src"，下面两种导入方式等价
 // import { getComments } from '../../../../actions/comments';  // 默认的import方式
 import { getComments } from 'actions/comments';   // 借助jsconfig.json配置的import方式
+import { COMMENT_PAGESIZE } from 'constants/index';
 import styles from './index.module.scss';
 
 const CommentsList = ({ id }) => {
-    const dispatch = useDispatch();
+    // action获取评论列表后，会由reducer处理并存储在store/state中，这里从store/state提取评论列表
+    const { comments = [], page = 0, total } = useMappedState((state) => (state.comments)); 
+    
+    const dispatch = useDispatch();        
+    const handleInfiniteOnLoad = () => {
+        // 滚动条滚到到底部时，触发获取下一页评论列表的action
+        dispatch(getComments({ id, page : page + 1, count: COMMENT_PAGESIZE }));
+    }
     useEffect(() => {
-        dispatch(getComments({ id, page : 1 })); 
-    }, [dispatch]);
+        // 组件加载时、以及dispatch发生变化时，触发获取评论列表的action
+        handleInfiniteOnLoad();
+    }, []);
 
-    // 点击某条微博下面的评论时得到的该条微博的comment列表
-    // (1) 这个状态是有子组件<Post>触发action获取的，通过react单向链路，所有组件（包括它的父组件Home）都可以获取
-    const { comments = [] } = useMappedState((state) => (state.comments)); 
+    const loadMore = page * COMMENT_PAGESIZE < total && (
+        <div className={styles.loadMore}>
+            <Button onClick={handleInfiniteOnLoad}>加载更多</Button>
+        </div>
+    );
 
     return (
-        // 代码来自：https://ant.design/components/list-cn/
-        <Card>
+        // <List> 代码来自：https://ant.design/components/list-cn/ 
+        // <InfiniteScroll> 代码参考 <Home> 以及 https://ant.design/components/list-cn/ 
+        <Card className={styles.comentsList}>
             <List
+                loadMore={loadMore} 
                 dataSource={comments}
-                // 用解构赋值提取item的属性，减少内部代码取这些属性值时的复杂度
-                renderItem={({user = {}, id, text, created_at}) => (
-                    <List.Item key={id}>
+                // 用解构赋值提取comments中item的属性，减少内部代码取这些属性值时的复杂度
+                renderItem={({ user = {}, id, text, created_at }) => (
+                    <List.Item key={"list_itme_" + id}>
                         <List.Item.Meta
-                        avatar={<Avatar src={user.avatar_hd}/>}
-                        title={
+                            avatar={<Avatar src={user.avatar_hd} />}
+                            title={
                                 <div>
                                     <span>{user.name}</span>
                                     <span className={styles.extra}>
