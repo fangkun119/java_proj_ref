@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import * as api from 'api/comments';
-import { GET_COMMENTS } from 'constants/actions';
+import { GET_COMMENTS, RESET_COMMENTS } from 'constants/actions';
 
 export function createComment(params = {}) {
     return async () => {
@@ -18,8 +18,7 @@ export function createComment(params = {}) {
 
 export function getComments(params = {}) {
     return async (dispatch) => {
-        // console.log(await api.getComments(params)); 
-        // 解构赋值、从response中取出comments和total_number
+        // 解构赋值、从response中取出comments和total_number // console.log(await api.getComments(params)); 
         const {comments = [], total_number = 0 } = await api.getComments(params); 
         dispatch({
             type: GET_COMMENTS, 
@@ -28,6 +27,14 @@ export function getComments(params = {}) {
                 params, 
                 total: total_number, 
             }   
-        })
+        });
+    }
+}
+
+export function resetComments(payload = {}) {
+    return async (dispatch) => {
+        dispatch({
+            type: RESET_COMMENTS, 
+        });
     }
 }

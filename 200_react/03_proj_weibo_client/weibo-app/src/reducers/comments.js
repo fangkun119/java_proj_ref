@@ -1,4 +1,4 @@
-import { GET_COMMENTS } from "../constants/actions";
+import { GET_COMMENTS, RESET_COMMENTS } from "../constants/actions";
 
 const initState = {
     comments: []
@@ -18,6 +18,8 @@ export default function reducer(state = initState, action) {
                 // 总共有多少
                 total, 
             }
+        case RESET_COMMENTS: 
+            return initState;
         default: 
             return state;
     }
