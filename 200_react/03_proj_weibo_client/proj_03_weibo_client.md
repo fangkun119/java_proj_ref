@@ -690,3 +690,28 @@ URL：步骤`3`用[https://open.weibo.com/tools/console](https://open.weibo.com/
 > }
 > ~~~
 
+## 19. 增加微博评论
+
+> 展开评论列表时，同时显示一个输入框，用来输入微博评论
+>
+> 
+> 代码：[git commit 1](https://github.com/fangkun119/java_proj_ref/commit/ade5acb473d8695c1205acd3e72e37775b696dd7)，[git commit 2](https://github.com/fangkun119/java_proj_ref/commit/655f5c97e7baed41b404ee141e907aadde363f6d) 
+> 
+> * [src/actions/comments.js](https://github.com/fangkun119/java_proj_ref/blob/655f5c97e7baed41b404ee141e907aadde363f6d/200_react/03_proj_weibo_client/weibo-app/src/actions/comments.js)：增加一个action、用来在comment列表（已有其他评论、即`isFirst === false`）新增评论
+> * [/src/reducers/comments.js](https://github.com/fangkun119/java_proj_ref/blob/655f5c97e7baed41b404ee141e907aadde363f6d/200_react/03_proj_weibo_client/weibo-app/src/reducers/comments.js)：reducer中增加对`ADD_COMMENT`的处理，它将新创建的评论与已有的评论列表合并，以便能够触发页面渲染，将新建的comment也显示在评论页表中
+> * [/src/pages/Home/components/commentsList/index.js](https://github.com/fangkun119/java_proj_ref/blob/655f5c97e7baed41b404ee141e907aadde363f6d/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/components/commentsList/index.js)：view，触发`ADD_COMMENT`  action，并清空输入框
+
+## 20. 删除微博评论
+
+> 代码: [git comment](https://github.com/fangkun119/java_proj_ref/commit/bea8aeb4572b591477b78cade80d695bf4eb9a4a) 
+> 
+> * [/src/pages/Home/components/commentsList/index.js](https://github.com/fangkun119/java_proj_ref/blob/bea8aeb4572b591477b78cade80d695bf4eb9a4a/200_react/03_proj_weibo_client/weibo-app/src/pages/Home/components/commentsList/index.js)：为自己发的微博、显示“删除”链接、以及点击后的警示弹窗、确认后触发`deleteComment` action
+> * [/src/actions/comments.js](https://github.com/fangkun119/java_proj_ref/blob/bea8aeb4572b591477b78cade80d695bf4eb9a4a/200_react/03_proj_weibo_client/weibo-app/src/actions/comments.js)：增加`deleteComment` action
+> * [/src/api/comments.js](https://github.com/fangkun119/java_proj_ref/blob/bea8aeb4572b591477b78cade80d695bf4eb9a4a/200_react/03_proj_weibo_client/weibo-app/src/api/comments.js)：增加`deleteComment` api
+
+> 辅助代码 
+> 
+> * [/src/actions/account.js](https://github.com/fangkun119/java_proj_ref/blob/bea8aeb4572b591477b78cade80d695bf4eb9a4a/200_react/03_proj_weibo_client/weibo-app/src/actions/account.js)：在登录用的`getAccess`  action中增加保存登录用户id的操作 
+> * [/src/constants/index.js](https://github.com/fangkun119/java_proj_ref/blob/bea8aeb4572b591477b78cade80d695bf4eb9a4a/200_react/03_proj_weibo_client/weibo-app/src/constants/index.js)：增加用于获取登录用户id的公用函数 
+
+
