@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from 'antd';
 import { RetweetOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons';
 import moment from 'moment';
-import { useDispatch, useMappedState } from 'redux-react-hook';
+import { useDispatch } from 'redux-react-hook';
 import { setCurrentPost } from 'actions/timeline'; 
 import styles from './index.module.scss'
 

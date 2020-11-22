@@ -1,10 +1,10 @@
-import React, { useEffect, useCallback } from 'react';
-import { List, Avatar, Card, Button } from 'antd';
+import React, { useEffect, useCallback, useState } from 'react';
+import { List, Avatar, Card, Button, Input, Row, Col } from 'antd';
 import { useDispatch, useMappedState } from 'redux-react-hook';
 import moment from 'moment';
 // 因为在/jsconfig.json中配置了"baseUrl":"src"，下面两种导入方式等价
 // import { getComments } from '../../../../actions/comments';  // 默认的import方式
-import { getComments } from 'actions/comments';   // 借助jsconfig.json配置的import方式
+import { getComments, createComment } from 'actions/comments';   // 借助jsconfig.json配置的import方式
 import { COMMENT_PAGESIZE } from 'constants/index';
 import styles from './index.module.scss';
 
@@ -14,7 +14,7 @@ const CommentsList = ({ id }) => {
     
     // dispatch
     const dispatch = useDispatch();        
-    
+
     // 滚动条滚到到底部时，触发获取下一页评论列表的action
     // useCallback(() => {...}, [dispatch, id, page])
     //    把内联回调函数及依赖项数组作为参数传入 useCallback，它将返回该回调函数的 memoized 版本，该回调函数仅在某个依赖项改变时才会更新
@@ -39,10 +39,35 @@ const CommentsList = ({ id }) => {
         </div>
     );
 
+    // 发表评论
+    const [commentValue, setCommentValue] = useState('');
+    const handleSendComment = () => {
+        // 接口文档：https://open.weibo.com/wiki/2/comments/create 
+        // 参数access_token:由拦截器统一添加
+        // Post请求要使用URLSearchParams来封装
+        let param = new URLSearchParams();
+        param.append('id', id);                 // 被评论的微博id，来自url参数
+        param.append('comment', commentValue);  // 评论内容
+        dispatch(createComment(param));    
+    };
+
     return (
         // <List> 代码来自：https://ant.design/components/list-cn/ 
         // <InfiniteScroll> 代码参考 <Home> 以及 https://ant.design/components/list-cn/ 
         <Card className={styles.comentsList}>
+            <Row>
+                <Col span={20}>
+                    <Input onChange={(e) => setCommentValue(e.target.value)}/>
+                </Col>
+                <Col>
+                    <Button 
+                        onClick={handleSendComment} 
+                        type="primary"
+                    >
+                        评论
+                    </Button>
+                </Col>
+            </Row>
             <List
                 loadMore={loadMore} 
                 dataSource={comments}
