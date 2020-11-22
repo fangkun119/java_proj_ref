@@ -1,13 +1,19 @@
 import { message } from 'antd';
 import * as api from 'api/comments';
-import { GET_COMMENTS, RESET_COMMENTS } from 'constants/actions';
+import { GET_COMMENTS, RESET_COMMENTS, ADD_COMMENT } from 'constants/actions';
 
-export function createComment(params = {}) {
-    return async () => {
+export function createComment(params = {}, isFirst) {
+    return async (dispatch) => {
         try {
-            const { id } = await api.createComment(params);
-            if (id) {
+            const result = await api.createComment(params);
+            if (result) {
                 message.success('评论成功！');
+                if (!isFirst) {
+                    dispatch({ 
+                        type: ADD_COMMENT,
+                        payload: result,
+                    })
+                }
             } 
         } catch(e) {
             console.log(e);

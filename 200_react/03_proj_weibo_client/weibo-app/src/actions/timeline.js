@@ -5,7 +5,6 @@ import { resetComments } from './comments';
 export function getHomeTimeline(params = {}) {
     return async (dispatch) => {
         const result = await api.getHomeTimeline(params);
-        console.log(result);
         dispatch({
             type: GET_HOME_TIMELINE,
             payload: result,

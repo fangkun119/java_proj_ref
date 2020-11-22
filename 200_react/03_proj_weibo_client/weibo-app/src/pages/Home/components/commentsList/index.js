@@ -31,7 +31,7 @@ const CommentsList = ({ id }) => {
     // }, [handleInfiniteOnLoad]); 
     // 不希望 handleInfiniteOnLoad 发生变化时，加载下一页评论，将其从useEffect依赖中移除
     // 否则会造成死循环（调用handleInfiniteOnLoad会更新page，而更新page会导致handleInfiniteOnLoad发生变化）
-    
+
     // 仅当还有未显示的评论时，才会出现“加载更多”按钮
     const loadMore = page * COMMENT_PAGESIZE < total && (
         <div className={styles.loadMore}>
@@ -48,7 +48,8 @@ const CommentsList = ({ id }) => {
         let param = new URLSearchParams();
         param.append('id', id);                 // 被评论的微博id，来自url参数
         param.append('comment', commentValue);  // 评论内容
-        dispatch(createComment(param));    
+        dispatch(createComment(param, false));  // 触发另一action，以便发送ajas请求
+        setCommentValue('');                    // commentValue状态清零，以清空输入框
     };
 
     return (
@@ -57,15 +58,10 @@ const CommentsList = ({ id }) => {
         <Card className={styles.comentsList}>
             <Row>
                 <Col span={20}>
-                    <Input onChange={(e) => setCommentValue(e.target.value)}/>
+                    <Input value={commentValue} onChange={(e) => setCommentValue(e.target.value)}/>
                 </Col>
-                <Col>
-                    <Button 
-                        onClick={handleSendComment} 
-                        type="primary"
-                    >
-                        评论
-                    </Button>
+                <Col span={4}>
+                    <Button onClick={handleSendComment} type="primary">评论</Button>
                 </Col>
             </Row>
             <List
