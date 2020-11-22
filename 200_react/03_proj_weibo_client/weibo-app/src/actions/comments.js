@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import * as api from 'api/comments';
-import { GET_COMMENTS, RESET_COMMENTS, ADD_COMMENT } from 'constants/actions';
+import { GET_COMMENTS, RESET_COMMENTS, ADD_COMMENT, REMOVE_COMMENT } from 'constants/actions';
 
 export function createComment(params = {}, isFirst) {
     return async (dispatch) => {
@@ -42,5 +42,18 @@ export function resetComments(payload = {}) {
         dispatch({
             type: RESET_COMMENTS, 
         });
+    }
+}
+
+export function deleteComment(payload = {}) {
+    return async (dispatch) => {
+        const { id } = await api.deleteComment(payload)
+        if (id) {
+            message.success('删除评论');
+        }
+        dispatch({
+            type: REMOVE_COMMENT,
+            payload: id
+        })
     }
 }

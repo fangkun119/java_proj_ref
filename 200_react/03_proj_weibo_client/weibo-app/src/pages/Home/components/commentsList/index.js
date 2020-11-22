@@ -1,12 +1,16 @@
 import React, { useEffect, useCallback, useState } from 'react';
-import { List, Avatar, Card, Button, Input, Row, Col } from 'antd';
+import { List, Avatar, Card, Button, Input, Row, Col, Modal} from 'antd';
 import { useDispatch, useMappedState } from 'redux-react-hook';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 // 因为在/jsconfig.json中配置了"baseUrl":"src"，下面两种导入方式等价
 // import { getComments } from '../../../../actions/comments';  // 默认的import方式
-import { getComments, createComment } from 'actions/comments';   // 借助jsconfig.json配置的import方式
-import { COMMENT_PAGESIZE } from 'constants/index';
+import { getComments, createComment, deleteComment } from 'actions/comments';   // 借助jsconfig.json配置的import方式
+import { COMMENT_PAGESIZE, getUid } from 'constants/index';
 import styles from './index.module.scss';
+
+const uid = getUid();
+const { confirm } = Modal; // 解构赋值
 
 const CommentsList = ({ id }) => {
     // action获取评论列表后，会由reducer处理并存储在store/state中，这里从store/state提取评论列表
@@ -52,6 +56,22 @@ const CommentsList = ({ id }) => {
         setCommentValue('');                    // commentValue状态清零，以清空输入框
     };
 
+    // 删除评论
+    const handleDeleteComment  = (e, id) => {
+        e.preventDefault();
+        let param = new URLSearchParams(); 
+        param.append('cid', id);
+        confirm({
+            title: '警告',
+            icon: <ExclamationCircleOutlined />,
+            content: '确定要删除这条评论吗？',
+            onOk() {
+                dispatch(deleteComment(param))
+            }
+        })
+    }
+
+    // 组件渲染
     return (
         // <List> 代码来自：https://ant.design/components/list-cn/ 
         // <InfiniteScroll> 代码参考 <Home> 以及 https://ant.design/components/list-cn/ 
@@ -69,7 +89,13 @@ const CommentsList = ({ id }) => {
                 dataSource={comments}
                 // 用解构赋值提取comments中item的属性，减少内部代码取这些属性值时的复杂度
                 renderItem={({ user = {}, id, text, created_at }) => (
-                    <List.Item key={"list_itme_" + id}>
+                    <List.Item 
+                        key={id}
+                        actions={
+                            uid === user.idstr ? 
+                                [<a href="#!" onClick={(e) => handleDeleteComment(e, id)}>删除</a>] : []
+                            }
+                    >
                         <List.Item.Meta
                             avatar={<Avatar src={user.avatar_hd} />}
                             title={

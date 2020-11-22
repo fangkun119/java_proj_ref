@@ -1,5 +1,7 @@
 // 登录功能完成之前、调试用的ACCESS_TOKEN，在`https://open.weibo.com/tools/console`生成
 export const ACCESS_TOKEN_KEY = 'weibo_app_access_token';
+export const UID_KEY = 'weibo_app_uid';
+export const getUid = () => localStorage.getItem(UID_KEY);
 
 // 在`http://open.weibo.com`点击“我的应用”，点击应用，在”应用信息”-“基本信息”可以看到
 export const APP_KEY = '1394113243';

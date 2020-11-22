@@ -1,5 +1,5 @@
 import { PresetStatusColorTypes } from "antd/lib/_util/colors";
-import { GET_COMMENTS, RESET_COMMENTS, ADD_COMMENT } from "../constants/actions";
+import { GET_COMMENTS, RESET_COMMENTS, ADD_COMMENT, REMOVE_COMMENT } from "../constants/actions";
 
 const initState = {
     comments: []
@@ -26,6 +26,11 @@ export default function reducer(state = initState, action) {
             return {
                 ...state,
                 comments: [action.payload, ...state.comments],
+            }
+        case REMOVE_COMMENT: 
+            return {
+                ...state,
+                comments: state.comments.filter(({id}) => id !== action.payload)
             }
         default: 
             return state;
