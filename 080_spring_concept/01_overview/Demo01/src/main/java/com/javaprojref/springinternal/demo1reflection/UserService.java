@@ -1,4 +1,4 @@
-package com.javaprojref.springinternal.demo1;
+package com.javaprojref.springinternal.demo1reflection;
 
 public class UserService {
     public UserService() {

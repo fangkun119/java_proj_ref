@@ -1,7 +1,7 @@
-package com.javaprojref.springinternal.demo1.test;
+package test.javaprojref.springinternal.demo1reflection;
 
-import com.javaprojref.springinternal.demo1.UserController;
-import com.javaprojref.springinternal.demo1.UserService;
+import com.javaprojref.springinternal.demo1reflection.UserController;
+import com.javaprojref.springinternal.demo1reflection.UserService;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
