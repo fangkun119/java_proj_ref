@@ -14,6 +14,6 @@
 > * 在VM中查看该VM的内网IP：执行命令 `ip add` （不再是ifconfig）
 > * 安装Virtual Box增强工具，用来设置共享目录从主机传递文件：参考url [1](https://www.jianshu.com/p/1ccff5a7d750) [2](https://blog.csdn.net/kswkly/article/details/83690565) [3](https://blog.csdn.net/Scythe666/article/details/88624279)
 
-## (2) Mac OS Big Sur 11.0.1, Virtual Box 6.1.14, CentOS 7
+## (2) Mac OS Big Sur 11.0.1, Virtual Box 6.1.16, CentOS 7
 
-> Mac OS升级到11.0.1，原虚拟机无需改动，仍然可以正常使用
+> Mac OS升级到11.0.1，原虚拟机无法启动，下载最新的`Virtual Box 6.1.16`，安装过程中提示需要“安全与隐私”授权时按提示跳转到MacOS设置中为其设置权限，启动`Virtual Box`时按提示更新`Virtual Box Extension`，原虚拟机可以正常启动
