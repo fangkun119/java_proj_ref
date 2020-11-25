@@ -74,13 +74,14 @@
 
 "In contrast to the methods in {@link ListableBeanFactory}, all of the. operations in this interface will also check parent factories if this is a {@link HierarchicalBeanFactory}. If a bean is not found in this factory instance, the immediate parent factory will be asked. Beans in this factory instance are supposed to override beans of the same name in any parent factory."
 
-> `HierarchicalBeanFactory`：子容器可以访问父容器，父容器不能访问子容器。例如`Spring MVC 容器`是`Spring容器`的子容器，因此`Service`和`DAO`放在`Spring容器`中 、`Controller`要放在`Spring MVC`容器中。如果一个Factory同时实现`ListableBeanFactory`和`HierarchicalBeanFactory`，就会具有两个接口的特性.
+> `HierarchicalBeanFactory`：子容器可以访问父容器，父容器不能访问子容器。例如`Spring MVC 容器`是`Spring容器`的子容器，因此`Service`和`DAO`放在`Spring容器`中 、`Controller`要放在`Spring MVC`容器中 ([http://blog.xuyinhui.com/2018/10/02/Spring%E4%B8%AD%E7%9A%84%E7%88%B6%E5%AD%90%E5%AE%B9%E5%99%A8/](http://blog.xuyinhui.com/2018/10/02/Spring%E4%B8%AD%E7%9A%84%E7%88%B6%E5%AD%90%E5%AE%B9%E5%99%A8/)
+)。如果一个Factory同时实现`ListableBeanFactory`和`HierarchicalBeanFactory`，就会具有两个接口的特性.
 
 ## 4.  例子
 
-### 例子1：Bean添加到容器并注入的过程
+Bean添加到容器并注入的过程
 
-> 例子：[https://github.com/spring-cloud/spring-cloud-openfeign/blob/ffb17a45523f614a3a5bfa9564493cf0374edf34/spring-cloud-openfeign-core/src/main/java/org/springframework/cloud/openfeign/FeignClientFactoryBean.java](https://github.com/spring-cloud/spring-cloud-openfeign/blob/ffb17a45523f614a3a5bfa9564493cf0374edf34/spring-cloud-openfeign-core/src/main/java/org/springframework/cloud/openfeign/FeignClientFactoryBean.java)
+> 代码：[https://github.com/spring-cloud/spring-cloud-openfeign/blob/ffb17a45523f614a3a5bfa9564493cf0374edf34/spring-cloud-openfeign-core/src/main/java/org/springframework/cloud/openfeign/FeignClientFactoryBean.java](https://github.com/spring-cloud/spring-cloud-openfeign/blob/ffb17a45523f614a3a5bfa9564493cf0374edf34/spring-cloud-openfeign-core/src/main/java/org/springframework/cloud/openfeign/FeignClientFactoryBean.java)
 > 
 > ~~~java
 > ...
@@ -187,6 +188,4 @@
 >	}	
 > }
 > ~~~
-
-### 例子2：父子容器
 
