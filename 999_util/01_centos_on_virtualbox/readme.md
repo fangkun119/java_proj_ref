@@ -1,6 +1,8 @@
 # 在`Virtual Box`上安装`CentOS` 
 
-## (1) Mac OS Catalina 10.15.7, Virtual Box 6.1.14, CentOS 7
+## 1.安装记录
+
+### (1) Mac OS Catalina 10.15.7, Virtual Box 6.1.14, CentOS 7
 
 > * centos镜像下载：[http://mirrors.163.com/centos/7/](http://mirrors.163.com/centos/7/)
 > * centos虚拟机安装：用运行在Mac OS Catalina 10.15.7上的Virtual Box 6.1上安装和运行Centos 7虚拟机
@@ -14,6 +16,96 @@
 > * 在VM中查看该VM的内网IP：执行命令 `ip add` （不再是ifconfig）
 > * 安装Virtual Box增强工具，用来设置共享目录从主机传递文件：参考url [1](https://www.jianshu.com/p/1ccff5a7d750) [2](https://blog.csdn.net/kswkly/article/details/83690565) [3](https://blog.csdn.net/Scythe666/article/details/88624279)
 
-## (2) Mac OS Big Sur 11.0.1, Virtual Box 6.1.16, CentOS 7
+### (2) Mac OS Big Sur 11.0.1, Virtual Box 6.1.16, CentOS 7
 
 > Mac OS升级到11.0.1，原虚拟机无法启动，下载最新的`Virtual Box 6.1.16`，安装过程中提示需要“安全与隐私”授权时按提示跳转到MacOS设置中为其设置权限，启动`Virtual Box`时按提示更新`Virtual Box Extension`，原虚拟机可以正常启动
+
+## 2. `CentOS 7`相关操作
+
+### (1) 开启某个端口
+
+参考url：[https://blog.csdn.net/weixin_38750084/article/details/90387056](https://blog.csdn.net/weixin_38750084/article/details/90387056)
+
+> 例子：开启80、8080、3306、8088端口：
+> 
+> ~~~shell
+> [root@localhost tengine]# systemctl status firewalld  #如果是关闭就执行systemctl start firewalld
+> ● firewalld.service - firewalld - dynamic firewall daemon
+>    Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled; vendor preset: enabled)
+>    Active: active (running) since 一 2020-10-19 20:00:05 CST; 28min ago
+>      Docs: man:firewalld(1)
+>  Main PID: 754 (firewalld)
+>     Tasks: 2
+>    CGroup: /system.slice/firewalld.service
+>            └─754 /usr/bin/python2 -Es /usr/sbin/firewalld --nofork --nopid
+> 
+> 10月 19 20:00:03 localhost.localdomain systemd[1]: Starting firewalld - dynamic fi....
+> 10月 19 20:00:05 localhost.localdomain systemd[1]: Started firewalld - dynamic fir....
+> 10月 19 20:00:05 localhost.localdomain firewalld[754]: WARNING: AllowZoneDrifting ....
+> Hint: Some lines were ellipsized, use -l to show in full.
+> [root@localhost tengine]# firewall-cmd --list-ports
+> 
+> [root@localhost tengine]# firewall-cmd --zone=public --add-port=80/tcp --permanent
+> success
+> [root@localhost tengine]# firewall-cmd --zone=public --add-port=8080/tcp --permanent
+> success
+> [root@localhost tengine]# firewall-cmd --zone=public --add-port=8088/tcp --permanent
+> success
+> [root@localhost tengine]# firewall-cmd --zone=public --add-port=3306/tcp --permanent
+> success
+> [root@localhost tengine]# firewall-cmd --reload
+> success
+> [root@localhost tengine]# firewall-cmd --list-ports
+> 80/tcp 8080/tcp 8088/tcp 3306/tcp
+> ~~~
+
+### (2) 查看虚拟机IP地址
+
+> `ifconfig`还没有安装时、可以使用`ip add`
+> 
+> ~~~shell
+> [root@localhost tengine]# ip add | grep inet
+>     inet 127.0.0.1/8 scope host lo
+>     inet6 ::1/128 scope host
+>     inet 192.168.1.169/24 brd 192.168.1.255 scope global noprefixroute dynamic enp0s8
+>     inet6 fe80::fc2e:c8d8:879e:f698/64 scope link noprefixroute
+>     inet 192.168.122.1/24 brd 192.168.122.255 scope global virbr0
+> ~~~
+
+### (3) 关闭`防火墙`
+
+参考URL：[https://blog.csdn.net/zsgcsdn/article/details/78337564](https://blog.csdn.net/zsgcsdn/article/details/78337564)
+
+> ~~~bash
+> [root@localhost ~]# systemctl status firewalld # 查看防火墙状态
+> ● firewalld.service - firewalld - dynamic firewall daemon
+>    Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled; vendor preset: enabled)
+>    Active: active (running) since 三 2020-11-25 16:20:30 CST; 19min ago
+>      Docs: man:firewalld(1)
+>  Main PID: 760 (firewalld)
+>     Tasks: 2
+>    CGroup: /system.slice/firewalld.service
+>            └─760 /usr/bin/python2 -Es /usr/sbin/firewalld --nofork --nopid
+> 
+> 11月 25 16:20:29 localhost.localdomain systemd[1]: Starting firewalld - dynamic firewall .....
+> 11月 25 16:20:30 localhost.localdomain systemd[1]: Started firewalld - dynamic firewall d...n.
+> 11月 25 16:20:31 localhost.localdomain firewalld[760]: WARNING: AllowZoneDrifting is enabl....
+> Hint: Some lines were ellipsized, use -l to show in full.
+> [root@localhost ~]# systemctl stop firewalld # 关闭防火墙
+> [root@localhost ~]# systemctl disable firewalld # 防火墙开机不启动
+> Removed symlink /etc/systemd/system/multi-user.target.wants/firewalld.service.
+> Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
+> [root@localhost ~]# systemctl status firewalld # 查看防火墙状态
+> ● firewalld.service - firewalld - dynamic firewall daemon
+>    Loaded: loaded (/usr/lib/systemd/system/firewalld.service; disabled; vendor preset: enabled)
+>    Active: inactive (dead)
+>      Docs: man:firewalld(1)
+> 
+> 11月 25 16:20:29 localhost.localdomain systemd[1]: Starting firewalld - dynamic firewall .....
+> 11月 25 16:20:30 localhost.localdomain systemd[1]: Started firewalld - dynamic firewall d...n.
+> 11月 25 16:20:31 localhost.localdomain firewalld[760]: WARNING: AllowZoneDrifting is enabl....
+> 11月 25 16:39:58 localhost.localdomain systemd[1]: Stopping firewalld - dynamic firewall .....
+> 11月 25 16:39:59 localhost.localdomain systemd[1]: Stopped firewalld - dynamic firewall d...n.
+> Hint: Some lines were ellipsized, use -l to show in full.
+> ~~~
+
