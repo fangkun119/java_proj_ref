@@ -109,3 +109,24 @@
 > Hint: Some lines were ellipsized, use -l to show in full.
 > ~~~
 
+(4)为虚拟机设置固定IP
+
+> (1) `Virtual Box`虚拟机网卡配置：
+> 
+> * 网卡1：桥接，用来让虚拟机能访问外网，其中“高级”->“控制芯片”一定要选`virtio-net`
+> 
+> 	![](https://raw.githubusercontent.com/kenfang119/pics/main/999_util/virtual_box_network_static_ip_cfg_1.jpg)
+> 
+> * 网卡2：Host Only网络，组建一个从笔记本到虚拟机的子网，用来配置静态IP
+> 
+> 	![](https://raw.githubusercontent.com/kenfang119/pics/main/999_util/virtual_box_network_static_ip_cfg_2.jpg)
+> 
+> (2) 虚拟机静态IP配置：之前的步骤中安装`Virtual Box增强工具`时已经顺带安装了XServer，可以用图形化界面配置；启动虚拟机后、在Virtual Box为虚拟机开启的中断界面输入`startx`命令，进入图形界面
+> 
+> * `Application` -> `Setting` -> `Network`：点击`Red Hat Ethernet`
+> 
+> 	![](https://raw.githubusercontent.com/kenfang119/pics/main/999_util/static_ip_cfg_1.jpg)
+> 
+> * 填入静态IP、掩码、网关及DNS：
+> 
+> 	![](https://raw.githubusercontent.com/kenfang119/pics/main/999_util/static_ip_cfg_2.jpg)
