@@ -231,7 +231,8 @@
 > [root@CentOSA ~]# vi /usr/kafka_2.11-2.2.0/config/server.properties # 修改配置
 > [root@CentOSA ~]# 以下命令列出了检查或修改的内容
 > [root@CentOSA ~]# # 三台虚拟机的brocker.id分别应当是0，1，2
-> [root@CentOSA ~]# cat /usr/kafka_2.11-2.2.0/config/server.properties | grep ^broker.id=broker.id=0
+> [root@CentOSA ~]# cat /usr/kafka_2.11-2.2.0/config/server.properties | grep ^broker.id=
+> broker.id=0
 > [root@CentOSA ~]# # 三台虚拟机监听的Host分别应当是CentOSA:9092, CentOSB:9092, CentOSC:9092
 > [root@CentOSA ~]# cat /usr/kafka_2.11-2.2.0/config/server.properties | grep ^listeners= 
 > listeners=PLAINTEXT://CentOSA:9092
@@ -241,12 +242,13 @@
 > zookeeper.connect=CentOSA:2181,CentOSB:2181,CentOSC:2181
 > ~~~
 > 
-> 清理拷贝VM之前、上一次遗留的kafka日志
+> 清理拷贝VM之前、上一次前一个VM遗留的kafka日志
 > 
 > ~~~bash
 > [root@CentOSA ~]# rm -rf /usr/kafka-logs/* #因为是拷贝过来的VM，清理之前遗留的kafka日志
 > [root@CentOSA ~]# ls /usr/kafka-logs/
 > [root@CentOSA ~]#
+> [root@CentOSA ~]# rm -f /usr/kafka_2.11-2.2.0/logs/* 
 > ~~~
 > 
 > 至此`Kafka`集群环境搭建完毕，下一个实验（topic管理）将启动和测试`Kafka`
