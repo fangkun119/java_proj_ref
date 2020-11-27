@@ -10,16 +10,26 @@
 
 ### (2) 修改3台机器的静态IP、配置主机名和IP映射
 
-> 方法参考[上一个实验](../02_single_node_setup/readme.md)的配置记录，配置3台VM的`HostName`，`静态IP`如下
+> 为每台机器配置两个网卡：
 > 
-> |  VM 			 			| 主机名  	| 静态IP 	         |
-> | --------------------	| --------	| ---------- |
-> | `kafka_cluster_node_a`	| CentOSA	| 192.168.1.121  |
-> | `kafka_cluster_node_b`	| CentOSB	| 192.168.1.122 |
-> | `kafka_cluster_node_c`	| CentOSC	| 192.168.1.123 |
+> * 网卡1：`桥接网卡`，用来让机器能够访问外网，以便下载安装包执行如`rpm`等远程安装命令：
+> 	* IP可以使用默认的`DHCP`，以免与其他设备IP冲突；
+> 	* 也可以设置成静态IP、方便使用`ssh client`登录（不用每次登录机器都要先在Virtual Box中断执行`ip add`查询IP地址）
+> * 网卡2：`Host Only网络`，用来让3台机器组成一个局域网，设置成静态IP
+> 
+> 配置方法参考文档：[在Virtual Box上安装CentOS](https://github.com/fangkun119/java_proj_ref/blob/master/999_util/01_centos_on_virtualbox/readme.md)中`2.(4) 为虚拟机设置固定IP`小节
+> 
+> 以下是配置3台VM的`HostName`，`静态IP`如下
+> 
+> |  VM                             	| 主机名  	| Host Only网络静态IP |  桥接网络 | 
+> | --------------------	| --------	| ---------------  | ------- | 
+> | `kafka_cluster_node_a`	| CentOSA	| 192.168.56.102         | DHCP     |
+> | `kafka_cluster_node_b`	| CentOSB	| 192.168.56.103         | DHCP     |
+> | `kafka_cluster_node_c`	| CentOSC	| 192.168.56.104         | DHCP     |
 
 ### (3) 网络连接检查
 
+> 修改三台机器的`/etc/sysconfig/network`、`/etc/hosts`文件，修改结果如下
 > 配置好，重启之后，以第一台`kafaka_cluster_node_a`为例检查如下，另外两台类似
 > 
 > ~~~bash
@@ -30,54 +40,67 @@
 > [root@localhost ~]# cat /etc/hosts #IP到HostName的映射
 > 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 > ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-> 192.168.1.121 CentOSA
-> 192.168.1.122 CentOSB
-> 192.168.1.123 CentOSC
+> 192.168.56.102 CentOSA
+> 192.168.56.103 CentOSB
+> 192.168.56.104 CentOSC
+> ~~~
 > 
-> [root@CentOSA ~]# ip add #三台机器的地址依次是192.168.1.121, 122, 123，网关和DNS都是192.168.1.1，子网掩码都是255.255.255.0
+> 重启后，检查3台机器用在`Host Only`网络网卡的IP地址，以`CentOSA`为例如下：
+> 
+> ~~~bash
+> [root@CentOSA ~]# ip add #三台机器的地址依次是192.168.56.102、103、104，网关和DNS都是192.168.56.1，子网掩码都是255.255.255.0
 > ...
-> 3: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
->     link/ether 08:00:27:ba:a7:e9 brd ff:ff:ff:ff:ff:ff
->     inet 192.168.1.121/24 brd 192.168.1.255 scope global noprefixroute eth0
+> 3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+>     link/ether 08:00:27:1b:24:7f brd ff:ff:ff:ff:ff:ff
+>     inet 192.168.56.102/24 brd 192.168.56.255 scope global noprefixroute eth1
 >        valid_lft forever preferred_lft forever
->     inet6 fe80::b6da:a7fa:3df:886b/64 scope link noprefixroute
+>     inet6 fe80::88d5:e1eb:8622:2e7/64 scope link noprefixroute
 >        valid_lft forever preferred_lft forever
 > ...
 > 
 > [root@CentOSA ~]# ping www.baidu.com #可以访问外网
 > PING www.a.shifen.com (112.80.248.76) 56(84) bytes of data.
 > 64 bytes from 112.80.248.76 (112.80.248.76): icmp_seq=1 ttl=56 time=19.6 ms
-> 
 > ~~~
 > 
->启动三台虚拟机，互相之间可以`ping`通
+> 三台虚拟机之间可以通过配置的域名在`Host Only`网络互相访问，基本不会丢包。以`CentOSA`为例、检查结果如下（其中的`192.168.1.124`是在`Virtual Box`虚拟机终端使用`ip add`命令得到）
 >
 >~~~bash
 > __________________________________________________________________
-> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/300_kafka/
-> $ ssh root@192.168.1.121
-> root@192.168.1.121's password:
-> Last login: Thu Nov 26 16:41:27 2020
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/100_nginx_tengine/01_setup_and_config/
+> $ ssh root@192.168.1.124
+> root@192.168.1.124's password:
+> Last login: Fri Nov 27 15:27:46 2020
 > [root@CentOSA ~]# ping CentOSA
-> PING CentOSA (192.168.1.121) 56(84) bytes of data.
-> 64 bytes from CentOSA (192.168.1.121): icmp_seq=1 ttl=64 time=0.050 ms
+> PING CentOSA (192.168.56.102) 56(84) bytes of data.
+> 64 bytes from CentOSA (192.168.56.102): icmp_seq=1 ttl=64 time=0.109 ms
+> 64 bytes from CentOSA (192.168.56.102): icmp_seq=2 ttl=64 time=0.063 ms
+> 64 bytes from CentOSA (192.168.56.102): icmp_seq=3 ttl=64 time=0.069 ms
+> 64 bytes from CentOSA (192.168.56.102): icmp_seq=4 ttl=64 time=0.063 ms
 > ^C
 > --- CentOSA ping statistics ---
-> 1 packets transmitted, 1 received, 0% packet loss, time 999ms
-> rtt min/avg/max/mdev = 0.038/0.044/0.050/0.006 ms
+> 4 packets transmitted, 4 received, 0% packet loss, time 3002ms
+> rtt min/avg/max/mdev = 0.063/0.076/0.109/0.019 ms
 > [root@CentOSA ~]# ping CentOSB
-> PING CentOSB (192.168.1.122) 56(84) bytes of data.
-> 64 bytes from CentOSB (192.168.1.122): icmp_seq=10 ttl=64 time=1.38 ms
+> PING CentOSB (192.168.56.103) 56(84) bytes of data.
+> 64 bytes from CentOSB (192.168.56.103): icmp_seq=1 ttl=64 time=1.32 ms
+> 64 bytes from CentOSB (192.168.56.103): icmp_seq=2 ttl=64 time=0.621 ms
+> 64 bytes from CentOSB (192.168.56.103): icmp_seq=3 ttl=64 time=0.692 ms
+> 64 bytes from CentOSB (192.168.56.103): icmp_seq=4 ttl=64 time=0.631 ms
 > ^C
 > --- CentOSB ping statistics ---
-> 2 packets transmitted, 1 received, 50% packet loss, time 19012ms
-> rtt min/avg/max/mdev = 1.382/1.382/1.382/0.000 ms
+> 4 packets transmitted, 4 received, 0% packet loss, time 3005ms
+> rtt min/avg/max/mdev = 0.621/0.816/1.322/0.294 ms
 > [root@CentOSA ~]# ping CentOSC
-> PING CentOSC (192.168.1.123) 56(84) bytes of data.
-> 64 bytes from CentOSC (192.168.1.123): icmp_seq=10 ttl=64 time=1.87 ms
-> --- CentOSC ping statistics ---
-> 1 packets transmitted, 1 received, 0% packet loss, time 999ms
+> PING CentOSC (192.168.56.104) 56(84) bytes of data.
+> 64 bytes from CentOSC (192.168.56.104): icmp_seq=1 ttl=64 time=2.38 ms
+> 64 bytes from CentOSC (192.168.56.104): icmp_seq=2 ttl=64 time=0.718 ms
+> 64 bytes from CentOSC (192.168.56.104): icmp_seq=3 ttl=64 time=0.603 ms
+> 64 bytes from CentOSC (192.168.56.104): icmp_seq=4 ttl=64 time=0.898 ms
 > ^C
+> --- CentOSC ping statistics ---
+> 4 packets transmitted, 4 received, 0% packet loss, time 3007ms
+> rtt min/avg/max/mdev = 0.603/1.150/2.381/0.718 ms
 > ~~~
 
 ### 运行环境配置及`Kafka`启动
