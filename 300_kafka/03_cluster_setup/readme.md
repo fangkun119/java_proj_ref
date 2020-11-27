@@ -188,7 +188,12 @@
 > server.1=CentOSA:2888:3888
 > server.2=CentOSB:2888:3888
 > server.3=CentOSC:2888:3888
+> ~~~
 > 
+> 写入节点id标识：与zoo.cfg保持一致，`CentOSA`为1、`CentOSB`为2、`CentOSC`为3
+> 
+> ~~~bash
+> [root@CentOSA zookeeper-3.4.6]# echo 1 > /root/zkdata/myid #“1”来自zoo.cfg，每台机器值都不一样
 > ~~~
 > 
 > 启动zookeeper节点（三台虚拟机上的节点都启动）
@@ -199,8 +204,24 @@
 > Using config: /usr/zookeeper-3.4.6/bin/../conf/zoo.cfg
 > Starting zookeeper ... STARTED
 > ~~~
+> 
+> 检查zookeeper进程，下面的`QuorumPeerMain`就是zookeeper的进程
+> 
+> ~~~bash
+> [root@CentOSA ~]# jps
+> 6745 Jps
+> 6095 QuorumPeerMain
+> ~~~
+> 
+> 检查zookeeper日志，待3个zookeeper节点都启动后，应当不会再有“java.net.ConnectException: 拒绝连接 (Connection refused)”日志，只剩下下面的正常日志
+> 
+> ~~~bash
+> [root@CentOSA ~]# tail zookeeper.out
+> 2020-11-27 16:38:10,556 [myid:1] - INFO  [CentOSA/192.168.56.102:3888:QuorumCnxManager$Listener@511] - Received connection request /192.168.56.104:53134
+> 2020-11-27 16:38:10,560 [myid:1] - INFO  [WorkerReceiver[myid=1]:FastLeaderElection@597] - Notification: 1 (message format version), 3 (n.leader), 0x0 (n.zxid), 0x1 (n.round), LOOKING (n.state), 3 (n.sid), 0x0 (n.peerEpoch) FOLLOWING (my state)
+> ~~~
 
-(6) `Kafka`配置及启动
+(6) `Kafka`配置
 
 > 检查和修改`Kafka`配置
 > 
@@ -210,8 +231,7 @@
 > [root@CentOSA ~]# vi /usr/kafka_2.11-2.2.0/config/server.properties # 修改配置
 > [root@CentOSA ~]# 以下命令列出了检查或修改的内容
 > [root@CentOSA ~]# # 三台虚拟机的brocker.id分别应当是0，1，2
-> [root@CentOSA ~]# cat /usr/kafka_2.11-2.2.0/config/server.properties | grep ^broker.id=
-broker.id=0
+> [root@CentOSA ~]# cat /usr/kafka_2.11-2.2.0/config/server.properties | grep ^broker.id=broker.id=0
 > [root@CentOSA ~]# # 三台虚拟机监听的Host分别应当是CentOSA:9092, CentOSB:9092, CentOSC:9092
 > [root@CentOSA ~]# cat /usr/kafka_2.11-2.2.0/config/server.properties | grep ^listeners= 
 > listeners=PLAINTEXT://CentOSA:9092
@@ -229,6 +249,18 @@ broker.id=0
 > [root@CentOSA ~]#
 > ~~~
 > 
-> 至此`Kafka`集群环境搭建完毕，可以启动`Kafka`
+> 至此`Kafka`集群环境搭建完毕，下一个实验（topic管理）将启动和测试`Kafka`
 > 
+> 关闭zookeeper节点，关闭虚拟机
 > 
+> ~~~
+> [root@CentOSA zookeeper-3.4.6]# cd /usr/zookeeper-3.4.6/
+> [root@CentOSA zookeeper-3.4.6]# ./bin/zkServer.sh stop zoo.cfg #关闭zookeeper
+> JMX enabled by default
+> Using config: /usr/zookeeper-3.4.6/bin/../conf/zoo.cfg
+> Stopping zookeeper ... STOPPED
+> [root@CentOSA zookeeper-3.4.6]# jps #检查
+> 12952 Jps
+> [root@CentOSA zookeeper-3.4.6]# shutdown 0 # 关闭虚拟机
+> ~~~
+
