@@ -97,7 +97,8 @@
 
 ### (1) 代码
 
-* [`/src/main/java/com/javaproref/kafka/apidemo/dml/KafkaTopicDMLMemo.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/dml/KafkaTopicDMLMemo.java)
+> * [`**/dml/KafkaTopicDMLMemo.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/dml/KafkaTopicDMLMemo.java)
+> * [`**/dml/DMLCommon.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/dml/DMLCommon.java)
 
 ### (2) 输出
 
@@ -120,13 +121,29 @@
 > after delete topic: dmlTestTopic01
 > topic01
 > ~~~
+> 
+> 另外有两份代码，是为了接下来的实验清理和重置实验环境而编写
+> 
+> * [**/dml/CreateTestingTopic.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/dml/CreateTestingTopic.java)
+> * [**/dml/RemoveTestingTopic.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/dml/RemoveTestingTopic.java)
 
 ## 5. 生产者消费者
 
 ### (1) 代码
 
-### (2) 输出
+> * [**/producer/KafkaProducerDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/producer/KafkaProducerDemo.java)
+> * [**/consumer/ConsumerCommon.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/consumer/ConsumerCommon.java)
+> * [**/consumer/KafkaConsumerSubscribeDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/consumer/KafkaConsumerSubscribeDemo.java)
 
+### (2) 实验输出
+
+> 重置实验环境
+> 
+> ~~~bash
+> java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar clear
+> java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar init
+> ~~~
+> 
 > Producer Demo
 > 
 > ~~~bash
@@ -197,3 +214,58 @@
 
 > 每个消费者消费哪些分区、默认是由`ConsumerCoordinator`来指定，但也可以在消费者的代码中手动指定 
 
+### (1) 代码
+
+> * [**/producer/KafkaProducerDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/producer/KafkaProducerDemo.java)
+> * [**/consumer/ConsumerCommon.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/consumer/ConsumerCommon.java)
+> * [**/consumer/KafkaConsumerPartitionAssignDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/consumer/KafkaConsumerPartitionAssignDemo.java)
+
+### (2) 实验输出
+
+> 重置实验环境
+> 
+> ~~~bash
+> java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar clear
+> java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar init
+> ~~~
+> 
+> Producer生产数据
+> 
+> ~~~bash
+> > [root@CentOSA ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar producer
+> INFO 2020-11-28 21:33:59,353(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values:
+> 	acks = 1
+> 	batch.size = 16384
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	...
+> 	value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+> 
+> INFO 2020-11-28 21:33:59,872(yyyy-MM-dd HH:mm:ss} org.apache.kafka.common.utils.AppInfoParser - Kafka version: 2.2.0
+> INFO 2020-11-28 21:33:59,872(yyyy-MM-dd HH:mm:ss} org.apache.kafka.common.utils.AppInfoParser - Kafka commitId: 05fcfde8f69b0349
+> INFO 2020-11-28 21:34:00,166(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.Metadata - Cluster ID: 8gU3YeKrQaiFufBYCW182g
+> INFO 2020-11-28 21:34:00,222(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1] Closing the Kafka producer with timeoutMillis = 9223372036854775807 ms.
+> ~~~
+>
+> 用手动指定分区的方式让消费者消费，指定其只消费"topic01"的分区0，并且从offset=1开始消费（跳过第一条offset-0的数据）
+> 
+> ~~~bash
+> [root@CentOSA ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar assign_consumer_partition
+> INFO 2020-11-28 21:35:13,742(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.ConsumerConfig - ConsumerConfig values:
+> 	auto.commit.interval.ms = 5000
+> 	auto.offset.reset = latest
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	...
+> 	value.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+> 
+> INFO 2020-11-28 21:35:14,094(yyyy-MM-dd HH:mm:ss} org.apache.kafka.common.utils.AppInfoParser - Kafka version: 2.2.0
+> INFO 2020-11-28 21:35:14,094(yyyy-MM-dd HH:mm:ss} org.apache.kafka.common.utils.AppInfoParser - Kafka commitId: 05fcfde8f69b0349
+> INFO 2020-11-28 21:35:14,097(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.KafkaConsumer - [Consumer clientId=consumer-1, groupId=null] Subscribed to partition(s): topic01-0
+> Type in: Ctrl + C to quit
+> INFO 2020-11-28 21:35:17,579(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.Metadata - Cluster ID: 8gU3YeKrQaiFufBYCW182g
+> topic01	0,1	key_4	value_4	1606570325083
+> topic01	0,2	key_5	value_5	1606570325083
+> topic01	0,3	key_2	value_2	1606570440220
+> topic01	0,4	key_4	value_4	1606570440220
+> topic01	0,5	key_5	value_5	1606570440220
+> ^C[root@CentOSA ~]#
+> ~~~
