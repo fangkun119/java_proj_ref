@@ -50,7 +50,7 @@
                     <archive>
                         <manifest>
                             <!--包含main函数的类 -->
-                            <mainClass>com.javaproref.kafka.apidemo.demo01.dml.KafkaTopicDML</mainClass>
+                            <mainClass>com.javaproref.kafka.apidemo.dml.Main</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>.</Class-Path>

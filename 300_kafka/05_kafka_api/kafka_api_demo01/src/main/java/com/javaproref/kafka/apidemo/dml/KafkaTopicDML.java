@@ -1,4 +1,4 @@
-package com.javaproref.kafka.apidemo.demo01.dml;
+package com.javaproref.kafka.apidemo.dml;
 
 import org.apache.kafka.clients.admin.*;
 
@@ -16,7 +16,7 @@ import static java.lang.Thread.sleep;
  * 需要在运行环境中（如Mac或者Linux的"/etc/hosts"）配置CentOSA, CentOSB, CentOSC的IP和主机名映射
  */
 public class KafkaTopicDML {
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
+    public static void runDemo() throws ExecutionException, InterruptedException {
         final String TOPIC_NAME = "dmlTestTopic01";
         final int PARTITION_NUM = 3;
         final short REPLICA_FACTOR = 2;
