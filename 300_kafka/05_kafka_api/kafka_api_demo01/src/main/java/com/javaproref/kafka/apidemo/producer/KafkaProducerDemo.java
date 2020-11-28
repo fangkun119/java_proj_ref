@@ -1,5 +1,6 @@
 package com.javaproref.kafka.apidemo.producer;
 
+import com.javaproref.kafka.apidemo.util.Constants;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -20,7 +21,7 @@ public class KafkaProducerDemo {
         // 2. 发送消息
         for (int i = 0; i < 10; ++i) {
             ProducerRecord<String, String> record
-                    = new ProducerRecord<String, String>("topic01", "key_" + i, "value_" + i); //还可以设定分区、时间戳等
+                    = new ProducerRecord<String, String>(Constants.TOPIC_01, "key_" + i, "value_" + i); //还可以设定分区、时间戳等
             producer.send(record);
         }
 

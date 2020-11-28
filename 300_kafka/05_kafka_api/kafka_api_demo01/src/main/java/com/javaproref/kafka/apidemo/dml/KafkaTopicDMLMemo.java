@@ -17,7 +17,7 @@ import static java.lang.Thread.sleep;
  */
 public class KafkaTopicDMLMemo {
     public void runDemo(String bootStrapServers) throws ExecutionException, InterruptedException {
-        final String TOPIC_NAME = "dmlTestTopic01";
+        final String TOPIC_NAME = "dml_test_topic";
         final int PARTITION_NUM = 3;
         final short REPLICA_FACTOR = 2;
 
@@ -28,7 +28,7 @@ public class KafkaTopicDMLMemo {
 
         //2. 列出topic
         System.out.println("before create topic: " + TOPIC_NAME);
-        listTopics(adminClient);
+        DMLCommon.getTopics(adminClient).forEach(System.out::println);
 
         //3. 异步提交Topic创建请求
         CreateTopicsResult createTopicResult = adminClient.createTopics(
@@ -42,7 +42,7 @@ public class KafkaTopicDMLMemo {
 
         //4. 查看Topic列表
         System.out.println("after create topic: " + TOPIC_NAME);
-        listTopics(adminClient);
+        DMLCommon.getTopics(adminClient).forEach(System.out::println);
 
         //5. 查看Topic详细信息
         DescribeTopicsResult dtr = adminClient.describeTopics(Arrays.asList(TOPIC_NAME));
@@ -60,18 +60,9 @@ public class KafkaTopicDMLMemo {
 
         //8. 再次查看Tipic列表
         System.out.println("after delete topic: " + TOPIC_NAME);
-        listTopics(adminClient);
+        DMLCommon.getTopics(adminClient).forEach(System.out::println);
 
         // 关闭KafkaAdminClient
         adminClient.close();
-    }
-
-    private void listTopics(KafkaAdminClient adminClient) throws ExecutionException, InterruptedException {
-        ListTopicsResult topicsResult = adminClient.listTopics();
-        Set<String> names = null;
-        names = topicsResult.names().get();
-        for (String name: names) {
-            System.out.println(name);
-        }
     }
 }
