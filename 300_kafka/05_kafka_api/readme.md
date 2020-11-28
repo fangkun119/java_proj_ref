@@ -75,7 +75,7 @@
 
 * [`/pom.xml`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/pom.xml)
 * [`/src/main/resources/log4j.properties`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/resources/log4j.properties) 
-* [`/src/main/java/com/javaproref/kafka/apidemo/demo01/dml/KafkaTopicDML.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/demo01/dml/KafkaTopicDML.java)
+* [`/src/main/java/com/javaproref/kafka/apidemo/dml/KafkaTopicDML.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/dml/KafkaTopicDML.java)
 
 ### (2) 运行
 

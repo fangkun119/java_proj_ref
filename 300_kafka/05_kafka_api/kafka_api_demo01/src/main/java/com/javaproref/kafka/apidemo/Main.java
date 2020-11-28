@@ -1,4 +1,6 @@
-package com.javaproref.kafka.apidemo.dml;
+package com.javaproref.kafka.apidemo;
+
+import com.javaproref.kafka.apidemo.dml.KafkaTopicDML;
 
 import java.util.concurrent.ExecutionException;
 
