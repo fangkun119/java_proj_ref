@@ -1,11 +1,10 @@
 package com.javaproref.kafka.apidemo;
 
-import com.javaproref.kafka.apidemo.consumer.KafkaConsumerDemo;
+import com.javaproref.kafka.apidemo.consumer.KafkaConsumerSubscribeDemo;
 import com.javaproref.kafka.apidemo.dml.KafkaTopicDMLMemo;
 import com.javaproref.kafka.apidemo.producer.KafkaProducerDemo;
 
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Stream;
 
 public class Main {
     public static final String BOOT_STRAP_SVRS = "CentOSA:9092,CentOSB:9092,CentOSC:9092";
@@ -32,7 +31,7 @@ public class Main {
                     (new KafkaProducerDemo()).runDemo(bootStrapSvrs);
                     break;
                 case Main.CONSUMER:
-                    (new KafkaConsumerDemo()).runDemo(bootStrapSvrs);
+                    (new KafkaConsumerSubscribeDemo()).runDemo(bootStrapSvrs);
                     break;
                 default:
                     Main.printHelp(args);

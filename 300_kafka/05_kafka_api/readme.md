@@ -178,4 +178,22 @@
 > topic01	0,7	key_5	value_5	1606554380649
 > ^C[root@CentOSA ~]#
 > ~~~
+> 
+> 其中的日志
+> 
+> ~~~txt
+> org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-1, groupId=g1] Setting newly assigned partitions: topic01-2, topic01-1, topic01-0
+> ~~~
+> 
+> 可以看到这个consumer会消费哪几个分区
+> 
+> * 如果启动多个属于同一个`group`（代码中的`props.put(ConsumerConfig.GROUP_ID_CONFIG, "g1")`）的消费者，这些消费者将分摊负载、分别负责不同的分区。
+> 	* 组内新增消费者时、一部分分区将交接给这个消费者
+> 	* 组内消费者退出或宕机时、其他消费者将接管这个消费者负责的分区
+> * 如果启动多个属于不同`group`的消费者，每条消息将向所有`group`都发送一遍
+> * 从消费者打印的消息日志可以看出，只保证同一个partition内的消息有序，来自不同`partition`的消息顺序不保证
+
+## 6. 手动指定`消费者`消费的分区
+
+> 每个消费者消费哪些分区、默认是由`ConsumerCoordinator`来指定，但也可以在消费者的代码中手动指定 
 

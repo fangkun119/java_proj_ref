@@ -11,7 +11,7 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-public class KafkaConsumerDemo {
+public class KafkaConsumerSubscribeDemo {
     public void runDemo(String bootStrapServers) throws InterruptedException {
         // 1. 创建Consumer
         Properties props = new Properties();
