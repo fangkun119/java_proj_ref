@@ -69,17 +69,17 @@
 > topic01
 > ~~~
 
-## 3. Topic管理及DML
+## 3. `Demo`代码入口
 
 ### (1) 代码
 
 * [`/pom.xml`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/pom.xml)
 * [`/src/main/resources/log4j.properties`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/resources/log4j.properties) 
-* [`/src/main/java/com/javaproref/kafka/apidemo/dml/KafkaTopicDML.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/dml/KafkaTopicDML.java)
+* [`/src/main/java/com/javaproref/kafka/apidemo/Main.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/Main.java)
 
 ### (2) 运行
 
-> 将`mvn package`生成的`jar`包放入笔记本与虚拟机的共享目录中
+> 将`mvn package`生成的`jar`包放入之前配置好的笔记本与虚拟机的共享目录
 > 
 > ~~~bash
 > __________________________________________________________________
@@ -91,20 +91,91 @@
 >
 > ~~~bash
 > [root@CentOSA ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar
-> INFO 2020-11-28 14:29:29,722(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.admin.AdminClientConfig - AdminClientConfig values:
+> ~~~
+
+## 4. `Topic`管理
+
+### (1) 代码
+
+* [`/src/main/java/com/javaproref/kafka/apidemo/dml/KafkaTopicDMLMemo.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/dml/KafkaTopicDMLMemo.java)
+
+### (2) 输出
+
+> ~~~bash
+> [root@CentOSA ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar topic_dml
+> INFO 2020-11-28 16:20:43,129(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.admin.AdminClientConfig - AdminClientConfig values:
 > 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
 > 	client.dns.lookup = default
 > 	...
 > 	ssl.truststore.type = JKS
 > 
-> INFO 2020-11-28 14:29:30,026(yyyy-MM-dd HH:mm:ss} org.apache.kafka.common.utils.AppInfoParser - Kafka version: 2.2.0
-> INFO 2020-11-28 14:29:30,026(yyyy-MM-dd HH:mm:ss} org.apache.kafka.common.utils.AppInfoParser - Kafka commitId: 05fcfde8f69b0349
+> INFO 2020-11-28 16:20:43,688(yyyy-MM-dd HH:mm:ss} org.apache.kafka.common.utils.AppInfoParser - Kafka version: 2.2.0
+> INFO 2020-11-28 16:20:43,688(yyyy-MM-dd HH:mm:ss} org.apache.kafka.common.utils.AppInfoParser - Kafka commitId: 05fcfde8f69b0349
 > before create topic: dmlTestTopic01
 > topic01
 > after create topic: dmlTestTopic01
 > dmlTestTopic01
 > topic01
-> dmlTestTopic01	(name=dmlTestTopic01, internal=false, partitions=(partition=0, leader=CentOSC:9092 (id: 0 rack: null), replicas=CentOSC:9092 (id: 0 rack: null), CentOSA:9092 (id: 2 rack: null), isr=CentOSC:9092 (id: 0 rack: null), CentOSA:9092 (id: 2 rack: null)),(partition=1, leader=CentOSA:9092 (id: 2 rack: null), replicas=CentOSA:9092 (id: 2 rack: null), CentOSB:9092 (id: 1 rack: null), isr=CentOSA:9092 (id: 2 rack: null), CentOSB:9092 (id: 1 rack: null)),(partition=2, leader=CentOSB:9092 (id: 1 rack: null), replicas=CentOSB:9092 (id: 1 rack: null), CentOSC:9092 (id: 0 rack: null), isr=CentOSB:9092 (id: 1 rack: null), CentOSC:9092 (id: 0 rack: null)))
+> dmlTestTopic01	(name=dmlTestTopic01, internal=false, partitions=(partition=0, leader=CentOSA:9092 (id: 2 rack: null), replicas=CentOSA:9092 (id: 2 rack: null), CentOSB:9092 (id: 1 rack: null), isr=CentOSA:9092 (id: 2 rack: null), CentOSB:9092 (id: 1 rack: null)),(partition=1, leader=CentOSB:9092 (id: 1 rack: null), replicas=CentOSB:9092 (id: 1 rack: null), CentOSC:9092 (id: 0 rack: null), isr=CentOSB:9092 (id: 1 rack: null), CentOSC:9092 (id: 0 rack: null)),(partition=2, leader=CentOSC:9092 (id: 0 rack: null), replicas=CentOSC:9092 (id: 0 rack: null), CentOSA:9092 (id: 2 rack: null), isr=CentOSC:9092 (id: 0 rack: null), CentOSA:9092 (id: 2 rack: null)))
 > after delete topic: dmlTestTopic01
 > topic01
 > ~~~
+
+## 5. 生产者消费者
+
+### (1) 代码
+
+### (2) 输出
+
+> Producer Demo
+> 
+> ~~~bash
+> [root@CentOSA ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar producer
+> INFO 2020-11-28 17:06:19,850(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values:
+> 	acks = 1
+> 	batch.size = 16384
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	...
+> 	value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+> 
+> INFO 2020-11-28 17:06:20,202(yyyy-MM-dd HH:mm:ss} org.apache.kafka.common.utils.AppInfoParser - Kafka version: 2.2.0
+> INFO 2020-11-28 17:06:20,202(yyyy-MM-dd HH:mm:ss} org.apache.kafka.common.utils.AppInfoParser - Kafka commitId: 05fcfde8f69b0349
+> INFO 2020-11-28 17:06:20,613(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.Metadata - Cluster ID: 8gU3YeKrQaiFufBYCW182g
+> INFO 2020-11-28 17:06:20,650(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1] Closing the Kafka producer with timeoutMillis = 9223372036854775807 ms.
+> ~~~
+> 
+> Consumer Demo
+> 
+> ~~~bash
+> [root@CentOSA ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar consumer
+> INFO 2020-11-28 17:06:25,276(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.ConsumerConfig - ConsumerConfig values:
+> 	auto.commit.interval.ms = 5000
+> 	auto.offset.reset = latest
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	...
+> 	value.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+> 
+> INFO 2020-11-28 17:06:25,645(yyyy-MM-dd HH:mm:ss} org.apache.kafka.common.utils.AppInfoParser - Kafka version: 2.2.0
+> INFO 2020-11-28 17:06:25,645(yyyy-MM-dd HH:mm:ss} org.apache.kafka.common.utils.AppInfoParser - Kafka commitId: 05fcfde8f69b0349
+> INFO 2020-11-28 17:06:25,649(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.KafkaConsumer - [Consumer clientId=consumer-1, groupId=g1] Subscribed to pattern: '^topic.*'
+> Type in: Ctrl + C to quit
+> INFO 2020-11-28 17:06:29,070(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.Metadata - Cluster ID: 8gU3YeKrQaiFufBYCW182g
+> INFO 2020-11-28 17:06:29,075(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.AbstractCoordinator - [Consumer clientId=consumer-1, groupId=g1] Discovered group coordinator CentOSA:9092 (id: 2147483645 rack: null)
+> INFO 2020-11-28 17:06:29,136(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-1, groupId=g1] Revoking previously assigned partitions []
+> INFO 2020-11-28 17:06:29,137(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.AbstractCoordinator - [Consumer clientId=consumer-1, groupId=g1] (Re-)joining group
+> INFO 2020-11-28 17:06:29,146(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.AbstractCoordinator - [Consumer clientId=consumer-1, groupId=g1] (Re-)joining group
+> INFO 2020-11-28 17:06:29,168(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.AbstractCoordinator - [Consumer clientId=consumer-1, groupId=g1] Successfully joined group with generation 6
+> INFO 2020-11-28 17:06:29,171(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-1, groupId=g1] Setting newly assigned partitions: topic01-2, topic01-1, topic01-0
+> topic01	2,6	key_0	value_0	1606554380628
+> topic01	2,7	key_6	value_6	1606554380649
+> topic01	2,8	key_7	value_7	1606554380649
+> topic01	2,9	key_8	value_8	1606554380649
+> topic01	2,10	key_9	value_9	1606554380649
+> topic01	1,4	key_1	value_1	1606554380647
+> topic01	1,5	key_3	value_3	1606554380649
+> topic01	0,5	key_2	value_2	1606554380648
+> topic01	0,6	key_4	value_4	1606554380649
+> topic01	0,7	key_5	value_5	1606554380649
+> ^C[root@CentOSA ~]#
+> ~~~
+

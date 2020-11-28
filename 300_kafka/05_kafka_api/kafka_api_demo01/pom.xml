@@ -40,7 +40,6 @@
             <version>3.9</version>
         </dependency> -->
     </dependencies>
-
     <build>
         <plugins>
             <!--`mvn package`时将所有依赖都打包到jar包中-->

@@ -15,16 +15,15 @@ import static java.lang.Thread.sleep;
  * Kafka Topic管理及DML
  * 需要在运行环境中（如Mac或者Linux的"/etc/hosts"）配置CentOSA, CentOSB, CentOSC的IP和主机名映射
  */
-public class KafkaTopicDML {
-    public static void runDemo() throws ExecutionException, InterruptedException {
+public class KafkaTopicDMLMemo {
+    public void runDemo(String bootStrapServers) throws ExecutionException, InterruptedException {
         final String TOPIC_NAME = "dmlTestTopic01";
         final int PARTITION_NUM = 3;
         final short REPLICA_FACTOR = 2;
 
         //1. 创建KafkaAdminClient
         Properties props = new Properties();
-        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,
-                "CentOSA:9092,CentOSB:9092,CentOSC:9092");
+        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
         KafkaAdminClient adminClient = (KafkaAdminClient)KafkaAdminClient.create(props);
 
         //2. 列出topic
@@ -67,7 +66,7 @@ public class KafkaTopicDML {
         adminClient.close();
     }
 
-    private static void listTopics(KafkaAdminClient adminClient) throws ExecutionException, InterruptedException {
+    private void listTopics(KafkaAdminClient adminClient) throws ExecutionException, InterruptedException {
         ListTopicsResult topicsResult = adminClient.listTopics();
         Set<String> names = null;
         names = topicsResult.names().get();
