@@ -3,9 +3,11 @@ package com.javaproref.kafka.apidemo.demo01.dml;
 import org.apache.kafka.clients.admin.*;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Stream;
 
 import static java.lang.Thread.sleep;
 
@@ -43,13 +45,21 @@ public class KafkaTopicDML {
         System.out.println("after create topic: " + TOPIC_NAME);
         listTopics(adminClient);
 
-        //5. 异步发起删除Topic的请求
-        DeleteTopicsResult deleteTopics = adminClient.deleteTopics(Arrays.asList(TOPIC_NAME));
+        //5. 查看Topic详细信息
+        DescribeTopicsResult dtr = adminClient.describeTopics(Arrays.asList(TOPIC_NAME));
+        Map<String, TopicDescription> topicDescriptionMap = dtr.all().get();
+        topicDescriptionMap.entrySet().forEach(entry -> {
+            System.out.println(entry.getKey() + "\t" + entry.getValue());
+        });
 
-        //6. 同步阻塞、等待Topic删除完毕
+        //6. 异步发起删除Topic的请求
+        DeleteTopicsResult deleteTopics
+                = adminClient.deleteTopics(Arrays.asList(TOPIC_NAME));
+
+        //7. 同步阻塞、等待Topic删除完毕
         deleteTopics.all().get();
 
-        //7. 再次查看Tipic列表
+        //8. 再次查看Tipic列表
         System.out.println("after delete topic: " + TOPIC_NAME);
         listTopics(adminClient);
 
