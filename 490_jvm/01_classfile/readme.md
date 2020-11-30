@@ -48,7 +48,7 @@ java  virtual machine specifications
 
 写一个空的类`Grp01Demo01ByteCode.java`，并在IDEA中编译生成`Grp01Demo01ByteCode.class`
 
-> [Grp01Demo01ByteCode.java.java](../demos/src/com/javaprojref/jvm/demogrp01/Grp01Demo01ByteCode.java)
+> [`../demos/src/com/javaprojref/jvm/grp01_classfile/Demo01ByteCode.java`](../demos/src/com/javaprojref/jvm/grp01_classfile/Demo01ByteCode.java)
 
 ### (2) 查看`.class`文件的方法
 
