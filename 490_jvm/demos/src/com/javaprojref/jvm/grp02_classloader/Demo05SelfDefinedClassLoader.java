@@ -1,7 +1,5 @@
 package com.javaprojref.jvm.grp02_classloader;
 
-import com.javaprojref.jvm.Hello;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,21 +14,15 @@ public class Demo05SelfDefinedClassLoader extends ClassLoader {
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         // 找到.class文件的存放路径
-        // 例如com.javaprojref.jvm.Hello，其class文件存放位置为../com/javaprojref/jvm/Hello.class
-        File f = new File("./src/", name.replace(".", "/").concat(".class"));
+        // 测试文件存放在：/Users/fangkun/test/com/javaprojref/jvm/Hello.class，是在另一个项目中构建的Hello.class
+        File f = new File("/Users/fangkun/test/", name.replace(".", "/").concat(".class"));
         try (
-                // use try-with-resource on AutoClosable and AutoClose objects
-                FileInputStream fis = new FileInputStream(f);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            FileInputStream fis = new FileInputStream(f);
         ){
-            // 从文件读入，写入到二进制输出流(ByteArrayOutputStream)中
-            int buf = 0;
-            while ((buf=fis.read()) !=0) {
-                baos.write(buf);
-            }
-            // 转换为二进制数组
-            byte[] bytes = baos.toByteArray();
-            // 将二进制数组转换为Class对象并返回
+            // 从文件加载come.javaprojref.jvm.Hello并返回
+            System.out.println("load class from file: " + f.getPath());
+            byte[] bytes = new byte[fis.available()];
+            fis.read(bytes);
             return defineClass(name, bytes, 0, bytes.length);
         } catch (Exception e) {
             e.printStackTrace();
@@ -46,8 +38,8 @@ public class Demo05SelfDefinedClassLoader extends ClassLoader {
         // 测试
         System.out.println(clazz == clazz1);
         // 输出：true
-        Hello h = (Hello)clazz.newInstance();
-        h.m();
+        // Hello h = (Hello)clazz.newInstance();
+        // h.m();
         // 输出：Hello JVM!
         System.out.println(selfDefinedClassLoader.getClass().getClassLoader());
         // 输出：sun.misc.Launcher$AppClassLoader@18b4aac2

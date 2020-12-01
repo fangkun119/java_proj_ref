@@ -20,11 +20,10 @@
 > ~~~java
 > String.class.getClassLoader();
 > ~~~
-> 
 
 2. 类加载器层次
 
-类加载器层次如下，上面的加载器是下面的`父加载器`（`父子加载器`关系、不是`父子类`关系）
+类加载器层次如下，上面的加载器是下面的`父加载器`（`父子加载器`关系，不是`父子类`关系，在`ClassLoader`模板类实现中，父加载器通过子加载器的成员变量来访问）
 
 > * `Bootstrap层`：负责加载`JDK`中最核心的`JAR`，如`lib/rt.jar`、`charset.jar`等，`C++`实现
 > * `Extension层`：负责加载扩展`JAR`包，加载`jre/lib/ext*.jar`或者`-Djava.ext.dirs指定的目录`
@@ -101,7 +100,7 @@ Demo代码：
 
 完整代码
 
-> [../demos/src/com/javaprojref/jvm/grp02_classloader/Demo04InvokeClassLoaderManually.java](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo04InvokeClassLoaderManually.java)
+> [`../demos/src/com/javaprojref/jvm/grp02_classloader/Demo04InvokeClassLoaderManually.java`](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo04InvokeClassLoaderManually.java)
 
 ### (2) 类加载（`loadClass方法`）执行过程
 
@@ -112,7 +111,8 @@ Demo代码：
 > 
 > public Class ClassLoader {
 >     ...
->     
+>     private final ClassLoader parent;  
+>     ...
 >     public Class<?> loadClass(String name) throws ClassNotFoundException {
 >         return loadClass(name, false);
 >     }
@@ -170,11 +170,51 @@ Demo代码：
 > 
 > 从上面可以看出，双亲委派使用了模板方法设计模式，如果要自定义`ClassLoader`，关键也是实现findClass方法
 
+### (3) 双亲委派机制有可能被打破吗？
+
+要通过重写`loadClass()`方法，有以下三种情况，详细内容在《[深入理解Java虚拟机：JVM高级特性与最佳实践](https://www.amazon.cn/dp/B082PTTSNB/ref=sr_1_1?__mk_zh_CN=%E4%BA%9A%E9%A9%AC%E9%80%8A%E7%BD%91%E7%AB%99&dchild=1&keywords=%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3java%E8%99%9A%E6%8B%9F%E6%9C%BA&qid=1606801962&sr=8-1)》（周志明著）中有提到：
+
+> 1. `JDK1.2`之前，自定义ClassLoader必须重写loadClass()
+> 2. `ThreadContextClassLoader`可以通过基础类调用实现类代码、通过`thread.setContextClassLoader`指定
+> 3. `osgi`, `tomcat`都有自己的模块指定classloader（可以加载同一类库的不同版本）
+
+下面是两个演示：
+
+> 1. 	[`Demo09ClassReloading1.java`](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo09ClassReloading1.java)：热加载被双亲委派机制阻止，无法加载新的类
+> 2.	[`Demo09ClassReloading2.java`](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo10ClassReloading2.java)：通过重写`loadClass`方法来打破双亲委派机制
+
 ##  4. 自定义类加载器
+
+### (1) 继承`ClassLoader`实现自定义加载器
 
 方法之一是`继承ClassLoader`类，例子如下
 
 > [../demos/src/com/javaprojref/jvm/grp02_classloader/Demo05SelfDefinedClassLoader.java](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo05SelfDefinedClassLoader.java)
+
+### (2) 为自定义加载器指定非默认的父加载器
+
+默认情况下，自定义ClassLoader的父加载器是`ClassLoader.getSystemClassLoader()`即`AppClassLoader`
+> 
+> 如[Demo01ClassLoaderLevel](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo01ClassLoaderLevel.java)中的演示
+> 
+> ~~~java
+> System.out.println(new Demo05SelfDefinedClassLoader().getParent());
+> //  输出 sun.misc.Launcher$AppClassLoader@18b4aac2
+> System.out.println(ClassLoader.getSystemClassLoader());
+> //  输出 sun.misc.Launcher$AppClassLoader@18b4aac2
+> ~~~
+> 
+> 在模板类`ClassLoader.java`的代码中也可以看出，默认构造函数是如何为一个自定义ClassLoader指派父加载器
+> 
+> ~~~java
+> protected ClassLoader() {
+>         this(checkCreateClassLoader(), getSystemClassLoader());
+>  }
+> ~~~
+
+如何为自定义ClassLoader指派父加载器，代码参考
+
+> [../demos/src/com/javaprojref/jvm/grp02_classloader/Demo08AssignParentClassLoader.java](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo08AssignParentClassLoader.java)
 
 ## 5. JVM的Lazy Loading
 
