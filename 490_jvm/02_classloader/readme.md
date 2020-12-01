@@ -1,5 +1,7 @@
 # Class加载和初始化
 
+[TOC]
+
 ## 1. 步骤 
 
 > 1. Loading ：将`class文件`加载到内存，使用`双亲委派模型`和`Lazy Loading`
@@ -9,7 +11,9 @@
 > 	3. Resolution：把`class`常量池里面的`符号引用`转换成可以直接取到值的内容
 > 3. Initializing：把静态变量赋为初始值（这时才调用静态代码块）
 
-## 2. 理解类加载器（`ClassLoader`）
+## 2. 加载
+
+### 2.1 理解类加载器（`ClassLoader`）
 
 1. 如何查某个类是被哪个ClassLoader加载到内存中的
 
@@ -85,9 +89,9 @@ Demo代码：
 > * 各个类加载器的加载范围：[grp02_classloader/Demo03ClassLoaderScope.java](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo03ClassLoaderScope.java)
 > * 
 
-## 3. 双亲委派加载过程
+### 2.2. 双亲委派加载过程
 
-### (1) 如何通过`ClassLoader`加载一个类
+#### (1) 如何通过`ClassLoader`加载一个类
 
 诸如`Spring的动态代理`、`JRebal热部署`等各类场景、都需要通过ClassLoader来加载类，例子如下
 
@@ -102,7 +106,7 @@ Demo代码：
 
 > [`../demos/src/com/javaprojref/jvm/grp02_classloader/Demo04InvokeClassLoaderManually.java`](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo04InvokeClassLoaderManually.java)
 
-### (2) 类加载（`loadClass方法`）执行过程
+#### (2) 类加载（`loadClass方法`）执行过程
 
 > 在`Idea`中通过`ClassLoader.class`可以查看到`ClassLoader`的代码，从入口函数`loadClass()`开始可以看出加载过程
 >
@@ -170,7 +174,7 @@ Demo代码：
 > 
 > 从上面可以看出，双亲委派使用了模板方法设计模式，如果要自定义`ClassLoader`，关键也是实现findClass方法
 
-### (3) 双亲委派机制有可能被打破吗？
+#### (3) 双亲委派机制有可能被打破吗？
 
 要通过重写`loadClass()`方法，有以下三种情况，详细内容在《[深入理解Java虚拟机：JVM高级特性与最佳实践](https://www.amazon.cn/dp/B082PTTSNB/ref=sr_1_1?__mk_zh_CN=%E4%BA%9A%E9%A9%AC%E9%80%8A%E7%BD%91%E7%AB%99&dchild=1&keywords=%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3java%E8%99%9A%E6%8B%9F%E6%9C%BA&qid=1606801962&sr=8-1)》（周志明著）中有提到：
 
@@ -183,15 +187,15 @@ Demo代码：
 > 1. 	[`Demo09ClassReloading1.java`](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo09ClassReloading1.java)：热加载被双亲委派机制阻止，无法加载新的类
 > 2.	[`Demo09ClassReloading2.java`](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo10ClassReloading2.java)：通过重写`loadClass`方法来打破双亲委派机制
 
-##  4. 自定义类加载器
+###  2.3. 自定义类加载器
 
-### (1) 继承`ClassLoader`实现自定义加载器
+#### (1) 继承`ClassLoader`实现自定义加载器
 
 方法之一是`继承ClassLoader`类，例子如下
 
 > [../demos/src/com/javaprojref/jvm/grp02_classloader/Demo05SelfDefinedClassLoader.java](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo05SelfDefinedClassLoader.java)
 
-### (2) 为自定义加载器指定非默认的父加载器
+#### (2) 为自定义加载器指定非默认的父加载器
 
 默认情况下，自定义ClassLoader的父加载器是`ClassLoader.getSystemClassLoader()`即`AppClassLoader`
 > 
@@ -216,7 +220,7 @@ Demo代码：
 
 > [../demos/src/com/javaprojref/jvm/grp02_classloader/Demo08AssignParentClassLoader.java](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo08AssignParentClassLoader.java)
 
-## 5. JVM的Lazy Loading
+### 2.4. JVM的Lazy Loading
 
 > 通常说的“懒加载”、严格讲应该叫“懒初始化”（Lazy Initializing），因为JVM规范并没有规定一个类何时加载、而是规定了何时初始化
 
@@ -232,7 +236,7 @@ Demo代码：
 
 > [../demos/src/com/javaprojref/jvm/grp02_classloader/Demo07LazyLoading.java](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo07LazyLoading.java)
 
-## 6. 解释器和即时编译器（`JIT）
+### 2.5. 解释器和即时编译器（`JIT）
 
 (1) 解释器和编译器
 
@@ -260,3 +264,61 @@ Demo代码：
 > * `-Xint`：纯解释模式、启动快，执行稍慢
 > * `-Xcomp`：纯编译模式、执行快、启动很慢（当jar包和类很多时）
 
+## 3. Linking以及Initializtion
+
+### 3.1 Linking的步骤
+
+> 1. Verfication：检查`class文件`是否符合标准 
+> 2. Perparation：为`class`的静态变量赋<b>默认值</b>（如int类型的赋默认值0）
+> 3. Resolution：把`class`常量池里面的`符号引用`转换成具体的内存地址、偏移量等直接引用
+> 
+> 	这一步其实就是`ClassLoader`类`loadClass(2)`方法中的第二个参数`resolve`所激活的操作
+> 
+> 	~~~java
+> 	protected Class<?> loadClass(String name, boolean resolve)
+> 	~~~
+
+### 3.2 Initialization的步骤
+
+> Initializing：把静态变量赋为初始值（而不再是默认值），这时会调用静态代码块
+
+### 3.3 代码演示
+
+> [../demos/src/com/javaprojref/jvm/grp02_classloader/Demo11ClassLoadLinkInitSteps.java](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo11ClassLoadLinkInitSteps.java)
+
+### 3.4 对于非静态成员变量
+
+以上面演示中的代码为例：
+
+> ~~~java
+> class T1 {
+>     public static int count = 2;
+>     public static T1 t = new T1();
+>     private int m = 8; // 非静态成员变量，new对象的时候才创建，过程是：(1)申请内存（2）赋默认值0，（3）执行构造函数设初始值为8
+>     private T1() {
+>         count ++; //这样的代码不规范，对静态变量的初始化操作，应当放在静态代码块中
+>     }
+> }
+> ~~~
+
+### 3.5 半初始化问题
+
+> ~~~java
+> public class Mgr {
+> 	private static volatile Mgr INSTANCE;  // 需要加volatile
+> 	...
+> 	public static Mgr getInstance() {
+> 		if (null == INSTANCE) {
+> 			// 双重检查
+> 			synchroized (Mgr.class) {
+> 				if (null == INSTANCE) {
+> 					// 如果INSTANCE变量不使用volatile
+> 					// 初始化到一半时但还没完成时，会因指令重排发生INSTANCE不为null的情况
+> 					// 这时另一个线程getInstance()会拿到一个正在初始化过程中的单例对象来使用
+> 					INSTANCE = new Mgr(); 
+> 				}
+> 			}
+> 		}
+> 	}
+> }
+> ~~~
