@@ -68,14 +68,14 @@
 > __consumer_offsets
 > topic01
 > ~~~
-
+demos
 ## 3. `Demo`代码入口
 
 ### (1) 代码
 
-* [`/pom.xml`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/pom.xml)
-* [`/src/main/resources/log4j.properties`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/resources/log4j.properties) 
-* [`/src/main/java/com/javaproref/kafka/apidemo/Main.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/Main.java)
+* [`/pom.xml`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/pom.xml)
+* [`/src/main/resources/log4j.properties`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/resources/log4j.properties) 
+* [`/src/main/java/com/javaproref/kafka/apidemo/Main.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/Main.java)
 
 ### (2) 运行
 
@@ -83,8 +83,8 @@
 > 
 > ~~~bash
 > __________________________________________________________________
-> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/300_kafka/05_kafka_api/kafka_api_demo01/ 
-> $ cp /Users/fangkun/Dev/git/java_proj_ref/300_kafka/05_kafka_api/kafka_api_demo01/target/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar ~/VirtualBox\ VMs/centos_share/
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/300_kafka/demos/ 
+> $ cp /Users/fangkun/Dev/git/java_proj_ref/300_kafka/demos/target/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar ~/VirtualBox\ VMs/centos_share/
 > ~~~
 
 > 在虚拟机中运行
@@ -97,8 +97,8 @@
 
 ### (1) 代码
 
-> * [`**/dml/KafkaTopicDMLMemo.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/dml/KafkaTopicDMLMemo.java)
-> * [`**/dml/DMLCommon.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/dml/DMLCommon.java)
+> * [`**/dml/KafkaTopicDMLMemo.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/dml/KafkaTopicDMLMemo.java)
+> * [`**/dml/DMLCommon.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/dml/DMLCommon.java)
 
 ### (2) 输出
 
@@ -124,16 +124,16 @@
 > 
 > 另外有两份代码，是为了接下来的实验清理和重置实验环境而编写
 > 
-> * [**/dml/CreateTestingTopic.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/dml/CreateTestingTopic.java)
-> * [**/dml/RemoveTestingTopic.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/dml/RemoveTestingTopic.java)
+> * [**/dml/CreateTestingTopic.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/dml/CreateTestingTopic.java)
+> * [**/dml/RemoveTestingTopic.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/dml/RemoveTestingTopic.java)
 
 ## 5. 生产者消费者
 
 ### (1) 代码
 
-> * [**/producer/KafkaProducerDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/producer/KafkaProducerDemo.java)
-> * [**/consumer/ConsumerCommon.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/consumer/ConsumerCommon.java)
-> * [**/consumer/KafkaConsumerSubscribeDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/consumer/KafkaConsumerSubscribeDemo.java)
+> * [**/producer/KafkaProducerDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/producer/KafkaProducerDemo.java)
+> * [**/consumer/ConsumerCommon.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/consumer/ConsumerCommon.java)
+> * [**/consumer/KafkaConsumerSubscribeDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/consumer/KafkaConsumerSubscribeDemo.java)
 
 ### (2) 实验输出
 
@@ -216,9 +216,9 @@
 
 ### (1) 代码
 
-> * [**/producer/KafkaProducerDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/producer/KafkaProducerDemo.java)
-> * [**/consumer/ConsumerCommon.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/consumer/ConsumerCommon.java)
-> * [**/consumer/KafkaConsumerPartitionAssignDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/05_kafka_api/kafka_api_demo01/src/main/java/com/javaproref/kafka/apidemo/consumer/KafkaConsumerPartitionAssignDemo.java)
+> * [**/producer/KafkaProducerDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/producer/KafkaProducerDemo.java)
+> * [**/consumer/ConsumerCommon.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/consumer/ConsumerCommon.java)
+> * [**/consumer/KafkaConsumerPartitionAssignDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/consumer/KafkaConsumerPartitionAssignDemo.java)
 
 ### (2) 实验输出
 
