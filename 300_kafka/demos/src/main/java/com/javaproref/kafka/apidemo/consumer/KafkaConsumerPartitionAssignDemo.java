@@ -31,7 +31,7 @@ public class KafkaConsumerPartitionAssignDemo {
 
         // 3. 打印取到的records
         try {
-            ConsumerCommon.consume(consumer);
+            ConsumerCommon.consume(consumer, ConsumerCommon.OffsetAutoSubmit.ENABLE);
         } catch (InterruptedException e) {
             throw e;
         } finally {
