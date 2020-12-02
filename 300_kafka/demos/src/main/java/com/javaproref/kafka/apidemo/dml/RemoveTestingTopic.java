@@ -1,5 +1,6 @@
 package com.javaproref.kafka.apidemo.dml;
 
+import com.javaproref.kafka.apidemo.common.DMLCommon;
 import com.javaproref.kafka.apidemo.util.Constants;
 import org.apache.kafka.clients.admin.*;
 

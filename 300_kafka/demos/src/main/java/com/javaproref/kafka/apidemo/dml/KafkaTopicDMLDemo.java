@@ -1,13 +1,12 @@
 package com.javaproref.kafka.apidemo.dml;
 
+import com.javaproref.kafka.apidemo.common.DMLCommon;
 import org.apache.kafka.clients.admin.*;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Stream;
 
 import static java.lang.Thread.sleep;
 
@@ -15,7 +14,7 @@ import static java.lang.Thread.sleep;
  * Kafka Topic管理及DML
  * 需要在运行环境中（如Mac或者Linux的"/etc/hosts"）配置CentOSA, CentOSB, CentOSC的IP和主机名映射
  */
-public class KafkaTopicDMLMemo {
+public class KafkaTopicDMLDemo {
     public void runDemo(String bootStrapServers) throws ExecutionException, InterruptedException {
         final String TOPIC_NAME = "dml_test_topic";
         final int PARTITION_NUM = 3;

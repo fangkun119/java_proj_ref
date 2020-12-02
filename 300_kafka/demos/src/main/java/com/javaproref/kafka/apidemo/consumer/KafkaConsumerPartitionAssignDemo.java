@@ -1,5 +1,6 @@
 package com.javaproref.kafka.apidemo.consumer;
 
+import com.javaproref.kafka.apidemo.common.ConsumerCommon;
 import com.javaproref.kafka.apidemo.util.Constants;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;

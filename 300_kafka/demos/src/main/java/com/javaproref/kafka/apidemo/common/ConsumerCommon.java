@@ -1,4 +1,4 @@
-package com.javaproref.kafka.apidemo.consumer;
+package com.javaproref.kafka.apidemo.common;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;

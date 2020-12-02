@@ -3,8 +3,9 @@ package com.javaproref.kafka.apidemo;
 import com.javaproref.kafka.apidemo.consumer.KafkaConsumerPartitionAssignDemo;
 import com.javaproref.kafka.apidemo.consumer.KafkaConsumerSubscribeDemo;
 import com.javaproref.kafka.apidemo.dml.CreateTestingTopic;
-import com.javaproref.kafka.apidemo.dml.KafkaTopicDMLMemo;
+import com.javaproref.kafka.apidemo.dml.KafkaTopicDMLDemo;
 import com.javaproref.kafka.apidemo.dml.RemoveTestingTopic;
+import com.javaproref.kafka.apidemo.offsets.KafkaOffsetResetDemo;
 import com.javaproref.kafka.apidemo.producer.KafkaProducerDemo;
 
 import java.util.concurrent.ExecutionException;
@@ -17,6 +18,9 @@ public class Main {
     public static final String ASSIGN_CONSUMER_PARTITION = "assign_consumer_partition";
     public static final String CLEAR     = "clear";
     public static final String INIT      = "init";
+    public static final String OFFSET_LATEST = "offset_latest";
+    public static final String OFFSET_EARLIEST = "offset_earliest";
+    public static final String OFFSET_NONE = "offset_none";
 
     private static void printHelp(String[] args) {
         System.out.println(
@@ -31,6 +35,9 @@ public class Main {
                         + "\n\t" + Main.PRODUCER
                         + "\n\t" + Main.CONSUMER
                         + "\n\t" + Main.ASSIGN_CONSUMER_PARTITION
+                        + "\n\t" + Main.OFFSET_LATEST
+                        + "\n\t" + Main.OFFSET_EARLIEST
+                        + "\n\t" + Main.OFFSET_NONE
         );
     }
 
@@ -48,7 +55,7 @@ public class Main {
         try {
             switch (args[0]) {
                 case Main.TOPIC_DML:
-                    (new KafkaTopicDMLMemo()).runDemo(bootStrapSvrs);
+                    (new KafkaTopicDMLDemo()).runDemo(bootStrapSvrs);
                     break;
                 case Main.CLEAR:
                     (new RemoveTestingTopic()).runDemo(bootStrapSvrs);
@@ -64,6 +71,12 @@ public class Main {
                 case Main.ASSIGN_CONSUMER_PARTITION:
                     (new KafkaConsumerPartitionAssignDemo()).runDemo(bootStrapSvrs);
                     break;
+                case Main.OFFSET_LATEST:
+                    (new KafkaOffsetResetDemo()).runDemo(bootStrapSvrs, KafkaOffsetResetDemo.LATEST);
+                case Main.OFFSET_EARLIEST:
+                    (new KafkaOffsetResetDemo()).runDemo(bootStrapSvrs, KafkaOffsetResetDemo.EARLIEST);
+                case Main.OFFSET_NONE:
+                    (new KafkaOffsetResetDemo()).runDemo(bootStrapSvrs, KafkaOffsetResetDemo.NONE);
                 default:
                     Main.printHelp(args);
             }

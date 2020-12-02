@@ -1,4 +1,4 @@
-package com.javaproref.kafka.apidemo.dml;
+package com.javaproref.kafka.apidemo.common;
 
 import org.apache.kafka.clients.admin.KafkaAdminClient;
 import org.apache.kafka.clients.admin.ListTopicsResult;
