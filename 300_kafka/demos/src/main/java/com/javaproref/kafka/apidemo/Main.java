@@ -20,8 +20,9 @@ public class Main {
     public static final String INIT             = "init";               // 初始化实验环境
     public static final String TOPIC_DML        = "topic_dml";          // topic管理演示
     public static final String PRODUCER         = "producer";           // 生产者演示
+    public static final String PRODUCER_ROUND_ROBIN = "producer_round_robin";   // 生产者不使用record key，采用轮询的方式为record分区
     public static final String CONSUMER         = "consumer";           // 消费者演示
-    public static final String ASSIGN_CONSUMER_PARTITION = "assign_consumer_partition"; // 手动指定消费者消费的分区
+    public static final String ASSIGN_CONSUMER_PARTITION = "assign_consumer_partition"; // 手动指定消费者消费的分区和消费其实位置
     public static final String OFFSET_LATEST    = "offset_latest";      // 指定新加入消费组起始偏移量为"latest"
     public static final String OFFSET_EARLIEST  = "offset_earliest";    // 指定新加入消费组起始偏移量为"earliest"
     public static final String OFFSET_NONE      = "offset_none";        // 指定新加入消费组起始偏移量为"none"
@@ -39,6 +40,7 @@ public class Main {
                         + "\n\t" + Main.CLEAR
                         + "\n\t" + Main.INIT
                         + "\n\t" + Main.PRODUCER
+                        + "\n\t" + Main.PRODUCER_ROUND_ROBIN
                         + "\n\t" + Main.CONSUMER
                         + "\n\t" + Main.ASSIGN_CONSUMER_PARTITION
                         + "\n\t" + Main.OFFSET_LATEST
@@ -71,8 +73,10 @@ public class Main {
                 case Main.INIT:
                     (new CreateTestingTopic()).runDemo(bootStrapSvrs);
                 case Main.PRODUCER:
-                    (new KafkaProducerDemo()).runDemo(bootStrapSvrs);
+                    (new KafkaProducerDemo()).runDemo(bootStrapSvrs, KafkaProducerDemo.RecordKeyPolicy.ENABLE);
                     break;
+                case Main.PRODUCER_ROUND_ROBIN:
+                    (new KafkaProducerDemo()).runDemo(bootStrapSvrs, KafkaProducerDemo.RecordKeyPolicy.DISABLE);
                 case Main.CONSUMER:
                     (new KafkaConsumerSubscribeDemo()).runDemo(bootStrapSvrs);
                     break;
