@@ -36,11 +36,15 @@ public class ConsumerCommon {
                     long timestamp  = record.timestamp();   // 消息的时间戳
                     // 手动提交offset
                     if (OffsetAutoSubmit.DISABLE == autoSubmitOffset) {
-                        offsets.put(new TopicPartition(topic, partition), new OffsetAndMetadata(offset));
+                        long submittedOffset = offset + 1; // 提交的偏移量要大于当前消费的偏移量，因为它代表下一条消费信息的偏移量
+                        offsets.put(
+                                new TopicPartition(topic, partition),
+                                new OffsetAndMetadata(submittedOffset)
+                        );
                         consumer.commitAsync(offsets, new OffsetCommitCallback() {
                             @Override
                             public void onComplete(Map<TopicPartition, OffsetAndMetadata> map, Exception e) {
-                                System.out.println("offsets: " + offset + "\t exception: " + e);
+                                System.out.println("offsets: " + submittedOffset + "\t exception: " + e);
                             }
                         });
                     }
