@@ -1,7 +1,7 @@
 package com.javaproref.kafka.apidemo.consumer;
 
 import com.javaproref.kafka.apidemo.common.ConsumerCommon;
-import com.javaproref.kafka.apidemo.util.Constants;
+import com.javaproref.kafka.apidemo.domain.Constants;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
@@ -31,7 +31,7 @@ public class KafkaConsumerPartitionAssignDemo {
 
         // 3. 打印取到的records
         try {
-            ConsumerCommon.consume(consumer, ConsumerCommon.OffsetAutoSubmit.ENABLE);
+            ConsumerCommon.consume(consumer, ConsumerCommon.OffsetAutoSubmit.TRUE);
         } catch (InterruptedException e) {
             throw e;
         } finally {

@@ -38,7 +38,7 @@ public class AutoOffsetResetConfigDemo {
 
         // 3. 接收消息
         try {
-            ConsumerCommon.consume(consumer, ConsumerCommon.OffsetAutoSubmit.ENABLE);
+            ConsumerCommon.consume(consumer, ConsumerCommon.OffsetAutoSubmit.TRUE);
         } catch (InterruptedException e) {
             throw e;
         } finally {

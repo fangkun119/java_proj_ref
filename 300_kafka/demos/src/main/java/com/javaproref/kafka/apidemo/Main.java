@@ -1,5 +1,6 @@
 package com.javaproref.kafka.apidemo;
 
+import com.javaproref.kafka.apidemo.consumer.ConsumerDeserializationDemo;
 import com.javaproref.kafka.apidemo.consumer.KafkaConsumerPartitionAssignDemo;
 import com.javaproref.kafka.apidemo.consumer.KafkaConsumerSubscribeDemo;
 import com.javaproref.kafka.apidemo.dml.CreateTestingTopic;
@@ -9,6 +10,7 @@ import com.javaproref.kafka.apidemo.offsets.AutoOffsetResetConfigDemo;
 import com.javaproref.kafka.apidemo.offsets.OffsetConsumerSubmitDemo;
 import com.javaproref.kafka.apidemo.producer.KafkaProducerDemo;
 import com.javaproref.kafka.apidemo.producer.ProducerPartitionerDemo;
+import com.javaproref.kafka.apidemo.producer.ProducerSerializationDemo;
 
 import java.util.concurrent.ExecutionException;
 
@@ -17,18 +19,20 @@ public class Main {
     public static final String BOOT_STRAP_SVRS = "CentOSA:9092,CentOSB:9092,CentOSC:9092";
 
     // demo主题，通过第一个参数传入
-    public static final String CLEAR            = "clear";              // 清理实验环境
-    public static final String INIT             = "init";               // 初始化实验环境
-    public static final String TOPIC_DML        = "topic_dml";          // topic管理演示
-    public static final String PRODUCER         = "producer";           // 生产者演示
-    public static final String PRODUCER_ROUND_ROBIN = "producer_round_robin";   // 生产者不使用record key，采用轮询的方式为record分区
-    public static final String PRODUCER_PARTITIONER = "producer_partitioner";   // 自定义生产者Partitioner
-    public static final String CONSUMER         = "consumer";           // 消费者演示
+    public static final String CLEAR                     = "clear";                     // 清理实验环境
+    public static final String INIT                      = "init";                      // 初始化实验环境
+    public static final String TOPIC_DML                 = "topic_dml";                 // topic管理演示
+    public static final String PRODUCER                  = "producer";                  // 生产者演示
+    public static final String PRODUCER_ROUND_ROBIN      = "producer_round_robin";      // 生产者不使用record key，采用轮询的方式为record分区
+    public static final String PRODUCER_PARTITIONER      = "producer_partitioner";      // 自定义生产者Partitioner
+    public static final String CONSUMER                  = "consumer";                  // 消费者演示
     public static final String ASSIGN_CONSUMER_PARTITION = "assign_consumer_partition"; // 手动指定消费者消费的分区和消费其实位置
-    public static final String OFFSET_LATEST    = "offset_latest";      // 指定新加入消费组起始偏移量为"latest"
-    public static final String OFFSET_EARLIEST  = "offset_earliest";    // 指定新加入消费组起始偏移量为"earliest"
-    public static final String OFFSET_NONE      = "offset_none";        // 指定新加入消费组起始偏移量为"none"
-    public static final String OFFSET_CONSUMER_SUBMIT = "offset_consumer_submit";  // 由消费者代码调用api提交offset，而非由框架定期自动提交
+    public static final String OFFSET_LATEST             = "offset_latest";             // 指定新加入消费组起始偏移量为"latest"
+    public static final String OFFSET_EARLIEST           = "offset_earliest";           // 指定新加入消费组起始偏移量为"earliest"
+    public static final String OFFSET_NONE               = "offset_none";               // 指定新加入消费组起始偏移量为"none"
+    public static final String OFFSET_CONSUMER_SUBMIT    = "offset_consumer_submit";    // 由消费者代码调用api提交offset，而非由框架定期自动提交
+    public static final String SERIALIZATION_PRODUCER    = "serialization_producer";    // 自定义序列化的生产者
+    public static final String SERIALIZATION_CONSUMER    = "serialization_consumer";    // 自定义序列化的消费者
 
     // 打印帮助信息
     private static void printHelp(String[] args) {
@@ -50,6 +54,8 @@ public class Main {
                         + "\n\t" + Main.OFFSET_EARLIEST
                         + "\n\t" + Main.OFFSET_NONE
                         + "\n\t" + Main.OFFSET_CONSUMER_SUBMIT
+                        + "\n\t" + Main.SERIALIZATION_PRODUCER
+                        + "\n\t" + Main.SERIALIZATION_CONSUMER
         );
     }
 
@@ -101,6 +107,13 @@ public class Main {
                     break;
                 case Main.OFFSET_CONSUMER_SUBMIT:
                     (new OffsetConsumerSubmitDemo()).runDemo(bootStrapSvrs);
+                    break;
+                case Main.SERIALIZATION_PRODUCER:
+                    (new ProducerSerializationDemo()).runDemo(bootStrapSvrs);
+                    break;
+                case Main.SERIALIZATION_CONSUMER:
+                    (new ConsumerDeserializationDemo()).runDemo(bootStrapSvrs);
+                    break;
                 default:
                     Main.printHelp(args);
             }

@@ -33,7 +33,7 @@ public class OffsetConsumerSubmitDemo {
 
         // 3. 接收消息，以手动方式提交offset："autoSubmitOffset == DISABLE"
         try {
-            ConsumerCommon.consume(consumer, ConsumerCommon.OffsetAutoSubmit.DISABLE);
+            ConsumerCommon.consume(consumer, ConsumerCommon.OffsetAutoSubmit.FALSE);
         } catch (InterruptedException e) {
             throw e;
         } finally {

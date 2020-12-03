@@ -3,6 +3,7 @@ package com.javaproref.kafka.apidemo.common;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.TopicPartition;
 
+import javax.xml.bind.ValidationEvent;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,32 +11,33 @@ import java.util.Map;
 
 public class ConsumerCommon {
     public enum OffsetAutoSubmit {
-        ENABLE, DISABLE
+        TRUE, FALSE
     };
 
-    public static void consume(KafkaConsumer<String, String> consumer, OffsetAutoSubmit autoSubmitOffset) throws InterruptedException {
+    public static <KeyType, ValType> void consume(
+            KafkaConsumer<KeyType, ValType> consumer, OffsetAutoSubmit autoSubmitOffset) throws InterruptedException {
         System.out.println("Type in: Ctrl + C to quit");
         Thread.sleep(3000);
 
         while (true) {
-            ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofSeconds(1) /*每隔1秒取一次数据*/);
+            ConsumerRecords<KeyType, ValType> consumerRecords = consumer.poll(Duration.ofSeconds(1) /*每隔1秒取一次数据*/);
             if (!consumerRecords.isEmpty()) {
                 // iterator and offset map
-                Iterator<ConsumerRecord<String,String>> recordIterator = consumerRecords.iterator();
+                Iterator<ConsumerRecord<KeyType,ValType>> recordIterator = consumerRecords.iterator();
                 Map<TopicPartition, OffsetAndMetadata> offsets = new HashMap<>();
                 // consume records
                 while(recordIterator.hasNext()) {
                     // record
-                    ConsumerRecord<String,String> record = recordIterator.next();
+                    ConsumerRecord<KeyType,ValType> record = recordIterator.next();
                     // 常用字段
                     String topic    = record.topic();       // 所属topic
                     int partition   = record.partition();   // 所属分区
                     long offset     = record.offset();      // 消息在分区中的偏移量
-                    String key      = record.key();         // 消息的key
-                    String value    = record.value();       // 消息的value
+                    KeyType key     = record.key();         // 消息的key
+                    ValType value   = record.value();       // 消息的value
                     long timestamp  = record.timestamp();   // 消息的时间戳
                     // 手动提交offset
-                    if (OffsetAutoSubmit.DISABLE == autoSubmitOffset) {
+                    if (OffsetAutoSubmit.FALSE == autoSubmitOffset) {
                         long submittedOffset = offset + 1; // 提交的偏移量要大于当前消费的偏移量，因为它代表下一条消费信息的偏移量
                         offsets.put(
                                 new TopicPartition(topic, partition),

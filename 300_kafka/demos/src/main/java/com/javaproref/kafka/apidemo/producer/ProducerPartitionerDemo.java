@@ -1,6 +1,7 @@
 package com.javaproref.kafka.apidemo.producer;
 
-import com.javaproref.kafka.apidemo.util.Constants;
+import com.javaproref.kafka.apidemo.common.UserDefinedPartitioner;
+import com.javaproref.kafka.apidemo.domain.Constants;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
