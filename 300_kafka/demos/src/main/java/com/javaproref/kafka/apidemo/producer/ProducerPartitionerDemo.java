@@ -1,5 +1,6 @@
 package com.javaproref.kafka.apidemo.producer;
 
+import com.javaproref.kafka.apidemo.common.RecordKeyPolicy;
 import com.javaproref.kafka.apidemo.common.UserDefinedPartitioner;
 import com.javaproref.kafka.apidemo.domain.Constants;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -10,10 +11,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import java.util.Properties;
 
 public class ProducerPartitionerDemo {
-    public enum RecordKeyPolicy {
-        ENABLE, DISABLE
-    };
-
     public void runDemo(String bootstrapServers, RecordKeyPolicy recKeyPolicy) {
         // 1. 创建Producer
         Properties props = new Properties();

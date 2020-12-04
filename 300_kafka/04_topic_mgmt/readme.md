@@ -49,7 +49,6 @@
 > 创建名为"topic01"的Topic，分区数为3（不能大于节点数），每个分区2副本（不能大于节点数）
 > 
 > ~~~bash
-[root@CentOSA kafka_2.11-2.2.0]#
 > [root@CentOSA kafka_2.11-2.2.0]# cd /usr/kafka_2.11-2.2.0
 > [root@CentOSA kafka_2.11-2.2.0]# ./bin/kafka-topics.sh --bootstrap-server CentOSA:9092,CentOSB:9092,CentOSC:9092 --create --topic topic01 --partitions 3 --replication-factor 2
 > [root@CentOSA kafka_2.11-2.2.0]#
