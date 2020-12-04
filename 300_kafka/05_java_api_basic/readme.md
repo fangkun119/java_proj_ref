@@ -1,4 +1,4 @@
-# Kafka API
+# Kafka基础API
 
 ## 1. 内容
 
@@ -68,7 +68,7 @@
 > __consumer_offsets
 > topic01
 > ~~~
-demos
+
 ## 3. `Demo`代码入口
 
 ### (1) 代码
@@ -97,8 +97,8 @@ demos
 
 ### (1) 代码
 
-> * [`**/dml/KafkaTopicDMLMemo.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/dml/KafkaTopicDMLMemo.java)
-> * [`**/dml/DMLCommon.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/dml/DMLCommon.java)
+> * [`apidemo/dml/KafkaTopicDMLMemo.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/dml/KafkaTopicDMLMemo.java)
+> * [`apidemo/dml/DMLCommon.java`](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/common/DMLCommon.java)
 
 ### (2) 输出
 
@@ -131,9 +131,9 @@ demos
 
 ### (1) 代码
 
-> * [**/producer/KafkaProducerDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/producer/KafkaProducerDemo.java)
-> * [**/consumer/ConsumerCommon.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/consumer/ConsumerCommon.java)
-> * [**/consumer/KafkaConsumerSubscribeDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/consumer/KafkaConsumerSubscribeDemo.java)
+> * [apidemo/producer/KafkaProducerDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/producer/KafkaProducerDemo.java)
+> * [apidemo/consumer/ConsumerCommon.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/common/ConsumerCommon.java)
+> * [apidemo/consumer/KafkaConsumerSubscribeDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/consumer/KafkaConsumerSubscribeDemo.java)
 
 ### (2) 实验输出
 
@@ -216,9 +216,9 @@ demos
 
 ### (1) 代码
 
-> * [**/producer/KafkaProducerDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/producer/KafkaProducerDemo.java)
-> * [**/consumer/ConsumerCommon.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/consumer/ConsumerCommon.java)
-> * [**/consumer/KafkaConsumerPartitionAssignDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/consumer/KafkaConsumerPartitionAssignDemo.java)
+> * [apidemo/producer/KafkaProducerDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/producer/KafkaProducerDemo.java)
+> * [apidemo/consumer/ConsumerCommon.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/common/ConsumerCommon.java)
+> * [apidemo/consumer/KafkaConsumerPartitionAssignDemo.java](https://github.com/fangkun119/java_proj_ref/blob/master/300_kafka/demos/src/main/java/com/javaproref/kafka/apidemo/consumer/KafkaConsumerPartitionAssignDemo.java)
 
 ### (2) 实验输出
 
@@ -269,3 +269,173 @@ demos
 > topic01	0,5	key_5	value_5	1606570440220
 > ^C[root@CentOSA ~]#
 > ~~~
+
+## 7. 生产者分区策略
+
+### 7.1 `Kafka`默认的分区方式：
+
+* 生产者为`record`指定了key时、按照key的hash来分区
+* 没指定key时采用轮询的方式分区
+
+> ~~~java
+> if (RecordKeyPolicy.ENABLE == recKeyPolicy) {
+>	record = new ProducerRecord<String, String>(Constants.TOPIC_01, "key_" + i, "value_" + i); 
+> } else {
+>	record = new ProducerRecord<String, String>(Constants.TOPIC_01, "value_" + i);
+> }
+> ~~~
+
+### 7.2 自定义分区策略
+
+#### (1) 配置自定义分区策略类
+
+参照`ProducerConfg.java`（`Kafka`生产者配置类）中的代码注释
+
+> ~~~java
+>     /** <code>partitioner.class</code> */
+>     public static final String PARTITIONER_CLASS_CONFIG = "partitioner.class";
+>     private static final String PARTITIONER_CLASS_DOC = "Partitioner class that implements the <code>org.apache.kafka.clients.producer.Partitioner</code> interface.";
+> ~~~
+
+#### (2) 实现自定义分区策略类
+
+参照`org.apache.kafka.clients.producer.internals.DefaultPartitioner`来实现，这个类在`[Kafka文档](http://kafka.apache.org/documentation.html)`关于`partitioner.class`的部分被提到
+
+#### (3) Demo
+
+代码
+
+> * [apidemo/common/UserDefinedPartitioner.java](../demos/src/main/java/com/javaproref/kafka/apidemo/common/UserDefinedPartitioner.java)
+> * [apidemo/producer/ProducerPartitionerDemo.java](../demos/src/main/java/com/javaproref/kafka/apidemo/producer/ProducerPartitionerDemo.java)
+> * [apidemo/Main.java](../demos/src/main/java/com/javaproref/kafka/apidemo/Main.java)
+
+日志：
+
+> ~~~bash
+> [root@CentOSA kafka_2.11-2.2.0]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar producer_partitioner
+> INFO 2020-12-03 12:03:37,024(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values:
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	...
+> 	configs send to user defined partitioner
+> 	bootstrap.servers	:CentOSA:9092,CentOSB:9092,CentOSC:9092
+> 	value.serializer	:org.apache.kafka.common.serialization.StringSerializer
+> 	key.serializer	:org.apache.kafka.common.serialization.StringSerializer
+> 	partitioner.class	:class com.javaproref.kafka.apidemo.producer.UserDefinedPartitioner
+> INFO 2020-12-03 12:03:37,361(yyyy-MM-dd HH:mm:ss} org.apache.kafka.common.utils.AppInfoParser - Kafka version: 2.2.0
+> INFO 2020-12-03 12:03:37,361(yyyy-MM-dd HH:mm:ss} org.apache.kafka.common.utils.AppInfoParser - Kafka commitId: 05fcfde8f69b0349
+> send record 0
+> INFO 2020-12-03 12:03:37,736(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.Metadata - Cluster ID: 8gU3YeKrQaiFufBYCW182g
+> send record 1
+> send record 2
+> send record 3
+> send record 4
+> send record 5
+> send record 6
+> send record 7
+> send record 8
+> send record 9
+> INFO 2020-12-03 12:03:37,762(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1] Closing the Kafka producer with timeoutMillis = 9223372036854775807 ms.
+> user defined partitioner closed
+~~~
+
+## 8.序列化
+
+> 把传输对象变成可供Kafka网络传输的字节
+
+### 8.1 Kafka提供的序列化、解序列化类
+
+> `package org.apache.kafka.common.serialization`： `StringSerializer`、`ByteArraySerializer`、……
+> 
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_common_serialization.jpg) 
+
+### 8.2 自定义序列化、解序列化的类
+
+代码：
+
+> * [apidemo/common/UserDefinedSerializer.java](../demos/src/main/java/com/javaproref/kafka/apidemo/common/UserDefinedSerializer.java)
+> * [apidemo/common/UserDefinedDeSerializer.java](../demos/src/main/java/com/javaproref/kafka/apidemo/common/UserDefinedDeSerializer.java)
+> * [apidemo/producer/ProducerSerializationDemo.java](../demos/src/main/java/com/javaproref/kafka/apidemo/producer/ProducerSerializationDemo.java)
+> * [apidemo/consumer/ConsumerDeserializationDemo.java](../demos/src/main/java/com/javaproref/kafka/apidemo/consumer/ConsumerDeserializationDemo.java)
+> * [apidemo/Main.java](../demos/src/main/java/com/javaproref/kafka/apidemo/Main.java)
+
+实验：
+
+> ~~~bash
+> [root@CentOSA kafka_2.11-2.2.0]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar clear 2>&1 >out.log
+> [root@CentOSA kafka_2.11-2.2.0]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar init 2>&1 >out.log
+> [root@CentOSA kafka_2.11-2.2.0]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar serialization_producer
+> INFO 2020-12-03 16:50:55,509(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values:
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+> 	value.serializer = class com.javaproref.kafka.apidemo.common.UserDefinedSerializer
+> ...
+> [root@CentOSA kafka_2.11-2.2.0]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar serialization_consumer
+> INFO 2020-12-03 16:52:33,405(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.ConsumerConfig - ConsumerConfig values:
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+> 	value.deserializer = class com.javaproref.kafka.apidemo.common.UserDefinedDeSerializer
+> 	...
+> org.apache.kafka.clients.consumer.KafkaConsumer - [Consumer clientId=consumer-1, groupId=g2] Subscribed to topic(s): topic02
+> Type in: Ctrl + C to quit
+> ...
+> INFO 2020-12-03 16:52:37,479(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g2] Resetting offset for partition topic02-1 to offset 0.
+> INFO 2020-12-03 16:52:37,493(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g2] Resetting offset for partition topic02-2 to offset 0.
+> INFO 2020-12-03 16:52:37,514(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g2] Resetting offset for partition topic02-0 to offset 0.
+> topic02	2,0	key_0	User{id=0, name='user_0', birthDay=Thu Dec 03 16:50:55 CST 2020}	1606985456270
+> topic02	1,0	key_1	User{id=1, name='user_1', birthDay=Thu Dec 03 16:50:56 CST 2020}	1606985456286
+> topic02	1,1	key_3	User{id=3, name='user_3', birthDay=Thu Dec 03 16:50:56 CST 2020}	1606985456287
+> topic02	0,0	key_2	User{id=2, name='user_2', birthDay=Thu Dec 03 16:50:56 CST 2020}	1606985456287
+> topic02	0,1	key_4	User{id=4, name='user_4', birthDay=Thu Dec 03 16:50:56 CST 2020}	1606985456287
+> ^C
+> ~~~
+
+## 9. 拦截器
+
+> 在收发数据的时候、对数据做装饰
+
+Demo代码：
+
+> * [apidemo/common/UserDefinedProducerInterceptor.java](../demos/src/main/java/com/javaproref/kafka/apidemo/common/UserDefinedProducerInterceptor.java)
+> * [apidemo/producer/ProducerIntercepterDemo.java](../demos/src/main/java/com/javaproref/kafka/apidemo/producer/ProducerIntercepterDemo.java)
+javaproref/kafka/apidemo/consumer/ConsumerDeserializationDemo.java)
+> * [apidemo/Main.java](../demos/src/main/java/com/javaproref/kafka/apidemo/Main.java)
+
+实验：
+
+> ~~~bash
+> [root@CentOSA kafka_2.11-2.2.0]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar clear 2>&1 >out.log
+> [root@CentOSA kafka_2.11-2.2.0]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar init 2>&1 >out.log
+> [root@CentOSA kafka_2.11-2.2.0]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar producer_interceptor
+> INFO 2020-12-04 11:50:39,897(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values:
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	interceptor.classes = [com.javaproref.kafka.apidemo.common.UserDefinedProducerInterceptor]
+> 	...
+> 
+> metadata: topic01-2@0; exception: null
+> metadata: topic01-1@0; exception: null
+> metadata: topic01-1@1; exception: null
+> metadata: topic01-0@0; exception: null
+> metadata: topic01-0@1; exception: null
+> [root@CentOSA kafka_2.11-2.2.0]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar offset_earliest
+> INFO 2020-12-04 11:50:50,207(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.ConsumerConfig - ConsumerConfig values:
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	...
+> org.apache.kafka.clients.consumer.KafkaConsumer - [Consumer clientId=consumer-1, groupId=g1] Subscribed to topic(s): topic01
+> Type in: Ctrl + C to quit
+> org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-1, groupId=g1] Setting newly assigned partitions: topic01-2, topic01-1, topic01-0
+> INFO 2020-12-04 11:50:54,119(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g1] Resetting offset for partition topic01-2 to offset 0.
+> INFO 2020-12-04 11:50:54,129(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g1] Resetting offset for partition topic01-1 to offset 0.
+> INFO 2020-12-04 11:50:54,129(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g1] Resetting offset for partition topic01-0 to offset 0.
+> topic01	2,0	key_0	value_0:content_added_by_interceptor	1607053840611
+> topic01	1,0	key_1	value_1:content_added_by_interceptor	1607053840627
+> topic01	1,1	key_3	value_3:content_added_by_interceptor	1607053840627
+> topic01	0,0	key_2	value_2:content_added_by_interceptor	1607053840627
+> topic01	0,1	key_4	value_4:content_added_by_interceptor	1607053840628
+> ~~~
+
+
+
+
+
+
+
