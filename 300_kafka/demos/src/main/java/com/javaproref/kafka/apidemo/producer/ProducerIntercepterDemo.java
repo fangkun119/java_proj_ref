@@ -1,14 +1,12 @@
 package com.javaproref.kafka.apidemo.producer;
 
-import com.javaproref.kafka.apidemo.common.UserDefineProducerInterceptor;
+import com.javaproref.kafka.apidemo.common.UserDefinedProducerInterceptor;
 import com.javaproref.kafka.apidemo.domain.Constants;
-import com.javaproref.kafka.apidemo.domain.User;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
-import java.util.Date;
 import java.util.Properties;
 
 public class ProducerIntercepterDemo {
@@ -20,7 +18,7 @@ public class ProducerIntercepterDemo {
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
         // 设置生产者拦截器
-        props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, UserDefineProducerInterceptor.class.getName());
+        props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, UserDefinedProducerInterceptor.class.getName());
 
         KafkaProducer<String, String> producer = new KafkaProducer<>(props);
 

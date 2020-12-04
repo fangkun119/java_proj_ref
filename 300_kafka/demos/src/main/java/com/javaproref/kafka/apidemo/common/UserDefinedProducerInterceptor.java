@@ -6,7 +6,7 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 
 import java.util.Map;
 
-public class UserDefineProducerInterceptor implements ProducerInterceptor {
+public class UserDefinedProducerInterceptor implements ProducerInterceptor {
     @Override
     public ProducerRecord onSend(ProducerRecord record) {
         // 消息发送之前，可以拿到ProducerRecord以便装饰器进行编辑和修改
