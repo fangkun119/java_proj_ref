@@ -1,14 +1,13 @@
 # Class加载和初始化
 
-[TOC]
-
 ## 1. 步骤 
 
 > 1. Loading ：将`class文件`加载到内存，使用`双亲委派模型`和`Lazy Loading`
 > 2. Linking
-> 	1. Verfication：检查`class文件`是否符合标准 
-> 	2. Perparation：为`class`的静态变量赋<b>默认值</b>. 
-> 	3. Resolution：把`class`常量池里面的`符号引用`转换成可以直接取到值的内容
+> 
+>	* Verfication：检查`class文件`是否符合标准 
+> 	* Perparation：为`class`的静态变量赋<b>默认值</b>. 
+> 	* Resolution：把`class`常量池里面的`符号引用`转换成可以直接取到值的内容
 > 3. Initializing：把静态变量赋为初始值（这时才调用静态代码块）
 
 ## 2. 加载

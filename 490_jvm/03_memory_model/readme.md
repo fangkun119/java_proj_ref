@@ -3,9 +3,9 @@
 > * 高并发情况下Java内存怎么支持
 > * 一个对象new出来之后，在Java内存中是怎么布局的
 
-## 1. 硬件层的并发优化基础知识
+## 1 硬件层的并发优化基础知识
 
-1. 存储器层次结构（《深入理解计算机系统》，第三版，P421 ）
+### 1.1 存储器层次结构（《深入理解计算机系统》，第三版，P421 ）
 
 > `L0`：寄存器；`L1`/`L2`/`L3`：高速缓存；`L4`：主存（内存）；`L5`：硬盘；`L6`：远程文件存储
 > 
@@ -16,7 +16,7 @@
 > * QPI总线传输：约20ns
 > * 主存：约60-80ns
 
-2. 总线锁、缓存锁
+### 1.2 总线锁、缓存锁
 
 > 问题：每个核都有专用L1/L2缓存，多个核共享L3缓存时，如何保证同一个变量load到L1/L2里面的值，在不同的CPU内核之间保持一致？
 > 
@@ -29,15 +29,15 @@
 > * 对于无法被缓存的数据、或者跨多个`缓存行`的数据，依然使用总线锁
 > * 现代CPU的数据一致性通过`缓存锁`、`总线锁`来实现
 
-3. 缓存行（`Cache Line`）
+### 1.3 缓存行（`Cache Line`）
 
 > 为了提高效率，读取缓存时以缓存行（`Cache Line`）为基本单位，目前主流的实现是`64 Bytes`
 
-4. 伪共享
+### 1.4 伪共享
 
-> * 位于同一缓存行的两个不同数据被两个不同CPU锁定，产生互相影响的共享问题 
+> * 位于同一缓存行的两个不同数据被两个不同CPU锁定，产生互相影响的共享问题
 
-## 2. CPU指令重排带来的执行顺序问题
+## 2. CPU指令重排、内存屏障、`volatile`及`synchronized`
 
 ### 2.1 CPU指令重排
 
@@ -72,7 +72,7 @@
 
 #### (3) `Volatile`的实现细节
 
-(1) Java代码
+Java代码
 
 > [jvm/grp03_memory_model/TestVolatile.java](../demos/src/com/javaprojref/jvm/grp03_memory_model/TestVolatile.java)
 > 
@@ -83,13 +83,13 @@
 > }
 > ~~~
 
-(2) 字节码层面
+字节码层面
 
 > ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jclasslib_volatile.jpg)
 > 
 > 只是为变量`j`增加了`ACC_VOLATILE`标记
 
-(3) JVM层面
+JVM层面
 
 > volatile内存区的读写都加屏障
 > 
@@ -109,17 +109,17 @@
 > LoadStoreBarrier
 > ~~~
 
-(4) OS和硬件层面
+OS和硬件层面
 
 > * [volatile与lock前缀指令](https://blog.csdn.net/qq_26222859/article/details/52235930)：使用`hsdis - HotSpot Dis Assembler`观察汇编码、`lock ${instruction_to_be_locked}`指令执行时对内存区域的加锁
 
 #### `synchronized`实现细节
 
-(1) java代码
+java代码
 
 > [`jvm/grp03_memory_model/TestVolatile.java`](../demos/src/com/javaprojref/jvm/grp03_memory_model/TestVolatile.java)
 
-(2) 字节码层面
+字节码层面
 
 `synchronized void m() { }`
 
@@ -133,21 +133,133 @@
 > 
 > 使用monitorenter来告知JVM需要加锁、使用monitorexit来解锁（共2个：1个用于正常退出；1个用于异常退出）
 
-(3) JVM层面
+JVM层面
 
 > `C` `C++` 调用了操作系统提供的同步机制
 
-(4) OS和硬件层面
+OS和硬件层面
 
 > X86：`lock comxchg xxxx`指令 (locked compare and exchange)
 > 
 > 参考： [Java使用字节码和汇编语言同步分析volatile，synchronized的底层实现](https://blog.csdn.net/21aspnet/article/details/88571740)
 
+## 3 Java对象内存布局
 
+### 3.1 对象创建过程
 
+>1. 	`Class Loading`：把`.class`文件加载到 内存
+>2. 	`Class Linking (Verification, Preparation, Resolution)`
+>	* Verification：检查是否符合标准
+>	* Preparation：静态变量设默认值
+>	* Resolution：把常量池里面的符号引用转换成可以直接取到值的内容
+>3. `Class Initialaization`：类静态变量设为初始值，执行静态代码块
+>4.	申请对象内存
+>5. 	成员变量赋默认值
+>6. 	调用构造方法，在字节码中用`<init>`来表示
+>	* 成员变量顺序赋初始值：例如代码中的`private int m = 8`
+>	* 执行构造方法语句：先调用`super()`再调用构造方法
 
+### 3.2 对象在内存中的布局
 
+#### (1) 虚拟机设置
 
+> 对象大小和布局与虚拟机实现和设置有关，要先看一下虚拟机的配置
+> 
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/490_jvm/
+> $ java -XX:+PrintCommandLineFlags -version
+> -XX:ConcGCThreads=1 -XX:G1ConcRefinementThreads=4 -XX:GCDrainStackTargetSize=64 -XX:InitialHeapSize=134217728 -XX:MarkStackSize=4194304 -XX:MaxHeapSize=2147483648 -XX:MinHeapSize=6815736 -XX:+PrintCommandLineFlags -XX:ReservedCodeCacheSize=251658240 -XX:+SegmentedCodeCache -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseG1GC
+> openjdk version "15.0.1" 2020-10-20
+> OpenJDK Runtime Environment (build 15.0.1+9-18)
+> OpenJDK 64-Bit Server VM (build 15.0.1+9-18, mixed mode, sharing)
+> ~~~
+>
+> 其中的
+> 
+> * `-XX:+UseCompressedClassPointers`：与对象头有关
+> * `-XX:+UseCompressedOops`：与对象布局有关
+
+#### (2) 普通对象布局
+
+1. 对象头（在HotSpot中称为markword）： 8字节
+2. ClassPointer指针：指向所对应的Class类对象，`-XX:+UseCompressedClassPointers`开启时为4字节、关闭时为8字节
+3. 实例数据：成员变量，其中的引用类型、当`-XX:+UseCompressedOops`开启时为4字节、关闭时为8字节
+4. Padding对齐：为8的倍数，为了提高读取效率
+
+例如：`Object o = new Object`在内存中占多少个字节：
+
+> 总共16字节（没有成员变量）
+> 
+> * 对象头：8字节
+> * ClassPointer：4字节（压缩时）或8字节（不压缩时）
+> * Padding：4字节（压缩时）或0字节（不压缩时）
+
+#### (3) 数组对象布局
+
+1.对象头
+2.ClassPointer指针
+3.数组长度：4字节（比普通的对象多出来的一项）
+4.数组数据
+5.Padding对齐
+
+#### (4) 对象头包含的内容
+
+每个JVM版本实现都不一样，以下图某个`markword 32 bit`的JVM为例：
+ 
+![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_object_markword.jpg)
+ 
+> *	`锁标志位`（2 bit）表示对象加锁状态
+> 	* `无锁态`
+> 	* `轻量级锁`：仅在JVM虚拟机层面的锁、不会调用内核
+> 	* `重量级锁`：会调用到内核
+> 	* `偏向锁`：偏向某个线程
+> * `GC标记`；
+> * `分代年龄`：4bit，因此GC分代年龄默认值是15
+> * `hashCode`：当调用未重写过的`hashCode()`方法以及进一步`System.identityHashCode()`被调用时，JVM用`os::random::next_rand`为对象生成hashCode并存储在这里，因为对应的bit位已经被占用、该对象无法再进入`偏向锁`状态；对过重写过`hashCode()`方法、则不会使用这些bit位
+
+#### (5) 对象怎么定位
+
+参考：[https://blog.csdn.net/clover_lily/article/details/80095580](https://blog.csdn.net/clover_lily/article/details/80095580) 
+
+有两种方法：(1) `句柄池`；(2) `直接指针`。不同的虚拟机采用不同的方法，`Hostspot`使用的是`直接指针·
+
+1 句柄池
+
+执行`T t = new T()`时，在句柄池中存入两个指针，一个指向生成的对象，一个指向对应的`Class`对象上；垃圾回收更快
+
+2 直接指针：
+
+执行`T t = new T()`时，生成对象，对象中有一个指针，指向对应的`Class`对象；找对象更快
+
+## 4 其他
+
+Java 8大原子操作（已经在JSR-133中被废弃、但JMM还没有发生变化，《深入理解Java虚拟机》P364）
+
+> * `lock`：主内存操作、`标识`变量线程独占
+> * `unlock`：主内存操作、`解除`变量线程独占
+> * `read`：主内存操作、读取主内存读数据到工具内存
+> * `load`：工作内存操作、把read到的值放入线程本地变量副本
+> * `use`：工作内存操作、传值给执行引擎
+> * `assign`：工作内存操作、执行引擎结果赋值给线程本地变量
+> * `store`：工作内存、存值到主内存给write使用
+> * `write`：主内存操作、写变量值
+
+Java并发内存模型
+
+> Java线程 <=> 工作内存 <=> Save和Load操作 <=> 主内存
+
+`happens-before原则`：JVM规定重排序必须准守的规则（来自`Java Language Sepcification Java SE 12 Edition $17.4.5`）
+
+> * `程序次序规则`：同一个线程内、按照代码出现的顺序，前面的代码先行于后面的代码（控制流顺序）、因为要考虑到分支和循环结构
+> * `管程锁定规则`：一个unlock操作先行发生于后面（时间上）对同一个锁的lock操作
+> * `volatile变量规则`：对一个volatile变量的写操作先行发生于后面（时间上）对这个变量的读操作
+> * `线程启动规则` ：Thread的start()方法先行发生于这个线程的每一个操作
+> * `线程终止规则`：线程的所有操作都先行于对此线程的终止检测。可以通过`Thread.join()`、`Thread.isAlive()`等检测线程的终止
+> * `对象终结规则`：对象的初始化完成先于发生它的`finalize()`方法的开始
+> * `传递性`：如果操作A先于B、B先于C，那么操作A先于C
+
+`as if serial原则`：不管如何排序，单线程执行结果不会改变
 
 
 
