@@ -94,7 +94,7 @@
 >	* `InovkeSpecial`：调用可直接定位无需多态的方法（如private方法、构造方法），例如[jvm/grp04_runtimearea/Demo03InvokeSpecial.java](../demos/src/com/javaprojref/jvm/grp04_runtimearea/Demo03InvokeSpecial.java)
 >	* `InvokeDynamic`：lambda表达式、反射、其他动态语言scala kotlin、CGLib ASM……，动态产生的class会用到的指令，例如[jvm/grp04_runtimearea/Demo05InvokeDynamic.java](../demos/src/com/javaprojref/jvm/grp04_runtimearea/Demo05InvokeDynamic.java)
 
-> 使用`lambda表达式`时要小心下面的代码：
+> 使用`lambda表达式`时要小心下面的代码（[jvm/grp05_gc/LambdaGC.java](../demos/src/com/javaprojref/jvm/grp05_gc/LambdaGC.java)）：
 > 
 > ~~~java
 > for (...) {
