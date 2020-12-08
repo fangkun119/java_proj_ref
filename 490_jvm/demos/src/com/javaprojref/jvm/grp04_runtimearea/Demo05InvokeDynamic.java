@@ -13,7 +13,9 @@ public class Demo05InvokeDynamic {
         // class com.javaprojref.jvm.grp04_runtimearea.Demo05InvokeDynamic$$Lambda$2/668386784
         // class com.javaprojref.jvm.grp04_runtimearea.Demo05InvokeDynamic$$Lambda$3/1329552164
 
-        //for(;;) {I j = C::n;} //MethodArea <1.8 Perm Space (FGC不回收)
+        // 用lambda表达式时要注意以下问题
+        // 下面代码会在MethodArea产生大量的对象，造成性能浪费（指1.8及之后的版本、它们将方法区是现在Meta Space中；而1.8之前方法区是现在Perm Space中并且Full GC时不会回收会直接导致OOM）
+        // for(;;) {I j = C::n;}
     }
 
     // 是一个Functional Interface，任何一个具体的方法，都可以认为是这个interface的一个具体对象
