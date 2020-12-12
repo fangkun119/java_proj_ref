@@ -1,4 +1,4 @@
-# `Parallel Scavenge`及`Parallel Old`GC日志及调优
+# GC日志及调优
 
 ## 1 PS(`Parallel Scavenge`) PO（`Parallel Old`) GC日志
 
@@ -139,3 +139,24 @@
 
 > 上面是PSPO的日志，CMS的日志其实也类似，差别主要在于出错时的日志不同，会报`promotion failure`
 
+## 2 `CPU 100%`问题调优
+
+> CPU 100%：说明一定有线程在占用系统资源
+>
+> 1. 找出哪个进程CPU高：`top`命令
+> 2. 找出该进程中哪个线程CPU高：`top -Hp`命令
+> 3. （如果是java程序）导出该线程的堆栈、看看它都在调用什么：`jstack`
+> 4. 查找哪个方法（栈帧）消耗时间：`jstack`
+
+
+
+## 3 系统内存飙高、如何调优 
+
+> 内存飙高，一定是堆内存飙高
+>
+> 1. 导出堆内存（`jmap`)
+> 2. 分析（`jhat`, `jvisual vm`,`mat`, `jprofiler`……等工具）
+
+## 4 如何监控JVM
+
+> `jstat`, `jvisualvm`, `jprofiler`,`arthas`,`top` ……
