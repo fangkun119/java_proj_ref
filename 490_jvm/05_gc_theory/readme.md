@@ -242,15 +242,15 @@ G1同样使用四阶段回收过程
 > __________________________________________________________________
 > $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/490_jvm/05_gc/
 > $ java -X
->  -Xint			仅解释模式执行
->  -Xlog:<opts>	配置或启用采用 Java 虚拟机 (Java Virtual Machine, JVM) 统一记录框架进行事件记录。使用 -Xlog:help可了解详细信息。
->  -Xmixed		混合模式执行（默认值）
->  -Xmn<size> 	为年轻代（新生代）设置初始和最大堆大小（以字节为单位）
->  -Xms<size> 	设置初始 Java 堆大小
->  -Xmx<size> 	设置最大 Java 堆大小
->  -Xnoclassgc	禁用类垃圾收集
->  -Xss<size>  	设置 Java 线程堆栈大小
->  ……
+> -Xint			仅解释模式执行
+> -Xlog:<opts>	配置或启用采用 Java 虚拟机 (Java Virtual Machine, JVM) 统一记录框架进行事件记录。使用 -Xlog:help可了解详细信息。
+> -Xmixed		混合模式执行（默认值）
+> -Xmn<size> 	为年轻代（新生代）设置初始和最大堆大小（以字节为单位）
+> -Xms<size> 	设置初始 Java 堆大小
+> -Xmx<size> 	设置最大 Java 堆大小
+> -Xnoclassgc	禁用类垃圾收集
+> -Xss<size>  	设置 Java 线程堆栈大小
+> ……
 > ~~~
 
 查看不稳定参数：`java -XX:+PrintFlagsFinal -version`，可以结合`grep`来使用
