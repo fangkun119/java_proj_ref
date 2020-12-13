@@ -415,11 +415,11 @@
 >
 > 在Mac上，用`Finder`进入JDK存放java bin文件的目录，双击jconsole，启动图形化界面
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/upload/jvm_jconsole_conn.png)
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jconsole_conn.jpg)
 >
 > 填入Linux机器上JMX服务的地址和端口后，可以看到图形化的GC信息
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/upload/jvm_jconsole_monitor.png)
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jconsole_monitor.jpg)
 
 #### (4) 使用`jvisualvm`图形化界面查看进程GC的信息（会影响服务器性能、用于压力测试而非线上监控）
 
@@ -433,15 +433,15 @@
 >
 > 添加JMX连接
 >
-> ![image-20201213192207989](/Users/fangkun/Library/Application Support/typora-user-images/image-20201213192207989.png)
+> ![jvm_jvisualvm_conn](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jvisualvm_conn.jpg)
 >
 > 连接JMX可以看到相关的信息
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/upload/jvm_jvisualvm_monitor.png)
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jvisualvm_monitor.jpg)
 >
 > 用`堆抽样器`可以看出来是哪个类占用的内存导致了堆被占满，还可以看来是哪个线程分配了大量的内存
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/upload/jvm_jvisualvm_heapsampler.png)
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jvisualvm_heapsampler.jpg)
 
 #### （5）使用`jmap -histo ${pid} | head -n ${top_line_num}`查看有多少对象产生
 
