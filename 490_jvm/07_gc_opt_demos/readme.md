@@ -1,4 +1,4 @@
-# GC日志及调优Demos
+# GC日志、调优案例及工具
 
 ## 1 准备
 
@@ -29,15 +29,15 @@
 > import java.util.LinkedList;
 > 
 > public class GCCmdDemo {
->  public static void main(String[] args) {
->      System.out.println("HelloGC");
->      List list = new LinkedList();
->      for (;;) {
->          byte[] b = new byte[1024 * 1024];
->        	@unchecked
->          list.add(b);
->      }
->  }
+>    public static void main(String[] args) {
+>        System.out.println("HelloGC");
+>        List list = new LinkedList();
+>        for (;;) {
+>            byte[] b = new byte[1024 * 1024];
+>            @unchecked
+>            list.add(b);
+>        }
+>    }
 > }
 > ~~~
 
@@ -151,11 +151,11 @@
 
 > 上面是PSPO的日志，CMS的日志其实也类似，差别主要在于出错时的日志不同，会报`promotion failure`
 
-## 3 `CPU 100%`问题调优
+## 3 调优案例及工具
 
 ### 3.1 总体步骤
 
-> CPU 100%：说明一定有线程在占用系统资源
+> 症状：CPU 100%，说明一定有线程在占用系统资源
 >
 > 1. 找出哪个进程CPU高：`top`命令
 > 2. 找出该进程中哪个线程CPU高：`top -Hp`命令
@@ -322,7 +322,9 @@
 >
 > 另外一个思路是，此时系统已经在频繁GC了，如果找到是哪个类被大量创建对象（使用下面介绍的各种工具），也能找到问题的原因
 
-### 3.3 其他工具
+### 3.3 其他`jvm`自带的工具
+
+> CentOS自带的JDK未必提供了这些工具，有可能需要自行下载和安装
 
 #### (1) 用`jinfo`查看进程虚拟机的详细信息 
 
@@ -517,8 +519,7 @@
 > Dump file created Sun Dec 13 20:23:26 CST 2020
 > Snapshot read, resolving...
 > Resolving 2850637 objects...
-> Chasing references, expect 570 dots..........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
-> Eliminating duplicate references..........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+> ......
 > Snapshot resolved.
 > Started HTTP server on port 7000
 > Server is ready.
@@ -526,20 +527,529 @@
 >
 > * 考虑到dump堆内存会影响在线服务，在线排查使用`arthas`会更加合适
 
-## 4 系统内存飙高调优 
+### 3.4 [`Arthas`](https://arthas.aliyun.com/doc/)在线排查工具
+
+> 排查生产环境问题时、遇到一些不容易排查的问题，用`threaddump`或`heapdump`会收到限制或查不出原因、增加日志又过于繁琐时，使用在线排查工具会比较方便
+
+#### (1) 资料
+
+> * [https://arthas.aliyun.com/doc/](https://arthas.aliyun.com/doc/)
+> * [https://github.com/alibaba/arthas](https://github.com/alibaba/arthas)
+
+#### (2) 快速开始
+
+推荐方法：使用`arthas-boot`
+
+> ~~~bash
+> [root@CentOS share]# curl -O https://alibaba.github.io/arthas/arthas-boot.jar
+>   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+>                                  Dload  Upload   Total   Spent    Left  Speed
+> 100  135k  100  135k    0     0   124k      0  0:00:01  0:00:01 --:--:--  124k
+> [root@CentOS share]# ls arthas-boot.jar
+> arthas-boot.jar
+> [root@CentOS share]# java -jar arthas-boot.jar -h
+> [INFO] arthas-boot version: 3.4.5
+> Usage: arthas-boot [-h] [--target-ip <value>] [--telnet-port <value>]
+>        [--http-port <value>] [--session-timeout <value>] [--arthas-home <value>]
+>        [--use-version <value>] [--repo-mirror <value>] [--versions] [--use-http]
+>        [--attach-only] [-c <value>] [-f <value>] [--height <value>] [--width
+>        <value>] [-v] [--tunnel-server <value>] [--agent-id <value>] [--app-name
+>        <value>] [--stat-url <value>] [--select <value>] [pid]
+> Bootstrap Arthas
+> EXAMPLES:
+>   java -jar arthas-boot.jar <pid>
+>   java -jar arthas-boot.jar --target-ip 0.0.0.0
+>   java -jar arthas-boot.jar --telnet-port 9999 --http-port -1
+>   java -jar arthas-boot.jar --tunnel-server 'ws://192.168.10.11:7777/ws'
+> --app-name demoapp
+> ……
+> ~~~
+>
+>  如果速度慢，也可以使用阿里云的镜像
+>
+> ~~~bash
+> 
+> java -jar arthas-boot.jar --repo-mirror aliyun --use-http
+> ~~~
+
+其他方法：使用`as.sh`安装
+
+> ~~~bash
+> curl -L https://alibaba.github.io/arthas/install.sh | sh
+> ~~~
+
+### (3) 将`Arthas` attach到运行中的java程序上
+
+在一个终端窗口启动`FullGCIssueDemo`，让它运行一段时间后开始频繁Full GC
+
+> ~~~bash
+> [root@CentOS share]# java -Xms100M -Xmx100M -XX:+PrintGC FullGCIssueDemo
+> [GC (Allocation Failure)  27328K->1144K(99008K), 0.0026640 secs]
+> [GC (Allocation Failure)  28472K->12127K(99008K), 0.0348546 secs]
+> ~~~
+
+在另一个窗口，启动`Arthas`，`Arthas`会找到当前正在运行的java进程并提示要debug哪一个，之后进入`Arthas`交互式命令行
+
+> ~~~bash
+> [root@CentOS share]# ls arthas-boot.jar
+> arthas-boot.jar
+> [root@CentOS share]# java -jar arthas-boot.jar
+> [INFO] arthas-boot version: 3.4.5
+> [INFO] Found existing java process, please choose one and input the serial number of the process, eg : 1. Then hit ENTER.
+> * [1]: 1769 FullGCIssueDemo
+> 1
+> [INFO] Start download arthas from remote server: https://arthas.aliyun.com/download/3.4.5?mirror=aliyun
+> [INFO] Download arthas success.
+> [INFO] arthas home: /root/.arthas/lib/3.4.5/arthas
+> [INFO] Try to attach process 3078
+> [INFO] Found java home from System Env JAVA_HOME: /usr/java/latest
+> [INFO] Attach process 3078 success.
+> [INFO] arthas-client connect 127.0.0.1 3658
+>   ,---.  ,------. ,--------.,--.  ,--.  ,---.   ,---.
+>  /  O  \ |  .--. ''--.  .--'|  '--'  | /  O  \ '   .-'
+> |  .-.  ||  '--'.'   |  |   |  .--.  ||  .-.  |`.  `-.
+> |  | |  ||  |\  \    |  |   |  |  |  ||  | |  |.-'    |
+> `--' `--'`--' '--'   `--'   `--'  `--'`--' `--'`-----'
+> 
+> 
+> wiki      https://arthas.aliyun.com/doc
+> tutorials https://arthas.aliyun.com/doc/arthas-tutorials.html
+> version   3.4.5
+> pid       1769
+> time      2020-12-14 11:42:59
+> 
+> [arthas@1769]$
+> 
+> ~~~
+
+在交互式命令行输入`help`可以查看可用的命令
+
+> ~~~bash
+> [arthas@1769]$ help
+>  NAME         DESCRIPTION
+>  help         Display Arthas Help
+>  keymap       Display all the available keymap for the specified connection.
+>  sc           Search all the classes loaded by JVM
+>  sm           Search the method of classes loaded by JVM
+>  classloader  Show classloader info
+>  jad          Decompile class
+>  getstatic    Show the static field of a class
+>  monitor      Monitor method execution statistics, e.g. total/success/failure count, average rt
+>               , fail rate, etc.
+>  stack        Display the stack trace for the specified class and method
+>  thread       Display thread info, thread stack
+>  trace        Trace the execution time of specified method invocation.
+>  watch        Display the input/output parameter, return object, and thrown exception of specif
+>               ied method invocation
+>  tt           Time Tunnel
+>  jvm          Display the target JVM information
+>  perfcounter  Display the perf counter information.
+>  ognl         Execute ognl expression.
+>  mc           Memory compiler, compiles java files into bytecode and class files in memory.
+>  redefine     Redefine classes. @see Instrumentation#redefineClasses(ClassDefinition...)
+>  dashboard    Overview of target jvm's thread, memory, gc, vm, tomcat info.
+>  dump         Dump class byte array from JVM
+>  heapdump     Heap dump
+>  options      View and change various Arthas options
+>  cls          Clear the screen
+>  reset        Reset all the enhanced classes
+>  version      Display Arthas version
+>  session      Display current session information
+>  sysprop      Display, and change the system properties.
+>  sysenv       Display the system env.
+>  vmoption     Display, and update the vm diagnostic options.
+>  logger       Print logger info, and update the logger level
+>  history      Display command history
+>  cat          Concatenate and print files
+>  echo         write arguments to the standard output
+>  pwd          Return working directory name
+>  mbean        Display the mbean information
+>  grep         grep command for pipes.
+>  tee          tee command for pipes.
+>  profiler     Async Profiler. https://github.com/jvm-profiling-tools/async-profiler
+>  stop         Stop/Shutdown Arthas server and exit the console.
+> ~~~
+
+#### (4) `Arthas`常用命令
+
+##### `jvm`：相当于之前的`jinfo`命令、查看jvm的详细配置情况
+
+> ~~~bash
+> [arthas@1769]$ jvm
+>  RUNTIME
+> ---------------------------------------------------------------------------------
+>  MACHINE-NAME               1769@CentOS
+>  JVM-START-TIME             2020-12-14 13:05:19
+>  MANAGEMENT-SPEC-VERSION    1.2
+>  SPEC-NAME                  Java Virtual Machine Specification
+>  SPEC-VENDOR                Oracle Corporation
+>  SPEC-VERSION               1.8
+>  VM-NAME                    Java HotSpot(TM) 64-Bit Server VM
+>  VM-VENDOR                  Oracle Corporation
+>  VM-VERSION                 25.191-b12
+>  INPUT-ARGUMENTS            -Xms100M
+>                             -Xmx100M
+>                             -XX:+PrintGC
+> 
+>  CLASS-PATH                 .
+>  BOOT-CLASS-PATH            /usr/java/jdk1.8.0_191-amd64/jre/lib/resources.jar:/usr/java/jdk1.8
+>                             .0_191-amd64/jre/lib/rt.jar:/usr/java/jdk1.8.0_191-amd64/jre/lib/su
+>                             nrsasign.jar:/usr/java/jdk1.8.0_191-amd64/jre/lib/jsse.jar:/usr/jav
+>                             a/jdk1.8.0_191-amd64/jre/lib/jce.jar:/usr/java/jdk1.8.0_191-amd64/j
+>                             re/lib/charsets.jar:/usr/java/jdk1.8.0_191-amd64/jre/lib/jfr.jar:/u
+>                             sr/java/jdk1.8.0_191-amd64/jre/classes
+>  LIBRARY-PATH               /usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
+> 
+> ---------------------------------------------------------------------------------
+>  CLASS-LOADING
+> ---------------------------------------------------------------------------------
+>  LOADED-CLASS-COUNT         3442
+>  TOTAL-LOADED-CLASS-COUNT   3442
+>  UNLOADED-CLASS-COUNT       0
+>  IS-VERBOSE                 false
+> 
+> ---------------------------------------------------------------------------------
+>  COMPILATION
+> ---------------------------------------------------------------------------------
+>  NAME                       HotSpot 64-Bit Tiered Compilers
+>  TOTAL-COMPILE-TIME         2078
+>  [time (ms)]
+> 
+> ---------------------------------------------------------------------------------
+>  GARBAGE-COLLECTORS
+> ---------------------------------------------------------------------------------
+>  Copy                       name : Copy
+>  [count/time (ms)]          collectionCount : 5
+>                             collectionTime : 93
+> 
+>  MarkSweepCompact           name : MarkSweepCompact
+>  [count/time (ms)]          collectionCount : 0
+>                             collectionTime : 0
+> 
+> 
+> ---------------------------------------------------------------------------------
+>  MEMORY-MANAGERS
+> ---------------------------------------------------------------------------------
+>  CodeCacheManager           Code Cache
+> 
+>  Metaspace Manager          Metaspace
+>                             Compressed Class Space
+> 
+>  Copy                       Eden Space
+>                             Survivor Space
+> 
+>  MarkSweepCompact           Eden Space
+>                             Survivor Space
+>                             Tenured Gen
+> 
+> 
+> ---------------------------------------------------------------------------------
+>  MEMORY
+> ---------------------------------------------------------------------------------
+>  HEAP-MEMORY-USAGE          init : 104857600(100.0 MiB)
+>  [memory in bytes]          used : 35131368(33.5 MiB)
+>                             committed : 101384192(96.7 MiB)
+>                             max : 101384192(96.7 MiB)
+> 
+>  NO-HEAP-MEMORY-USAGE       init : 2555904(2.4 MiB)
+>  [memory in bytes]          used : 26585768(25.4 MiB)
+>                             committed : 29032448(27.7 MiB)
+>                             max : -1(-1 B)
+> 
+>  PENDING-FINALIZE-COUNT     0
+> 
+> ---------------------------------------------------------------------------------
+>  OPERATING-SYSTEM
+> ---------------------------------------------------------------------------------
+>  OS                         Linux
+>  ARCH                       amd64
+>  PROCESSORS-COUNT           2
+>  LOAD-AVERAGE               0.28
+>  VERSION                    3.10.0-1127.19.1.el7.x86_64
+> 
+> ---------------------------------------------------------------------------------
+>  THREAD
+> ---------------------------------------------------------------------------------
+>  COUNT                      65
+>  DAEMON-COUNT               14
+>  PEAK-COUNT                 65
+>  STARTED-COUNT              67
+>  DEADLOCK-COUNT             0
+> 
+> ---------------------------------------------------------------------------------
+>  FILE-DESCRIPTOR
+> ---------------------------------------------------------------------------------
+>  MAX-FILE-DESCRIPTOR-COUNT  4096
+>  OPEN-FILE-DESCRIPTOR-COUN  67
+>  T
+> ~~~
+>
+> * GARBAGE-COLLECTORS 
+>   * Copy：伊甸区会用Copy垃圾回收算法
+>   * MarkSweepCompact：老年代会用扫描标记压缩回收算法
+> * MEMORY-MANAGERS：可以看到上面列出的垃圾回收算法都用在了哪些内存分区上
+> * FILE-DESCRIPTOR：文件句柄使用情况
+
+##### `thread`：各个线程的阻塞情况和CPU使用情况
+
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_arthas_thread.jpg)
+
+##### `thread ${ARTHAS_THREAD_ID}`：查看线程调用栈
+
+> ~~~bash
+> [arthas@1769]$ thread 30
+> "pool-1-thread-23" Id=30 WAITING on java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject@3c6b06a5
+>     at sun.misc.Unsafe.park(Native Method)
+>     -  waiting on java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject@3c6b06a5
+>     at java.util.concurrent.locks.LockSupport.park(LockSupport.java:175)
+>     at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:2039)
+>     at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1088)
+>     at java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:809)
+>     at java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1074)
+>     at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1134)
+>     at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+>     at java.lang.Thread.run(Thread.java:748)
+> ~~~
+
+##### `dashboard`：查看整体线程情况（类似之前的`top -Hp ${pid}`但功能会更丰富)，有哪些线程，内存情况怎么，哪些线程在消耗CPU
+
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_arthas_dashboard.jpg)
+
+##### `heapdump`：导出堆文件，相当于`jmap -dump:format=b,file=${file_path} ${pid}`
+
+> 该命令对程序性能也有影响，尽量不要dump，而是使用在线定位
+>
+> ~~~bash
+> [arthas@1769]$ heapdump
+> Dumping heap to /tmp/heapdump2020-12-14-13-366916075808810091709.hprof ...
+> Heap dump file created
+> [arthas@1769]$ heapdump /root/share/heap_dump_FullGCIssueDemo_pid_1769.hprof
+> Dumping heap to /root/share/heap_dump_FullGCIssueDemo_pid_1769.hprof ...
+> Heap dump file created
+> ~~~
+>
+> 可以使用`jhat`载入dump文件并启动一个http server供交互式分析
+>
+> ~~~bash
+> [root@CentOS share]# ls *hprof
+> heap_dump_FullGCIssueDemo_pid_1769.hprof
+> [root@CentOS share]# jhat -J-mx512M heap_dump_FullGCIssueDemo_pid_1769.hprof
+> Reading from heap_dump_FullGCIssueDemo_pid_1769.hprof...
+> Dump file created Mon Dec 14 13:38:10 CST 2020
+> Snapshot read, resolving...
+> Resolving 2502183 objects...
+> ......
+> Snapshot resolved.
+> Started HTTP server on port 7000
+> Server is ready.
+> ~~~
+>
+> 用浏览器访问dump结果
+>
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_arthas_jhat.jpg)
+>
+> 使用`Show heap histogram`或者`Show instances counts for all classes`查询可以找到哪个类分配了大量对象占用了内存
+>
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_arthas_jhat_histo.jpg)
+>
+> 使用`Execute Object Query Language (OQL) query`可以查看某个类new了多少个对象、占用多少字节，每个对象有多少个引用等。在某些特别复杂的case中可以用来看是怎样的对象出了问题
+>
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_athas_jhat_oql.jpg)
+>
+>  出了`jhat`，使用`MAT`,`jvisualvm`也都可以分析heap dump文件（需要jvm版本一致） 
+
+#### (5) Arthas特有的功能
+
+##### `jad`：反编译
+
+>  用于辅助分析动态代理问题、第三方类问题、以及确认程序版本是不是自己最新提交的版本
+>
+> ~~~bash
+> [arthas@1769]$ jad --help
+>  USAGE:
+>    jad [--classLoaderClass <value>] [-c <value>] [-h] [--hideUnicode] [-E] [--source-only] class-pattern [method-name]
+> 
+>  SUMMARY:
+>    Decompile class
+> 
+>  EXAMPLES:
+>    jad java.lang.String
+>    jad java.lang.String toString
+>    jad --source-only java.lang.String
+>    jad -c 39eb305e org/apache/log4j/Logger
+>    jad -c 39eb305e -E org\\.apache\\.*\\.StringUtils
+> 
+>  WIKI:
+>    https://arthas.aliyun.com/doc/jad
+> 
+>  OPTIONS:
+>      --classLoaderClass <value>          The class name of the special class's classLoader.
+>  -c, --code <value>                      The hash code of the special class's classLoader
+>  -h, --help                              this help
+>      --hideUnicode                       hide unicode, default value false
+>  -E, --regex                             Enable regular expression to match (wildcard matching by default)
+>      --source-only                       Output source code only
+>  <class-pattern>                         Class name pattern, use either '.' or '/' as separator
+>  <method-name>                           method name pattern, decompile a specific method instead of the whole class
+> ~~~
+
+##### `redefine`：热替换
+
+> 目前有限制，只能修改方法实现（方法已经运行完成）、不能改方法名，不能改属性
+>
+> ~~~bash
+> [arthas@2429]$ redefine --help
+>  USAGE:
+>    redefine [-c <value>] [--classLoaderClass <value>] [-h] classfilePaths...
+> 
+>  SUMMARY:
+>    Redefine classes. @see Instrumentation#redefineClasses(ClassDefinition...)
+> 
+>  EXAMPLES:
+>    redefine /tmp/Test.class
+>    redefine -c 327a647b /tmp/Test.class /tmp/Test\$Inner.class
+> 
+>  WIKI:
+>    https://arthas.aliyun.com/doc/redefine
+> 
+>  OPTIONS:
+>  -c, --classloader <value>               classLoader hashcode
+>      --classLoaderClass <value>          The class name of the special class's classLoader.
+>  -h, --help                              this help
+>  <classfilePaths>                        .class file paths
+> ~~~
+
+##### `sc`：search class
+
+> 找到某个Class并打印详细信息
+>
+> ~~~bash
+> [arthas@1906]$ sc -d *CardInfo
+>  class-info        FullGCIssueDemo$CardInfo
+>  code-source       /root/share/
+>  name              FullGCIssueDemo$CardInfo
+>  isInterface       false
+>  isAnnotation      false
+>  isEnum            false
+>  isAnonymousClass  false
+>  isArray           false
+>  isLocalClass      false
+>  isMemberClass     true
+>  isPrimitive       false
+>  isSynthetic       false
+>  simple-name       CardInfo
+>  modifier          private,static
+>  annotation
+>  interfaces
+>  super-class       +-java.lang.Object
+>  class-loader      +-sun.misc.Launcher$AppClassLoader@73d16e93
+>                      +-sun.misc.Launcher$ExtClassLoader@4be5871e
+>  classLoaderHash   73d16e93
+> 
+> Affect(row-cnt:1) cost in 12 ms.
+> ~~~
+
+##### `watch`：观察方法执行
+
+> 方法调用时的参数、返回值、抛出的异常
+>
+> ~~~bash
+> [arthas@1906]$ watch *FullGCIssueDemo getAllCardInfo
+> Press Q or Ctrl+C to abort.
+> Affect(class count: 1 , method count: 1) cost in 143 ms, listenerId: 1
+> ts=2020-12-14 16:10:36; [cost=1.920062ms] result=@ArrayList[
+>     @Object[][isEmpty=true;size=0],
+>     null,
+>     @ArrayList[isEmpty=false;size=100],
+> ]
+> ts=2020-12-14 16:10:36; [cost=0.044709ms] result=@ArrayList[
+>     @Object[][isEmpty=true;size=0],
+>     null,
+>     @ArrayList[isEmpty=false;size=100],
+> ]
+> ......
+> ~~~
+
+#### (6) `Arthas`没有包含的功能
+
+> `jmap -histo ${pid}`的功能
+
+## 4 其他场景
+
+### 4.1 宕机程序
+
+> * 如果程序启动时设置了`-XX:+HeapDumpOnOutOfMemoryError`会自动dump heap以供分析
+> * 如果程序没有设置上述选项，宕机时不要立刻重启，此时用`jmap`仍然可以dump heap到文件
+
+### 4.2 系统内存飙高调优 
 
 > 内存飙高，一定是堆内存飙高
 >
 > 1. 导出堆内存（`jmap`)
 > 2. 分析（`jhat`, `jvisual vm`,`mat`, `jprofiler`……等工具）
 
-## 5 监控JVM
+### 4.3 `Lambda`表达式导致方法区溢出
 
-> `jstat`, `jvisualvm`, `jprofiler`,`arthas`,`top` ……
+> 例如[../demos/src/com/javaprojref/jvm/grp05_gc/LambdaGC.java](demos/src/com/javaprojref/jvm/grp05_gc/LambdaGC.java)
+>
+> ~~~java
+> public class LambdaGC {
+>     public static void main(String[] args) {
+>         for(;;) {
+>             I i = C::n; //每一次调用都会产生一个新的Class对象
+>         }
+>     }
+>     public static interface I {
+>         void m();
+>     }
+>     public static class C {
+>         static void n() {
+>             System.out.println("hello");
+>         }
+>     }
+> }
+> ~~~
+>
+> 每一个`Lambda`表达式都会产生一个新的Class，分配在方法区，最终将方法区占满，发生例如`java.lang.OutOfMemoryError: Compressed class space`这样的错误（有的垃圾回收器不清理方法区、有的垃圾回收器有条件回收并且条件比较严格）
 
-## 附录
+### 4.4 栈溢出
+
+> 如果没有bug（如递归相关），可以增加`-Xss`设定
+
+### 4.6 监控JVM
+
+> `jstat`， `jvisualvm`， `jprofiler`，`arthas`，`top` ……
+
+## 5 代码优化
+
+> 代码1：
+>
+> ~~~java
+> for (int i = 0; i < 100; ++i) {
+>   Object o = new Object();
+>   // ...
+> }
+> ~~~
+>
+> 代码2：
+>
+> ~~~java
+> Object o = null;
+> for (int i = 0; i < 100; ++i) {
+>   o = new Object();
+>   // ...
+> }
+> ~~~
+>
+> 相比代码1，代码2给JVM带来的负担更小，更加优化
+
+
+
+## 其他
 
 ### 安装`htop`
+
+> Mac上的`top`命令的功能限制比较多、可是安装`htop`来实现查看线程等功能，但是Mac上的java程序运行与Linux差别还是很大，因此还是在Linux上进行JVM分析，最接近生产环境
 
 方法一：使用`homebrew`安装htop
 
@@ -549,7 +1059,7 @@
 >   * 参考链接 [https://learnku.com/articles/18908](https://learnku.com/articles/18908) 
 >   * 仅限链接中的方法一，方法二应该已经不能使用了，它导致我的brew无法使用最终重装了brew)
 >
-> * 方法2：用能够为terminal提供`http`, `https`, `sock5`代理的翻墙软件（我目前使用的方法）
+> * 方法2：用能够为terminal提供`http`, `https`, `sock5`代理的翻墙软件
 >
 >   ~~~
 >   export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7890

@@ -189,4 +189,7 @@
 >   * 1.8.0_181 默认（看不出来）Copy MarkCompact
 >   * 1.8.0_222 默认 PS + PO
 
-## 
+## 7 常用JVM参数
+
+> * `-XX:+DisableExplictGC`：禁用显式GC（例如：`System.gc()`)
+
