@@ -1,5 +1,7 @@
 package com.javaproref.kafka.apidemo;
 
+import com.javaproref.kafka.apidemo.acks.AckDemoConsumer;
+import com.javaproref.kafka.apidemo.acks.AckTimeoutDemoProducer;
 import com.javaproref.kafka.apidemo.common.RecordKeyPolicy;
 import com.javaproref.kafka.apidemo.consumer.ConsumerDeserializationDemo;
 import com.javaproref.kafka.apidemo.consumer.KafkaConsumerPartitionAssignDemo;
@@ -36,6 +38,8 @@ public class Main {
     public static final String OFFSET_CONSUMER_SUBMIT    = "offset_consumer_submit";    // 由消费者代码调用api提交offset，而非由框架定期自动提交
     public static final String SERIALIZATION_PRODUCER    = "serialization_producer";    // 自定义序列化的生产者
     public static final String SERIALIZATION_CONSUMER    = "serialization_consumer";    // 自定义序列化的消费者
+    public static final String ACK_TIMEOUT_PRODUCER      = "ack_timeout_producer";      // ACK超时Demo的生产者
+    public static final String ACK_CONSUMER              = "ack_consumer";              // ACK相关Demo的消费者
 
     // 打印帮助信息
     private static void printHelp(String[] args) {
@@ -60,6 +64,8 @@ public class Main {
                         + "\n\t" + Main.OFFSET_CONSUMER_SUBMIT
                         + "\n\t" + Main.SERIALIZATION_PRODUCER
                         + "\n\t" + Main.SERIALIZATION_CONSUMER
+                        + "\n\t" + Main.ACK_TIMEOUT_PRODUCER
+                        + "\n\t" + Main.ACK_CONSUMER
         );
     }
 
@@ -121,6 +127,12 @@ public class Main {
                     break;
                 case Main.SERIALIZATION_CONSUMER:
                     (new ConsumerDeserializationDemo()).runDemo(bootStrapSvrs);
+                    break;
+                case Main.ACK_TIMEOUT_PRODUCER:
+                    (new AckTimeoutDemoProducer()).runDemo(bootStrapSvrs, "all");
+                    break;
+                case Main.ACK_CONSUMER:
+                    (new AckDemoConsumer()).runDemo(bootStrapSvrs);
                     break;
                 default:
                     Main.printHelp(args);
