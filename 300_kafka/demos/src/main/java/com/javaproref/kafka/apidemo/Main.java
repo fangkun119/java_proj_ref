@@ -16,12 +16,14 @@ import com.javaproref.kafka.apidemo.producer.KafkaProducerDemo;
 import com.javaproref.kafka.apidemo.producer.ProducerIntercepterDemo;
 import com.javaproref.kafka.apidemo.producer.ProducerPartitionerDemo;
 import com.javaproref.kafka.apidemo.producer.ProducerSerializationDemo;
+import com.javaproref.kafka.apidemo.tranactions.ProducerOnlyTransactionDemoConsumer;
+import com.javaproref.kafka.apidemo.tranactions.ProducerOnlyTransactionDemoProducer;
 
 import java.util.concurrent.ExecutionException;
 
 public class Main {
     // bootstrap server  默认值，非默认值可通过第二个参数传入
-    public static final String BOOT_STRAP_SVRS = "CentOSA:9092,CentOSB:9092,CentOSC:9092";
+    public static final String BOOT_STRAP_SEVERS = "CentOSA:9092,CentOSB:9092,CentOSC:9092";
 
     // demo主题，通过第一个参数传入
     public static final String CLEAR                     = "clear";                     // 清理实验环境
@@ -42,9 +44,11 @@ public class Main {
     public static final String ACK_TIMEOUT_PRODUCER      = "ack_timeout_producer";      // ACK包超时Demo的生产者
     public static final String ACK_IDEMPOTENCE_PRODUCER  = "act_idempotence_producer";  // ACK包幂等性Demo的生产者
     public static final String ACK_CONSUMER              = "ack_consumer";              // ACK包相关Demo的消费者
+    public static final String PROD_TRX_PRODUCER         = "prod_trx_producer";         // Producer Only事务Demo的生产者
+    public static final String PROD_TRX_CONSUMER         = "prod_trx_consumer";         // Producer Only事务Demo的消费者
 
     // 打印帮助信息
-    private static void printHelp(String[] args) {
+    private static void printHelp() {
         System.out.println(
                 "usage: "
                         + "\n\t" + "java -jar ${jar_file_path} ${demo_name} ${bootstrap_servers}\n\n" +
@@ -69,6 +73,8 @@ public class Main {
                         + "\n\t" + Main.ACK_TIMEOUT_PRODUCER
                         + "\n\t" + Main.ACK_IDEMPOTENCE_PRODUCER
                         + "\n\t" + Main.ACK_CONSUMER
+                        + "\n\t" + Main.PROD_TRX_PRODUCER
+                        + "\n\t" + Main.PROD_TRX_CONSUMER
         );
     }
 
@@ -76,76 +82,80 @@ public class Main {
     public static void main(String[] args) {
         // Stream.of(args).forEach(System.out::println);
         if (null == args || args.length < 1) {
-            Main.printHelp(args);
+            Main.printHelp();
             return;
         }
 
         // boot strap servers
-        String bootStrapSvrs = (args.length >= 2) ? args[1] : BOOT_STRAP_SVRS;
+        String bootStrapSevers = (args.length >= 2) ? args[1] : BOOT_STRAP_SEVERS;
 
         // run demo
         try {
             switch (args[0]) {
                 case Main.TOPIC_DML:
-                    (new KafkaTopicDMLDemo()).runDemo(bootStrapSvrs);
+                    (new KafkaTopicDMLDemo()).runDemo(bootStrapSevers);
                     break;
                 case Main.CLEAR:
-                    (new RemoveTestingTopic()).runDemo(bootStrapSvrs);
+                    (new RemoveTestingTopic()).runDemo(bootStrapSevers);
                     break;
                 case Main.INIT:
-                    (new CreateTestingTopic()).runDemo(bootStrapSvrs);
+                    (new CreateTestingTopic()).runDemo(bootStrapSevers);
                     break;
                 case Main.PRODUCER:
-                    (new KafkaProducerDemo()).runDemo(bootStrapSvrs, RecordKeyPolicy.ENABLE);
+                    (new KafkaProducerDemo()).runDemo(bootStrapSevers, RecordKeyPolicy.ENABLE);
                     break;
                 case Main.PRODUCER_ROUND_ROBIN:
-                    (new KafkaProducerDemo()).runDemo(bootStrapSvrs, RecordKeyPolicy.DISABLE);
+                    (new KafkaProducerDemo()).runDemo(bootStrapSevers, RecordKeyPolicy.DISABLE);
                     break;
                 case Main.PRODUCER_PARTITIONER:
-                    (new ProducerPartitionerDemo()).runDemo(bootStrapSvrs, RecordKeyPolicy.ENABLE);
+                    (new ProducerPartitionerDemo()).runDemo(bootStrapSevers, RecordKeyPolicy.ENABLE);
                     break;
                 case Main.PRODUCER_INTERCEPTOR:
-                    (new ProducerIntercepterDemo()).runDemo(bootStrapSvrs);
+                    (new ProducerIntercepterDemo()).runDemo(bootStrapSevers);
                     break;
                 case Main.CONSUMER:
-                    (new KafkaConsumerSubscribeDemo()).runDemo(bootStrapSvrs);
+                    (new KafkaConsumerSubscribeDemo()).runDemo(bootStrapSevers);
                     break;
                 case Main.ASSIGN_CONSUMER_PARTITION:
-                    (new KafkaConsumerPartitionAssignDemo()).runDemo(bootStrapSvrs);
+                    (new KafkaConsumerPartitionAssignDemo()).runDemo(bootStrapSevers);
                     break;
                 case Main.OFFSET_EARLIEST:
-                    (new AutoOffsetResetConfigDemo()).runDemo(bootStrapSvrs, AutoOffsetResetConfigDemo.EARLIEST);
+                    (new AutoOffsetResetConfigDemo()).runDemo(bootStrapSevers, AutoOffsetResetConfigDemo.EARLIEST);
                     break;
                 case Main.OFFSET_LATEST:
-                    (new AutoOffsetResetConfigDemo()).runDemo(bootStrapSvrs, AutoOffsetResetConfigDemo.LATEST);
+                    (new AutoOffsetResetConfigDemo()).runDemo(bootStrapSevers, AutoOffsetResetConfigDemo.LATEST);
                     break;
                 case Main.OFFSET_NONE:
-                    (new AutoOffsetResetConfigDemo()).runDemo(bootStrapSvrs, AutoOffsetResetConfigDemo.NONE);
+                    (new AutoOffsetResetConfigDemo()).runDemo(bootStrapSevers, AutoOffsetResetConfigDemo.NONE);
                     break;
                 case Main.OFFSET_CONSUMER_SUBMIT:
-                    (new OffsetConsumerSubmitDemo()).runDemo(bootStrapSvrs);
+                    (new OffsetConsumerSubmitDemo()).runDemo(bootStrapSevers);
                     break;
                 case Main.SERIALIZATION_PRODUCER:
-                    (new ProducerSerializationDemo()).runDemo(bootStrapSvrs);
+                    (new ProducerSerializationDemo()).runDemo(bootStrapSevers);
                     break;
                 case Main.SERIALIZATION_CONSUMER:
-                    (new ConsumerDeserializationDemo()).runDemo(bootStrapSvrs);
+                    (new ConsumerDeserializationDemo()).runDemo(bootStrapSevers);
                     break;
                 case Main.ACK_TIMEOUT_PRODUCER:
-                    (new AckTimeoutDemoProducer()).runDemo(bootStrapSvrs);
+                    (new AckTimeoutDemoProducer()).runDemo(bootStrapSevers);
                     break;
                 case Main.ACK_IDEMPOTENCE_PRODUCER:
-                    (new IdempotenceDemoProducer()).runDemo(bootStrapSvrs);
+                    (new IdempotenceDemoProducer()).runDemo(bootStrapSevers);
                     break;
                 case Main.ACK_CONSUMER:
-                    (new AckDemoConsumer()).runDemo(bootStrapSvrs);
+                    (new AckDemoConsumer()).runDemo(bootStrapSevers);
+                    break;
+                case Main.PROD_TRX_PRODUCER:
+                    (new ProducerOnlyTransactionDemoProducer()).runDemo(bootStrapSevers);
+                    break;
+                case Main.PROD_TRX_CONSUMER:
+                    (new ProducerOnlyTransactionDemoConsumer()).runDemo(bootStrapSevers);
                     break;
                 default:
-                    Main.printHelp(args);
+                    Main.printHelp();
             }
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
     }
