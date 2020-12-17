@@ -9,7 +9,15 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import java.util.Arrays;
 import java.util.Properties;
 
-public class ProducerOnlyTransactionDemoConsumer {
+public class POnlyTrxDemoConsumer {
+    // 默认开启"read_committed"
+    private boolean enableReadCommitted = true;
+    public POnlyTrxDemoConsumer setEnableReadCommitted(boolean enableReadCommitted) {
+        this.enableReadCommitted = enableReadCommitted;
+        return this;
+    };
+
+    // 运行Demo
     public void runDemo(String bootStrapServers) throws InterruptedException {
         // 1. 创建Consumer
         Properties props = new Properties();
@@ -17,9 +25,11 @@ public class ProducerOnlyTransactionDemoConsumer {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "g1");
-
-        // 设置消费者的消费事务的隔离级别为read_committed
-        props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
+        // 设置消费者的消费事务的隔离级别：read_committed 或 read_uncommitted
+        props.put(
+                ConsumerConfig.ISOLATION_LEVEL_CONFIG,
+                enableReadCommitted ? "read_committed" : "read_uncommitted"
+                );
 
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 

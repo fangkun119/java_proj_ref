@@ -16,8 +16,7 @@ import com.javaproref.kafka.apidemo.producer.KafkaProducerDemo;
 import com.javaproref.kafka.apidemo.producer.ProducerIntercepterDemo;
 import com.javaproref.kafka.apidemo.producer.ProducerPartitionerDemo;
 import com.javaproref.kafka.apidemo.producer.ProducerSerializationDemo;
-import com.javaproref.kafka.apidemo.tranactions.ProducerOnlyTransactionDemoConsumer;
-import com.javaproref.kafka.apidemo.tranactions.ProducerOnlyTransactionDemoProducer;
+import com.javaproref.kafka.apidemo.tranactions.*;
 
 import java.util.concurrent.ExecutionException;
 
@@ -45,7 +44,12 @@ public class Main {
     public static final String ACK_IDEMPOTENCE_PRODUCER  = "act_idempotence_producer";  // ACK包幂等性Demo的生产者
     public static final String ACK_CONSUMER              = "ack_consumer";              // ACK包相关Demo的消费者
     public static final String PROD_TRX_PRODUCER         = "prod_trx_producer";         // Producer Only事务Demo的生产者
-    public static final String PROD_TRX_CONSUMER         = "prod_trx_consumer";         // Producer Only事务Demo的消费者
+    public static final String PROD_TRX_CONSUMER_RD_COMMITTED   = "prod_trx_consumer_read_committed";   // Producer Only事务Demo的消费者
+    public static final String PROD_TRX_CONSUMER_RD_UNCOMMITTED = "prod_trx_consumer_read_uncommitted"; // Producer Only事务Demo的消费者
+    public static final String CNP_TRX_PRODUCER          = "cnp_trx_producer";          // Consumer&Producer事务Demo的生产者
+    public static final String CNP_TRX_PRODUCER_ABORT    = "cnp_trx_producer_abort";    // Consumer&Producer事务Demo的生产者，中途会触发事务终止
+    public static final String CNP_TRX_FORWARD_NODE      = "cnp_trx_forward_node";      // Consumer&Producer事务Demo的转发节点，它既是生产者又是消费者
+    public static final String CNP_TRX_CONSUMER          = "cnp_trx_consumer";          // Consumer&Producer事务Demo的消费者
 
     // 打印帮助信息
     private static void printHelp() {
@@ -55,9 +59,9 @@ public class Main {
                         "bootstrap_servers: "
                         + "\n\t optional parameter, default value is : CentOSA:9092,CentOSB:9092,CentOSC:9092" +
                         "demo_name: "
-                        + "\n\t" + Main.TOPIC_DML
                         + "\n\t" + Main.CLEAR
                         + "\n\t" + Main.INIT
+                        + "\n\t" + Main.TOPIC_DML
                         + "\n\t" + Main.PRODUCER
                         + "\n\t" + Main.PRODUCER_ROUND_ROBIN
                         + "\n\t" + Main.PRODUCER_PARTITIONER
@@ -74,7 +78,12 @@ public class Main {
                         + "\n\t" + Main.ACK_IDEMPOTENCE_PRODUCER
                         + "\n\t" + Main.ACK_CONSUMER
                         + "\n\t" + Main.PROD_TRX_PRODUCER
-                        + "\n\t" + Main.PROD_TRX_CONSUMER
+                        + "\n\t" + Main.PROD_TRX_CONSUMER_RD_COMMITTED
+                        + "\n\t" + Main.PROD_TRX_CONSUMER_RD_UNCOMMITTED
+                        + "\n\t" + Main.CNP_TRX_PRODUCER
+                        + "\n\t" + Main.CNP_TRX_PRODUCER_ABORT
+                        + "\n\t" + Main.CNP_TRX_FORWARD_NODE
+                        + "\n\t" + Main.CNP_TRX_CONSUMER
         );
     }
 
@@ -147,10 +156,25 @@ public class Main {
                     (new AckDemoConsumer()).runDemo(bootStrapSevers);
                     break;
                 case Main.PROD_TRX_PRODUCER:
-                    (new ProducerOnlyTransactionDemoProducer()).runDemo(bootStrapSevers);
+                    (new POnlyTrxDemoProducer()).runDemo(bootStrapSevers);
                     break;
-                case Main.PROD_TRX_CONSUMER:
-                    (new ProducerOnlyTransactionDemoConsumer()).runDemo(bootStrapSevers);
+                case Main.PROD_TRX_CONSUMER_RD_COMMITTED:
+                    (new POnlyTrxDemoConsumer()).setEnableReadCommitted(true).runDemo(bootStrapSevers);
+                    break;
+                case Main.PROD_TRX_CONSUMER_RD_UNCOMMITTED:
+                    (new POnlyTrxDemoConsumer()).setEnableReadCommitted(false).runDemo(bootStrapSevers);
+                    break;
+                case Main.CNP_TRX_PRODUCER:
+                    (new CNPTrxDemoProducer()).setTriggerTrxAbort(false).runDemo(bootStrapSevers);
+                    break;
+                case Main.CNP_TRX_PRODUCER_ABORT:
+                    (new CNPTrxDemoProducer()).setTriggerTrxAbort(true).runDemo(bootStrapSevers);
+                    break;
+                case Main.CNP_TRX_FORWARD_NODE:
+                    (new CNPTrxDemoProducerAndConsumer()).runDemo(bootStrapSevers);
+                    break;
+                case Main.CNP_TRX_CONSUMER:
+                    (new CNPTrxDemoConsumer()).runDemo(bootStrapSevers);
                     break;
                 default:
                     Main.printHelp();
