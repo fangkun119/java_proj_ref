@@ -49,6 +49,7 @@ public class Main {
     public static final String CNP_TRX_PRODUCER          = "cnp_trx_producer";          // Consumer&Producer事务Demo的生产者
     public static final String CNP_TRX_PRODUCER_ABORT    = "cnp_trx_producer_abort";    // Consumer&Producer事务Demo的生产者，中途会触发事务终止
     public static final String CNP_TRX_FORWARD_NODE      = "cnp_trx_forward_node";      // Consumer&Producer事务Demo的转发节点，它既是生产者又是消费者
+    public static final String CNP_TRX_FORWARD_ABORT     = "cnp_trx_forward_node_abort";// Consumer&Producer事务Demo的转发节点，它既是生产者又是消费者
     public static final String CNP_TRX_CONSUMER          = "cnp_trx_consumer";          // Consumer&Producer事务Demo的消费者
 
     // 打印帮助信息
@@ -83,6 +84,7 @@ public class Main {
                         + "\n\t" + Main.CNP_TRX_PRODUCER
                         + "\n\t" + Main.CNP_TRX_PRODUCER_ABORT
                         + "\n\t" + Main.CNP_TRX_FORWARD_NODE
+                        + "\n\t" + Main.CNP_TRX_FORWARD_ABORT
                         + "\n\t" + Main.CNP_TRX_CONSUMER
         );
     }
@@ -171,7 +173,10 @@ public class Main {
                     (new CNPTrxDemoProducer()).setTriggerTrxAbort(true).runDemo(bootStrapSevers);
                     break;
                 case Main.CNP_TRX_FORWARD_NODE:
-                    (new CNPTrxDemoProducerAndConsumer()).runDemo(bootStrapSevers);
+                    (new CNPTrxDemoProducerAndConsumer()).setTriggerAbort(false).runDemo(bootStrapSevers);
+                    break;
+                case Main.CNP_TRX_FORWARD_ABORT:
+                    (new CNPTrxDemoProducerAndConsumer()).setTriggerAbort(true).runDemo(bootStrapSevers);
                     break;
                 case Main.CNP_TRX_CONSUMER:
                     (new CNPTrxDemoConsumer()).runDemo(bootStrapSevers);

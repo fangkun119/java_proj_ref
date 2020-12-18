@@ -20,7 +20,7 @@ public class ConsumerCommon {
         Thread.sleep(3000);
 
         while (true) {
-            ConsumerRecords<KeyType, ValType> consumerRecords = consumer.poll(Duration.ofSeconds(1) /*每隔1秒取一次数据*/);
+            ConsumerRecords<KeyType, ValType> consumerRecords = consumer.poll(Duration.ofSeconds(1)); //每隔1秒取一次数据
             if (!consumerRecords.isEmpty()) {
                 // iterator and offset map
                 Iterator<ConsumerRecord<KeyType,ValType>> recordIterator = consumerRecords.iterator();

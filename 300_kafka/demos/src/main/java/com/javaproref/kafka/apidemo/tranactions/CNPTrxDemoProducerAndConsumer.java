@@ -15,43 +15,61 @@ import java.time.Duration;
 import java.util.*;
 
 public class CNPTrxDemoProducerAndConsumer {
+    // 默认关闭、如果开启会在事务中途触发异常，让事务终止
+    boolean isTriggerAbort = false;
+    public CNPTrxDemoProducerAndConsumer setTriggerAbort(boolean triggerAbort) {
+        isTriggerAbort = triggerAbort;
+        return this;
+    };
+
     // 运行Demo
     public void runDemo(String bootStrapServers) {
         // 1. 这个节点既是消费者又是生产者
         String consumerGroupId = "g1";
         KafkaConsumer<String, String> consumer = buildKafkaConsumer(bootStrapServers, consumerGroupId);
         KafkaProducer<String, String> producer = buildKafkaProducer(bootStrapServers);
+        int recordProcessCount = 0;
 
         // 2. 消费者订阅TOPIC01
         consumer.subscribe(Arrays.asList(Constants.TOPIC_01));
 
         // 3. 处理消息
+        // (1) 事务初始化
+        producer.initTransactions();
         while (true) {
             // 从Kafka队列取上游数据
             ConsumerRecords<String,String> consumerRecords = consumer.poll(Duration.ofSeconds(1));
             if (false == consumerRecords.isEmpty()) {
                 Map<TopicPartition,OffsetAndMetadata> offsets = new HashMap<>();
+                Map<TopicPartition,OffsetAndMetadata> offsetsForAbort  = new HashMap<>();
                 Iterator<ConsumerRecord<String,String>> recordIterator = consumerRecords.iterator();
-                // (1) 开始事务
+                // (2) 开始事务
                 producer.beginTransaction();
                 try {
-                    // (2) 迭代数据、开始业务处理
+                    // (3) 迭代数据、开始业务处理
                     while (recordIterator.hasNext()) {
-                        // 从上游topic01发来的record
+                        // 从上游topic01发来的record及元数据
                         ConsumerRecord<String,String> record = recordIterator.next();
-                        // 存储元数据
-                        offsets.put(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset() + 1));
+                        offsets.put(new TopicPartition(
+                                record.topic(), record.partition()), new OffsetAndMetadata(record.offset() + 1));
                         // 发往下游topic02
                         ProducerRecord<String,String> recordToForward = new ProducerRecord<>(
                                 Constants.TOPIC_02, record.key(), record.value() + " forwarded");
                         producer.send(recordToForward);
+                        // 如果开关开启，会在每10条信息的第8条触发异常，让事务Abort
+                        if (isTriggerAbort) {
+                            recordProcessCount = (++recordProcessCount) % 10;
+                            if (8 == recordProcessCount % 10) {
+                                int j = 8 / 0;
+                            }
+                        }
                     }
-                    // (3A) 提交事务
+                    // (4A) 提交事务
                     producer.sendOffsetsToTransaction(offsets, consumerGroupId);
                     producer.commitTransaction();
                 } catch (Exception e) {
-                    // (3B) 终止事务
-                    System.err.println("exception: " + e.getMessage());
+                    System.err.println("exception: " + e.getMessage() + ", producer abort transaction");
+                    // (4B) 终止事务
                     producer.abortTransaction();
                 }
             }
@@ -64,8 +82,10 @@ public class CNPTrxDemoProducerAndConsumer {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+
         // 设置消费者的消费事务的隔离级别为read_committed来忽略来自失败事务的数据
         props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
+
         // 对于消费者&生产者事务中既是生产者、又是消费者的节点
         // 必须关闭消费者端offset的自动提交，待下游业务确认完成后，主动提交offset
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);

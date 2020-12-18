@@ -28,7 +28,7 @@ public class CNPTrxDemoConsumer {
 
         // 3. 接收消息
         try {
-            ConsumerCommon.<String, String>consume(consumer, ConsumerCommon.OffsetAutoSubmit.TRUE);
+            ConsumerCommon.<String,String>consume(consumer, ConsumerCommon.OffsetAutoSubmit.TRUE);
         } catch (InterruptedException e) {
             throw e;
         } finally {
