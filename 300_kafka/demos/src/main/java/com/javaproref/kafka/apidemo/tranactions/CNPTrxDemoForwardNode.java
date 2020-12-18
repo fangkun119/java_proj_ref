@@ -1,23 +1,21 @@
 package com.javaproref.kafka.apidemo.tranactions;
 
-import com.javaproref.kafka.apidemo.common.ConsumerCommon;
 import com.javaproref.kafka.apidemo.domain.Constants;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.errors.ProducerFencedException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.time.Duration;
 import java.util.*;
 
-public class CNPTrxDemoProducerAndConsumer {
+public class CNPTrxDemoForwardNode {
     // 默认关闭、如果开启会在事务中途触发异常，让事务终止
     boolean isTriggerAbort = false;
-    public CNPTrxDemoProducerAndConsumer setTriggerAbort(boolean triggerAbort) {
+    public CNPTrxDemoForwardNode setTriggerAbort(boolean triggerAbort) {
         isTriggerAbort = triggerAbort;
         return this;
     };
@@ -43,7 +41,10 @@ public class CNPTrxDemoProducerAndConsumer {
                 Map<TopicPartition,OffsetAndMetadata> offsets = new HashMap<>();
                 Map<TopicPartition,OffsetAndMetadata> offsetsForAbort  = new HashMap<>();
                 Iterator<ConsumerRecord<String,String>> recordIterator = consumerRecords.iterator();
-                // (2) 开始事务
+                // (2) 开始事务：
+                //     a. 事务内的消息有一条处理错误，就认为整个事务内所有的消息都无效
+                //     b. 事务内有哪些消息、是由生产者决定的：对于收到的消息是由上游生产者决定；对于将发送的消息是由下面代码决定的
+                //     c. 实际使用当中，应当以根据业务含义来切分事务，而不是以consumer.poll(...)出来的ConsumerRecords<String,String>来切分事务
                 producer.beginTransaction();
                 try {
                     // (3) 迭代数据、开始业务处理

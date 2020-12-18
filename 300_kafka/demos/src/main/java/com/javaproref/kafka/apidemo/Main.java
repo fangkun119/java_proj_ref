@@ -173,10 +173,10 @@ public class Main {
                     (new CNPTrxDemoProducer()).setTriggerTrxAbort(true).runDemo(bootStrapSevers);
                     break;
                 case Main.CNP_TRX_FORWARD_NODE:
-                    (new CNPTrxDemoProducerAndConsumer()).setTriggerAbort(false).runDemo(bootStrapSevers);
+                    (new CNPTrxDemoForwardNode()).setTriggerAbort(false).runDemo(bootStrapSevers);
                     break;
                 case Main.CNP_TRX_FORWARD_ABORT:
-                    (new CNPTrxDemoProducerAndConsumer()).setTriggerAbort(true).runDemo(bootStrapSevers);
+                    (new CNPTrxDemoForwardNode()).setTriggerAbort(true).runDemo(bootStrapSevers);
                     break;
                 case Main.CNP_TRX_CONSUMER:
                     (new CNPTrxDemoConsumer()).runDemo(bootStrapSevers);
