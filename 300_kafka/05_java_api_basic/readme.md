@@ -336,7 +336,7 @@
 > send record 9
 > INFO 2020-12-03 12:03:37,762(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1] Closing the Kafka producer with timeoutMillis = 9223372036854775807 ms.
 > user defined partitioner closed
-~~~
+> ~~~
 
 ## 8.序列化
 
@@ -433,7 +433,24 @@ javaproref/kafka/apidemo/consumer/ConsumerDeserializationDemo.java)
 > topic01	0,1	key_4	value_4:content_added_by_interceptor	1607053840628
 > ~~~
 
+## 10 关闭zookeeper和kafka
 
+在三台虚拟机上都执行
+
+> ~~~bash
+> [root@CentOSA kafka_2.11-2.2.0]# ./bin/kafka-server-stop.sh # 关闭kafka
+> [root@CentOSA kafka_2.11-2.2.0]# cd /usr/zookeeper-3.4.6/
+> [root@CentOSA zookeeper-3.4.6]# ./bin/zkServer.sh stop zoo.cfg #关闭zookeeper
+> JMX enabled by default
+> Using config: /usr/zookeeper-3.4.6/bin/../conf/zoo.cfg
+> Stopping zookeeper ... STOPPED
+> [root@CentOSA zookeeper-3.4.6]# jps #确认zookeeper和Kafka进程都已经被关闭
+> 31763 Jps
+> [root@CentOSA zookeeper-3.4.6]# shutdown 0 # 关闭虚拟机
+> Shutdown scheduled for 五 2020-11-27 21:16:08 CST, use 'shutdown -c' to cancel.
+> [root@CentOSA zookeeper-3.4.6]# Connection to 192.168.1.124 closed by remote host.
+> Connection to 192.168.1.124 closed.
+> ~~~
 
 
 

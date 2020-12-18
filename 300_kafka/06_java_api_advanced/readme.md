@@ -331,7 +331,7 @@
 
 > * [kafka/apidemo/acks/IdempotenceDemoProducer.java](../demos/src/main/java/com/javaproref/kafka/apidemo/acks/IdempotenceDemoProducer.java)
 > * [kafka/apidemo/acks/AckDemoConsumer.java](../demos/src/main/java/com/javaproref/kafka/apidemo/acks/AckDemoConsumer.java)
-> * [kafka/apidemo/Main.java)](../demos/src/main/java/com/javaproref/kafka/apidemo/Main.java)
+> * [kafka/apidemo/Main.java](../demos/src/main/java/com/javaproref/kafka/apidemo/Main.java)
 
 运行
 
@@ -376,7 +376,7 @@
 > WARN 2020-12-16 21:41:03,355(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.internals.Sender - [Producer clientId=producer-1] Received invalid metadata error in produce request on partition topic01-0 due to org.apache.kafka.common.errors.NetworkException: The server disconnected before a response was received.. Going to request ...
 > ~~~
 >
-> 在`CentOSC`上消费者的日志打印可以看到，虽然生产者重试了三次，但这条消息只被消费了一次
+> 在`CentOSC`上消费者的日志打印可以看到，虽然生产者重试了三次，但这条消息只被消费了1次（另外的3次被去重）
 >
 > ~~~bash
 > INFO 2020-12-16 21:40:40,849(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-1, groupId=g1] Setting newly assigned partitions: topic01-2, topic01-1, topic01-0
@@ -384,5 +384,436 @@
 > INFO 2020-12-16 21:40:40,898(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g1] Resetting offset for partition topic01-2 to offset 0.
 > INFO 2020-12-16 21:40:40,917(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g1] Resetting offset for partition topic01-1 to offset 0.
 > topic01	0,0	test_ack_key	test_ack	1608126058779
+> ~~~
+>
+> 如果关闭幂等`props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, false);`，消费者会消费4次
+
+`Kafka`幂等性只能保证一条记录发送的原子性（`一个分区`），但如果保证多条记录（`多分区`）之间的完整性，这个时候需要开启`Kafka`的事务操作
+
+## 5 Kafka事务
+
+### 5.1 `生产者事务Only`与`消费者&生产者事务`
+
+> `Kafka`的事务操作（事务操作同样是在`Kafka 0.11`开始引入），分为：（1）`生产者事务`；（2）`消费者&生产者事务`
+
+#### (1) 生产者事务Only
+
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_producer_transaction_only.jpg)
+>
+> 生产者在同一个事物中，发送了3条消息（到3个不同分区），其中1条消息失败，会要求另外2条回滚
+
+#### (2) 消费者&生产者事务
+
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_cunsumer_producer_trainsaction.jpg)
+>
+> 图中业务1既是消费者、也是生产者，作为生产者如果它向Topic2发送消息失败，而它上游topic1中对应的消息也不会认为消费成功，状态仍然是`un-committed`
+
+#### (3) 事务隔离级别
+
+背景：为何要为消费者配置事务隔离级别
+
+> 与数据库不同，Kafka采用append的方式将消息写入磁盘文件，当消息发送失败时，并没有办法删除topic中已经写入的消息记录（只能通过状态`uncommitted`和`committed`来表示），因此需要为消费者配置事务隔离级别
+
+配置项：`isolation.level` 
+
+> 默认值：`read_uncommitted`
+>
+> 如果使用事务，需要将配置改为`isolation.level = read_committed`来阻止消费者消费那些失败事务产生对应的消息
+
+### 5.2 生产者事务
+
+生产者
+
+> 增加关于`transactional-id`，以及幂等性的设置
+>
+> ```java
+> // 在每个事务中，Transaction ID都要求唯一
+> props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "transaction-id" + UUID.randomUUID().toString());
+> // 设置Kafka的重试机制和幂等性
+> props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);  // 开启Kafka的幂等特性,它要求ACKS_CONFIG设为true，同时设置RETRIES_CONFIG
+> props.put(ProducerConfig.ACKS_CONFIG, "all");               // 要求Kafka把消息同步到所有副本才返回ACK
+> props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 20000); // 20000毫秒未收到ACK则认为消息超时
+> ```
+>
+> 同时为了方便观察，也增加了批处理（mini-batch）相关的设置
+>
+> ~~~java
+> // Kafka批处理大小：为了方便观察减小到1024字节
+> props.put(ProducerConfig.BATCH_SIZE_CONFIG, 1024);
+> // Kafka批处理等待时长：等待5毫秒，如果没有攒够1024字节数据，也会发送
+> props.put(ProducerConfig.LINGER_MS_CONFIG, 5);
+> ~~~
+>
+> 最后是事务相关的代码，包含用于触发事务Abort的实验代码
+>
+> ```java
+> // 2 用事务发送消息
+> // (1) 事务初始化
+> producer.initTransactions();
+> try {
+>     // (2) 事务开始
+>     producer.beginTransaction();
+>     for (int i = 0; i < 30; ++i) {
+>         if (8 == i) {
+>             int j = 10 / 0; // 在发送第8条数据的时候引发一个异常，构造事务终止的场景
+>         }
+>         ProducerRecord<String, String> record = new ProducerRecord<>(Constants.TOPIC_01, 1/*partition*/, "key " + i, "value " + i);
+>         producer.send(record);
+>         producer.flush(); // 确保事务总之之前，前7条消息都发出去
+>     }
+>     // (3) 事务提交
+>     producer.commitTransaction();
+> } catch (Exception e) {
+>     System.out.println("error: " + e.getMessage());
+>     // (4) 事务终止
+>     producer.abortTransaction();
+> }
+> ```
+
+消费者
+
+> 容许指定事务隔离级别（`isolation.level`）
+>
+> ```java
+> // 设置消费者的消费事务的隔离级别：read_committed 或 read_uncommitted
+> props.put(
+>         ConsumerConfig.ISOLATION_LEVEL_CONFIG,
+>         enableReadCommitted ? "read_committed" : "read_uncommitted"
+>         );
+> ```
+
+代码
+
+> * [kafka/tranactions/POnlyTrxDemoConsumer.java](../demos/src/main/java/com/javaproref/kafka/apidemo/tranactions/POnlyTrxDemoConsumer.java)
+> * [kafka/tranactions/POnlyTrxDemoProducer.java](../demos/src/main/java/com/javaproref/kafka/apidemo/tranactions/POnlyTrxDemoProducer.java)
+> * [kafka/apidemo/Main.java](../demos/src/main/java/com/javaproref/kafka/apidemo/Main.java)
+> * [kafka/apidemo/common/ConsumerCommon.java](../demos/src/main/java/com/javaproref/kafka/apidemo/common/ConsumerCommon.java)
+
+运行
+
+> 环境初始化
+>
+> ~~~bash
+> [root@CentOSA ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar clear 2>&1 > out.log
+> [root@CentOSA ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar init 2>&1 >> out.log
+> [root@CentOSA ~]# tail -n5 out.log
+> topics to create:
+> (name=topic01, numPartitions=3, replicationFactor=2, replicasAssignments=null, configs=null)
+> (name=topic02, numPartitions=3, replicationFactor=2, replicasAssignments=null, configs=null)
+> topic01
+> topic02
+> ~~~
+>
+> 在一台虚拟机上以`read_committed`的形式启动Consumer，进入监听状态
+>
+> ~~~bash
+> [root@CentOSA ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar prod_trx_consumer_read_committed
+> ......
+> org.apache.kafka.clients.consumer.ConsumerConfig - ConsumerConfig values:
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	group.id = g1
+> 	isolation.level = read_committed
+> 	......
+> Type in: Ctrl + C to quit
+> ~~~
+>
+> 在另一台虚拟机上启动Producer，在一个事务中发送一批记录，前7条记录发送后在第8条记录时触发异常引发transaction abort
+>
+> ~~~bash
+> [root@CentOSC ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar prod_trx_producer
+> INFO 2020-12-17 16:32:45,452(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values:
+> 	acks = all
+> 	batch.size = 1024
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	enable.idempotence = true
+> 	linger.ms = 5
+> 	max.in.flight.requests.per.connection = 5
+>   ...
+> INFO 2020-12-17 16:32:45,796(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1, transactionalId=transaction-idc6bd7b22-b19a-4975-925b-6e8e515e5034] Instantiated a transactional producer.
+> INFO 2020-12-17 16:32:45,987(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1, transactionalId=transaction-idc6bd7b22-b19a-4975-925b-6e8e515e5034] Overriding the default retries config to the recommended value of 2147483647 since the idempotent producer is enabled.
+> ...
+> INFO 2020-12-17 16:32:47,505(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.internals.TransactionManager - [Producer clientId=producer-1, transactionalId=transaction-idc6bd7b22-b19a-4975-925b-6e8e515e5034] ProducerId set to 15000 with epoch 0
+> error: / by zero
+> INFO 2020-12-17 16:32:47,738(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1, transactionalId=transaction-idc6bd7b22-b19a-4975-925b-6e8e515e5034] Closing the Kafka producer with timeoutMillis = 9223372036854775807 ms.
+> ~~~
+>
+> 与此同时消费者并不会收到任何来自un-committed事务的脏数据
+>
+> ~~~bash
+> INFO 2020-12-17 16:32:15,053(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.FetchSessionHandler - [Consumer clientId=consumer-1, groupId=g1] Node 2 was unable to process the fetch request with (sessionId=707163606, epoch=418): INVALID_FETCH_SESSION_EPOCH.
+> ~~~
+>
+> 如果消费者当时这设置的不是"read_committed"而是"read_uncommitted"，那么就会消费并输出前7条来自失败事务的脏数据。下面不重复整个实验，只截取Consumer的相关日志
+>
+> ~~~bash
+> [root@CentOSA ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar prod_trx_consumer_read_uncommitted
+> INFO 2020-12-17 17:17:08,443(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.ConsumerConfig - ConsumerConfig values:
+> 	auto.offset.reset = latest
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	group.id = g1
+> 	isolation.level = read_uncommitted
+> ...
+> INFO 2020-12-17 17:17:08,996(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.KafkaConsumer - [Consumer clientId=consumer-1, groupId=g1] Subscribed to topic(s): topic01
+> Type in: Ctrl + C to quit
+> ...
+> INFO 2020-12-17 17:17:12,611(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-1, groupId=g1] Setting newly assigned partitions: topic01-2, topic01-1, topic01-0
+> INFO 2020-12-17 17:17:12,676(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g1] Resetting offset for partition topic01-0 to offset 0.
+> INFO 2020-12-17 17:17:12,677(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g1] Resetting offset for partition topic01-2 to offset 0.
+> INFO 2020-12-17 17:17:12,677(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g1] Resetting offset for partition topic01-1 to offset 0.
+> topic01	1,0	key 0	value 0	1608196638386
+> topic01	1,1	key 1	value 1	1608196638501
+> topic01	1,2	key 2	value 2	1608196638535
+> topic01	1,3	key 3	value 3	1608196638544
+> topic01	1,4	key 4	value 4	1608196638551
+> topic01	1,5	key 5	value 5	1608196638562
+> topic01	1,6	key 6	value 6	1608196638579
+> topic01	1,7	key 7	value 7	1608196638605
+> ~~~
+
+### 5.3 消费者&生产者事务
+
+(1) 代码
+
+> * [kafka/apidemo/tranactions/CNPTrxDemoProducer.java](../demos/src/main/java/com/javaproref/kafka/apidemo/tranactions/CNPTrxDemoProducer.java)：生产者节点
+> * [kafka/apidemo/tranactions/CNPTrxDemoForwardNode.java](../demos/src/main/java/com/javaproref/kafka/apidemo/tranactions/CNPTrxDemoForwardNode.java)：转发节点、既是消费者又是生产者
+> * [kafka/apidemo/tranactions/CNPTrxDemoConsumer.java](../demos/src/main/java/com/javaproref/kafka/apidemo/tranactions/CNPTrxDemoConsumer.java)：消费者节点
+> * [kafka/apidemo/Main.java](../demos/src/main/java/com/javaproref/kafka/apidemo/Main.java)
+
+(2) 运行
+
+Demo 1：1个`生产者`节点、2个属于同一个消费者组的`转发节点`、1个`消费者`节点；模拟`转发节点`故障导致事务终止的场景
+
+> 清理环境
+>
+> ~~~bash
+> [root@CentOSA share]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar clear 2>&1 >out.log
+> [root@CentOSA share]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar init 2>&1 >out.log
+> ~~~
+>
+> 在虚拟机`CentOSB`打开两个终端窗口，一个启动正常的`转发节点`，一个启动会引发事务终止的`转发节点`
+>
+> 正常的转发节点、作为Consumer它负责了`topic01-2`即`topic01`的`partition 2`
+>
+> ~~~bash
+> [root@CentOSB share]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar cnp_trx_forward_node
+> INFO 2020-12-18 14:06:01,303(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.ConsumerConfig - ConsumerConfig values:
+> 	auto.offset.reset = latest
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	enable.auto.commit = false
+> 	group.id = g1
+> 	isolation.level = read_committed
+> 	...
+> org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values:
+> 	acks = all
+> 	batch.size = 1024
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	enable.idempotence = true
+> 	linger.ms = 5
+> 	max.in.flight.requests.per.connection = 5
+> 	...
+> 
+> INFO 2020-12-18 14:06:02,036(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1, transactionalId=transaction-idac6c49ff-9780-4251-96cf-af1ecd55dafc] Instantiated a transactional producer.
+> INFO 2020-12-18 14:06:02,131(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.KafkaConsumer - [Consumer clientId=consumer-1, groupId=g1] Subscribed to topic(s): topic01
+> Type in: Ctrl + C to quit
+> INFO 2020-12-18 14:06:03,276(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.AbstractCoordinator - [Consumer clientId=consumer-1, groupId=g1] Successfully joined group with generation 2
+> INFO 2020-12-18 14:06:03,291(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-1, groupId=g1] Setting newly assigned partitions: topic01-2
+> INFO 2020-12-18 14:06:03,344(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g1] Resetting offset for partition topic01-2 to offset 0.
+> ~~~
+>
+> 会引发事务终止的转发节点，它在两个`转发节点`都加入后，经过rebalance，最终负责`topic01-0`和`topic01-1`，即`topic01`的`partition 0和1`
+>
+> ~~~bash
+> [root@CentOSB ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar cnp_trx_forward_node_abort
+> INFO 2020-12-18 14:05:46,760(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.ConsumerConfig - ConsumerConfig values:
+> 	auto.offset.reset = latest
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	enable.auto.commit = false
+> 	group.id = g1
+> 	isolation.level = read_committed
+> 	...
+> org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values:
+> 	acks = all
+> 	batch.size = 1024
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	enable.idempotence = true
+> 	linger.ms = 5
+> 	max.in.flight.requests.per.connection = 5
+> 	...
+> 
+> INFO 2020-12-18 14:05:47,492(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1, transactionalId=transaction-id2bd12a33-24c5-4c07-96e2-dfe04653911a] Instantiated a transactional producer.
+> INFO 2020-12-18 14:05:47,541(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.KafkaConsumer - [Consumer clientId=consumer-1, groupId=g1] Subscribed to topic(s): topic01
+> Type in: Ctrl + C to quit
+> ...
+> org.apache.kafka.clients.consumer.internals.AbstractCoordinator - [Consumer clientId=consumer-1, groupId=g1] Successfully joined group with generation 1
+> INFO 2020-12-18 14:05:48,218(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-1, groupId=g1] Setting newly assigned partitions: topic01-2, topic01-1, topic01-0
+> INFO 2020-12-18 14:05:48,295(yyyy-MM-dd HH:mm:ss} 
+> ...
+> INFO 2020-12-18 14:06:03,267(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.AbstractCoordinator - [Consumer clientId=consumer-1, groupId=g1] Attempt to heartbeat failed since group is rebalancing
+> ...
+> org.apache.kafka.clients.consumer.internals.AbstractCoordinator - [Consumer clientId=consumer-1, groupId=g1] Successfully joined group with generation 2
+> INFO 2020-12-18 14:06:03,280(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-1, groupId=g1] Setting newly assigned partitions: topic01-1, topic01-0
+> INFO 2020-12-18 14:06:03,511(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g1] Resetting offset for partition topic01-1 to offset 0.
+> INFO 2020-12-18 14:06:03,519(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g1] Resetting offset for partition topic01-0 to offset 0.
+> ~~~
+>
+> 在虚拟机`Cent0SC`上启动消费者
+>
+> ~~~bash
+> [root@CentOSC ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar cnp_trx_consumer
+> INFO 2020-12-18 14:18:27,611(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.ConsumerConfig - ConsumerConfig values:
+> 	auto.offset.reset = latest
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	enable.auto.commit = true
+> 	group.id = g1
+> 	isolation.level = read_committed
+> 	...
+> 
+> INFO 2020-12-18 14:18:28,208(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.KafkaConsumer - [Consumer clientId=consumer-1, groupId=g1] Subscribed to topic(s): topic02
+> Type in: Ctrl + C to quit
+> ~~~
+>
+> 在虚拟机`CentOSA`上启动生产者、在一个事务中发送30条数据
+>
+> ~~~bash
+> [root@CentOSA share]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar cnp_trx_producer
+> INFO 2020-12-18 14:20:50,498(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values:
+> 	acks = all
+> 	batch.size = 1024
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	enable.idempotence = true
+> 	linger.ms = 5
+> 	max.in.flight.requests.per.connection = 5
+> 	...
+> INFO 2020-12-18 14:20:50,646(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1, transactionalId=transaction-idbc3263e1-e657-4660-886d-4dc51ea2b7a6] Instantiated a transactional producer.
+> ...
+> ~~~
+>
+> 在虚拟机`CentOSB`上会引发事务终止的`转发节点`上，可以看到，此时，该事务被认为是失败，事务内的`30条数据`都不能到达`消费者`节点
+>
+> ~~~bash
+> exception: / by zero, producer abort transaction
+> ~~~
+>
+> 如果`CentOSB`上两个`转发节点`都不会引发事务终止，则30条数据都会到达`消费者`节点
+
+Demo 2：1个`生产者`节点、2个属于同一个消费者组的`转发节点`、1个`消费者`节点；模拟`生产者节点`故障导致事务终止的场景
+
+> 在虚拟机`CentOSB`启动`中间节点`：该节点既是`topic01`的消费者、又是`topic02`的生产者、启动后处于阻塞状态，等待来自`topic01`的数据
+>
+> ~~~bash
+> [root@CentOSB ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar cnp_trx_forward_node
+> INFO 2020-12-18 12:09:28,673(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.ConsumerConfig - ConsumerConfig values:
+> 	auto.offset.reset = latest
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	enable.auto.commit = false
+> 	group.id = g1
+> 	isolation.level = read_committed
+>   ...
+> org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values:
+> 	acks = all
+> 	batch.size = 1024
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	enable.idempotence = true
+> 	linger.ms = 5
+> 	max.in.flight.requests.per.connection = 5
+>   ...
+> INFO 2020-12-18 12:09:29,844(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.KafkaConsumer - [Consumer clientId=consumer-1, groupId=g1] Subscribed to topic(s): topic01
+> Type in: Ctrl + C to quit
+> ...
+> ~~~
+>
+> 在虚拟机`CentOSC`上启动`消费者`节点，它订阅`topic02`接收来自`中间节点`的数据
+>
+> ~~~bash
+> [root@CentOSC ~]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar cnp_trx_consumer
+> INFO 2020-12-18 12:28:07,463(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.ConsumerConfig - ConsumerConfig values:
+> 	auto.offset.reset = latest
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	group.id = g1
+> 	isolation.level = read_committed
+> 	......
+> INFO 2020-12-18 12:28:08,249(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.KafkaConsumer - [Consumer clientId=consumer-1, groupId=g1] Subscribed to topic(s): topic02
+> Type in: Ctrl + C to quit
+> ~~~
+>
+> 在虚拟机`CentOSA`上启动`生产者`，通过`topic01`向中间节点发送数据，但是让它在发送途中触发异常导致`事务终止`
+>
+> ~~~bash
+> [root@CentOSA share]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar cnp_trx_producer_abort
+> INFO 2020-12-18 12:33:40,412(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values:
+> 	acks = all
+> 	batch.size = 1024
+> 	bootstrap.servers = [CentOSA:9092, CentOSB:9092, CentOSC:9092]
+> 	enable.idempotence = true
+> 	linger.ms = 5
+> 	max.in.flight.requests.per.connection = 5
+>   ...
+> INFO 2020-12-18 12:33:40,731(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1, transactionalId=transaction-id6db92bd6-35cc-4074-8db3-c95908a4b270] Instantiated a transactional producer.
+> INFO 2020-12-18 12:33:41,775(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.producer.internals.TransactionManager - [Producer clientId=producer-1, transactionalId=transaction-id6db92bd6-35cc-4074-8db3-c95908a4b270] ProducerId set to 23000 with epoch 0
+> exception: / by zero
+> ~~~
+>
+> 观察`CentOSB`、`CentOSC`，下游节点并没有消费来自已经`abort`的事务的脏数据（因为设置了`read_committed`）
+>
+> 在虚拟机`CentOSA`上重新启动`生产者`，但这次不触发异常，让事务内的数据完整发送
+>
+> ~~~bash
+> [root@CentOSA share]# java -jar ~/share/kafka_mq_demo01-1.0-SNAPSHOT-jar-with-dependencies.jar cnp_trx_producer
+> ~~~
+>
+> 在虚拟机`CentOSC`上可以观察到`消费者`接收到的来自`中间节点`转发的数据
+>
+> ~~~bash
+> INFO 2020-12-18 12:29:25,665(yyyy-MM-dd HH:mm:ss} org.apache.kafka.clients.consumer.internals.Fetcher - [Consumer clientId=consumer-1, groupId=g1] Resetting offset for partition topic02-1 to offset 0.
+> topic02	1,0	key 0	value 0 forwarded	1608266997094
+> topic02	1,1	key 4	value 4 forwarded	1608266997102
+> topic02	1,2	key 5	value 5 forwarded	1608266997102
+> topic02	1,3	key 7	value 7 forwarded	1608266997102
+> topic02	1,4	key 12	value 12 forwarded	1608266997102
+> topic02	1,5	key 18	value 18 forwarded	1608266997102
+> topic02	1,6	key 25	value 25 forwarded	1608266997103
+> topic02	1,7	key 26	value 26 forwarded	1608266997103
+> topic02	1,8	key 28	value 28 forwarded	1608266997103
+> topic02	2,0	key 1	value 1 forwarded	1608266997102
+> topic02	2,1	key 2	value 2 forwarded	1608266997102
+> topic02	2,2	key 6	value 6 forwarded	1608266997102
+> topic02	2,3	key 8	value 8 forwarded	1608266997102
+> topic02	2,4	key 10	value 10 forwarded	1608266997102
+> topic02	2,5	key 11	value 11 forwarded	1608266997102
+> topic02	2,6	key 19	value 19 forwarded	1608266997102
+> topic02	2,7	key 22	value 22 forwarded	1608266997103
+> topic02	2,8	key 27	value 27 forwarded	1608266997103
+> topic02	2,9	key 29	value 29 forwarded	1608266997103
+> topic02	0,0	key 3	value 3 forwarded	1608266997102
+> topic02	0,1	key 9	value 9 forwarded	1608266997102
+> topic02	0,2	key 13	value 13 forwarded	1608266997102
+> topic02	0,3	key 14	value 14 forwarded	1608266997102
+> topic02	0,4	key 15	value 15 forwarded	1608266997102
+> topic02	0,5	key 16	value 16 forwarded	1608266997102
+> topic02	0,6	key 17	value 17 forwarded	1608266997102
+> topic02	0,7	key 20	value 20 forwarded	1608266997102
+> topic02	0,8	key 21	value 21 forwarded	1608266997103
+> topic02	0,9	key 23	value 23 forwarded	1608266997103
+> topic02	0,10	key 24	value 24 forwarded	1608266997103
+> ~~~
+
+
+
+## 6 关闭zookeeper和kafka
+
+在三台虚拟机上都执行
+
+> ~~~bash
+> [root@CentOSA kafka_2.11-2.2.0]# ./bin/kafka-server-stop.sh # 关闭kafka
+> [root@CentOSA kafka_2.11-2.2.0]# cd /usr/zookeeper-3.4.6/
+> [root@CentOSA zookeeper-3.4.6]# ./bin/zkServer.sh stop zoo.cfg #关闭zookeeper
+> JMX enabled by default
+> Using config: /usr/zookeeper-3.4.6/bin/../conf/zoo.cfg
+> Stopping zookeeper ... STOPPED
+> [root@CentOSA zookeeper-3.4.6]# jps #确认zookeeper和Kafka进程都已经被关闭
+> 31763 Jps
+> [root@CentOSA zookeeper-3.4.6]# shutdown 0 # 关闭虚拟机
+> Connection to 192.168.1.124 closed by remote host.
+> Connection to 192.168.1.124 closed.
 > ~~~
 
