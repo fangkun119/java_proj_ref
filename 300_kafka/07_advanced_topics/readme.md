@@ -7,7 +7,7 @@
 > * `Topic`被分为多个`分区`，`分区`按照`Segments`存储文件块，这样可以根据偏移量快速查找分区块，Kafka可以保证分区里的事件是有序的，`Leader`负责对分区的读写、`Follower`负责同步分区的数据
 > * 高水位机制被用于`0.11`版本之前Kafka的`Leader`和`Followers`建的数据同步（低于`HW`的`Record`表示已经同步给了所有`Followers`，而高于`HW`则不保证）
 
-相关概念：
+相关概念
 
 > * `Log End Offset` （简称`LEO`）：标记分区中最后一条消息的下一个位置（下一条消息的写入位置）、每个副本都有自己的`LEO`
 >
@@ -46,7 +46,7 @@
 >
 >   * `Follower`变成`Leader`时，将新的`Leader Epoch`和它的`LEO`添加到`Leader Epoch Sequence`文件，并且该`Leader`之后产生的每个新消息都带有新的`Leader Epoch`标记
 >
->   * `Leader`变成`Follower`时，向新选举的`Leader`发送`Leader Epoch Request`，请求包含当前（已变成follower）节点所存最新的`<epoch_id, start_offset>`，而新`Leader`则返回`Leader`自身最`新epoch_id`的`<epoch_id, start_offset或LEO>`
+>   * `Leader`变成`Follower`时，向新选举的`Leader`发送`Leader Epoch Request`，请求包含当前（已变成follower）节点所存最新的`<epoch_id, start_offset>`，而新`Leader`则返回`Leader`自身`最新epoch_id`的`<epoch_id, start_offset或LEO>`
 >
 >     * 返回哪个值取决于request中的epoch_id是否与新leader的epoch_id相等
 >
@@ -63,5 +63,23 @@
 >
 >         ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_leaderepoch_sync_s2.jpg)
 
-2.  
+用`Leader Epoch机制`解决`高水位机制`的两个问题
+
+> * 解决“Follower重启引发HW截断，同时Leader宕机使Follower（截断尚未恢复）成为Leader时，引发数据丢失（[High Watermark Truncation followed by Immediate Leader Election](https://cwiki.apache.org/confluence/display/KAFKA/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation#KIP101AlterReplicationProtocoltouseLeaderEpochratherthanHighWatermarkforTruncation-Scenario1:HighWatermarkTruncationfollowedbyImmediateLeaderElection)）”的问题
+>
+>   ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_leaderepoch_solve_dataloss.jpg)
+>
+>   原问题：A重启由于HW还未更新、将m2截断丢弃并连接Leader B同步数据；然而随后B宕机A变成Leader导致消息m2丢失
+>
+>   引入Epoch后：A重启后并不会根据HW截断m2，而是向B发送Leader Epoch Request，B返回offset 2，B随后宕机发生重新选举使A成为Leader，A生成新的Leader Epoch <lg=2; offset=2>接收数据。因为在A成为leader之前，A的offset不可能比B高，根据上一小节的内容，A不会发生截断，因此也就没机会丢失消息m
+>
+> * 解决“Follower与Leader同时重启，先启动的Follower（截断尚未恢复）接收新数据时，引发数据不一致的问题（[Replica Divergence on Restart after Multiple Hard Failures](https://cwiki.apache.org/confluence/display/KAFKA/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation#KIP101AlterReplicationProtocoltouseLeaderEpochratherthanHighWatermarkforTruncation-Scenario2:ReplicaDivergenceonRestartafterMultipleHardFailures)）”的问题
+>
+>   ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_leaderepoch_solve_inconsist.jpg)
+>
+>   原问题：A、B同时重启，Follower B先启动成为Leader接收数据m3，随后A也启动完成但相同offset位置的数据是m2，引发数据不一致
+>
+>   引入Epoch后：A启动完成后先向B发送Leader Epoch  Request `<lg=0, offset=0>`，B返回了`<lg=1,offset=1>`，根据上一小节的内容 ，B返回的offset=1比 A的`start_offset=0`高 ，因此A知道发生了数据不一致，截断消息 m2，从B同步消息m3
+
+
 
