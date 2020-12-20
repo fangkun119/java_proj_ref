@@ -1,15 +1,17 @@
-# Kafka环境搭建（Linux）
+# 单节点Kafka环境搭建（Linux）
+
+> 本文档为在CentOS Linux上搭建单节点Kafka，在Mac上安装需参考另一份文档[single_node_kafka_on_mac.md](single_node_kafka_on_mac.md)
 
 ## 1. 环境准备
 
-### (1) 准备`CentOS` (没有用6.10）, `JDK 1.8+`的虚拟机
+### (1) 准备`CentOS` , `JDK 1.8+`的虚拟机
 
 在Virtual Box上安装CentOS
 
 > 参考: [`999_util/01_centos_on_virtualbox/readme.md`](https://github.com/fangkun119/java_proj_ref/blob/master/999_util/01_centos_on_virtualbox/readme.md)
-> 
+>
 > 查看操作系统版本
-> 
+>
 > ~~~bash
 > [root@localhost ~]# cat /etc/redhat-release
 > CentOS Linux release 7.8.2003 (Core)
@@ -18,23 +20,23 @@
 为虚拟机配置固定IP（后续要绑定到HostName上、所以需要固定IP）
 
 > (1) `Virtual Box`虚拟机网卡配置：
-> 
+>
 > * 网卡1：桥接，用来让虚拟机能访问外网，其中“高级”->“控制芯片”一定要选`virtio-net`
-> 
+>
 > 	![](https://raw.githubusercontent.com/kenfang119/pics/main/999_util/virtual_box_network_static_ip_cfg_1.jpg)
-> 
+>
 > * 网卡2：Host Only网络，组建一个从笔记本到虚拟机的子网，用来配置静态IP
-> 
+>
 > 	![](https://raw.githubusercontent.com/kenfang119/pics/main/999_util/virtual_box_network_static_ip_cfg_2.jpg)
-> 
+>
 > (2) 虚拟机静态IP配置：之前的步骤中安装`Virtual Box增强工具`时已经顺带安装了XServer，可以用图形化界面配置；启动虚拟机后、在Virtual Box为虚拟机开启的中断界面输入`startx`命令，进入图形界面
-> 
+>
 > * `Application` -> `Setting` -> `Network`：点击`Red Hat Ethernet`
-> 
+>
 > 	![](https://raw.githubusercontent.com/kenfang119/pics/main/999_util/static_ip_cfg_1.jpg)
-> 
+>
 > * 填入静态IP、掩码、网关及DNS：
-> 
+>
 > 	![](https://raw.githubusercontent.com/kenfang119/pics/main/999_util/static_ip_cfg_2.jpg)
 
 ### (2) 设置`JDK`, `JAVA_HOME`，
@@ -46,10 +48,10 @@
 > 警告：jdk-8u191-linux-x64.rpm: 头V3 RSA/SHA256 Signature, 密钥 ID ec551f03: NOKEY
 > 准备中...                          ################################# [100%]
 > 正在升级/安装...
->    1:jdk1.8-2000:1.8.0_191-fcs        ################################# [100%]
+> 1:jdk1.8-2000:1.8.0_191-fcs        ################################# [100%]
 > Unpacking JAR files...
 > 	tools.jar...
->	...
+> 	...
 > 	localedata.jar...
 > [root@localhost ~]# ls -l /usr/java/
 > 总用量 0
@@ -82,7 +84,7 @@
 > ~~~
 
 > 相关命令参考
-> 
+>
 > ~~~bash
 > # 查看是否安装了JDK 1.8
 > rpm -qa | grep jdk.*1.8
@@ -138,13 +140,13 @@
 > ~~~bash
 > [root@localhost ~]# systemctl status firewalld # 查看防火墙状态
 > ● firewalld.service - firewalld - dynamic firewall daemon
->    Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled; vendor preset: enabled)
->    Active: active (running) since 三 2020-11-25 16:20:30 CST; 19min ago
->      Docs: man:firewalld(1)
->  Main PID: 760 (firewalld)
->     Tasks: 2
->    CGroup: /system.slice/firewalld.service
->            └─760 /usr/bin/python2 -Es /usr/sbin/firewalld --nofork --nopid
+> Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled; vendor preset: enabled)
+> Active: active (running) since 三 2020-11-25 16:20:30 CST; 19min ago
+>   Docs: man:firewalld(1)
+> Main PID: 760 (firewalld)
+>  Tasks: 2
+> CGroup: /system.slice/firewalld.service
+>         └─760 /usr/bin/python2 -Es /usr/sbin/firewalld --nofork --nopid
 > 
 > 11月 25 16:20:29 localhost.localdomain systemd[1]: Starting firewalld - dynamic firewall .....
 > 11月 25 16:20:30 localhost.localdomain systemd[1]: Started firewalld - dynamic firewall d...n.
@@ -156,9 +158,9 @@
 > Removed symlink /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
 > [root@localhost ~]# systemctl status firewalld # 查看防火墙状态
 > ● firewalld.service - firewalld - dynamic firewall daemon
->    Loaded: loaded (/usr/lib/systemd/system/firewalld.service; disabled; vendor preset: enabled)
->    Active: inactive (dead)
->      Docs: man:firewalld(1)
+> Loaded: loaded (/usr/lib/systemd/system/firewalld.service; disabled; vendor preset: enabled)
+> Active: inactive (dead)
+>   Docs: man:firewalld(1)
 > 
 > 11月 25 16:20:29 localhost.localdomain systemd[1]: Starting firewalld - dynamic firewall .....
 > 11月 25 16:20:30 localhost.localdomain systemd[1]: Started firewalld - dynamic firewall d...n.
@@ -243,9 +245,9 @@
 修改配置文件：
 
 > 配置文件修改内容：[300_kafka/02_single_node_setup/kafaka/config/server.properties](https://github.com/fangkun119/java_proj_ref/commit/a1c1ee4cfbd52f1d3b5d9edb4ef9080bf814ec95?branch=a1c1ee4cfbd52f1d3b5d9edb4ef9080bf814ec95&diff=split#diff-7efccb1025d1f8b0ba9903944e70cc2d83c74a774edbf265a3cfa158abd183db) 
-> 
+>
 > 修改过程
-> 
+>
 > ~~~bash
 > [root@localhost kafka_2.11-2.2.0]# ls config/server.properties # 要修改的配置文件
 > config/server.properties 
@@ -326,9 +328,9 @@
 > [root@localhost kafka_2.11-2.2.0]# ./bin/kafka-topics.sh --help # 查看命令参数
 > [root@localhost kafka_2.11-2.2.0]# ./bin/kafka-topics.sh --bootstrap-server CentOS:9092 --create --topic topic01 --partitions 1 --replication-factor 1 # 创建分区
 > ~~~
-> 
+>
 > 备注：
-> 
+>
 > * `2.2`之前修改topic使用的是`--zookeeper`参数，`2.2`之后使用`--bootstrap-server`
 > * `--partitions`：topic分区数
 > * `--replication-factor`：每个分区的副本数
@@ -342,7 +344,7 @@
 > ~~~
 >
 > 备注：
-> 
+>
 > * `--group`：消费者所属的消费组组名
 
 (3) 用第一个终端窗口发送消息
@@ -394,27 +396,3 @@ Shutdown scheduled for 三 2020-11-25 18:46:30 CST, use 'shutdown -c' to cancel.
 [root@localhost zookeeper-3.4.6]# Connection to 192.168.1.104 closed by remote host.
 Connection to 192.168.1.104 closed.
 ~~~
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
