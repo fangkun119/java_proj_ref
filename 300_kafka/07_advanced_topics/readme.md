@@ -1,4 +1,4 @@
-# Kafka进阶
+# Kafka其他主题
 
 ## 1 高水位（High Water Mark)
 
@@ -81,5 +81,62 @@
 >
 >   引入Epoch后：A启动完成后先向B发送Leader Epoch  Request `<lg=0, offset=0>`，B返回了`<lg=1,offset=1>`，根据上一小节的内容 ，B返回的offset=1比 A的`start_offset=0`高 ，因此A知道发生了数据不一致，截断消息 m2，从B同步消息m3
 
+## 2 同步发送、异步发送和异步回调
 
+### 2.1 异步发送
+
+> **在未开启事务时**，调用`producer.send`只代表消息已经提交给了生产者底层的API，此时消息有可能只是缓存在Producer又或者已经交给`Leader Broker`但还没有返回ACK，但不论哪种生产者都认为消息已经发送完毕
+>
+> ~~~java
+> byte[] key = "key".getBytes();
+> byte[] value = "value".getBytes();
+> ProducerRecord<byte[],byte[]> record = new ProducerRecord<byte[],byte[]>("my-topic", key, value)
+> producer.send(record)
+> ~~~
+>
+> **如果已经开启了事务**，可以忽略下面的`同步发送`和`异步回调`，直接调用`producer.send`即可。
+>
+> 如果事务中任何一条消息发送失败，都会导致`producer.commitTransaction() `失败抛出异常。此时在catch块中可调用`producer.abortTransaction()`并重置队列状态，也可以知道该事务下所有的消息都没能提交给Kafka。
+
+### 2.2 同步发送
+
+> `producer.send`会返的类型是`Future<RecordMetadata>`，调用这个返回对象的`.get()`方法可以让生产者线程阻塞直到收到`Leader Broker`返回的ACK（可以向`.get()`方法传入阻塞超时时间）
+>
+> ~~~java
+> byte[] key = "key".getBytes();
+> byte[] value = "value".getBytes();
+> ProducerRecord<byte[],byte[]> record = new ProducerRecord<byte[],byte[]>("my-topic", key, value)
+> producer.send(record).get() // 阻塞等待Leader Broker返回的ACK
+> ~~~
+
+### 2.3 异步回调
+
+> 在调用`send`方法时可以设置回调函数，该函数在收到ACK或者发生异常时被调用
+>
+> ```java
+> producer.send(
+>         record,
+>         new Callback() {
+>             public void onCompletion(RecordMetadata metadata, Exception e) {
+>                 if(e != null) {
+>                     e.printStackTrace();
+>                 } else {
+>                     System.out.println("The offset of the record we just sent is: " + metadata.offset());
+>                 }
+>             }
+>         });
+> ```
+>
+> **`Producer`何时认为自己收到了`ACK`**：取决于配置项`acks`：
+>
+> * 为`0`消息进入生产者`socket`队列即视为已经ACK
+> * 为`1`(默认配置)消息被`Leader Broker`写入本地日志即可以返回ACK
+> * 为`all`要等待`Leader Broker`把消息同步给所有`Follower Broker`才会返回ACK
+>
+> 另外还有一个配置是`幂等写`，`enable.idempotence`，为true时消费者会开启过滤，去除哪些因为生产者重试而重复发送的数据
+
+### 2.4 参考
+
+> * [300_kafka/06_java_api_advanced/readme.md](https://github.com/fangkun119/java_proj_ref/tree/master/300_kafka/06_java_api_advanced)
+> * org.apache.kafka.clients.producer.KafkaProducer源代码注释
 
