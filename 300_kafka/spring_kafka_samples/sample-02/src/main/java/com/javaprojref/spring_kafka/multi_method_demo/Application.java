@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.javaprojref.spring_kafka.simple_pnc_demo;
+package com.javaprojref.spring_kafka.multi_method_demo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,8 +34,8 @@ import org.springframework.kafka.support.converter.RecordMessageConverter;
 import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 import org.springframework.util.backoff.FixedBackOff;
 
-import com.javaprojref.spring_kafka.common.Bar2;
-import com.javaprojref.spring_kafka.common.Foo2;
+import com.javaprojref.spring_kafka.multi_method_demo.domain.Bar2;
+import com.javaprojref.spring_kafka.multi_method_demo.domain.Foo2;
 
 /**
  * Sample shows use of a multi-method listener.
@@ -44,44 +44,11 @@ import com.javaprojref.spring_kafka.common.Foo2;
  * @since 2.2.1
  *
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.javaprojref.spring_kafka.multi_method_demo")
 public class Application {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args).close();
-	}
-
-	/*
-	 * Boot will autowire this into the container factory.
-	 */
-	@Bean
-	public SeekToCurrentErrorHandler errorHandler(KafkaTemplate<Object, Object> template) {
-		return new SeekToCurrentErrorHandler(
-				new DeadLetterPublishingRecoverer(template), new FixedBackOff(1000L, 2));
-	}
-
-	@Bean
-	public RecordMessageConverter converter() {
-		StringJsonMessageConverter converter = new StringJsonMessageConverter();
-		DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper();
-		typeMapper.setTypePrecedence(TypePrecedence.TYPE_ID);
-		typeMapper.addTrustedPackages("javaprojref.spring_kafka.common");
-		Map<String, Class<?>> mappings = new HashMap<>();
-		mappings.put("foo", Foo2.class);
-		mappings.put("bar", Bar2.class);
-		typeMapper.setIdClassMapping(mappings);
-		converter.setTypeMapper(typeMapper);
-		return converter;
-	}
-
-	@Bean
-	public NewTopic foos() {
-		return new NewTopic("foos", 1, (short) 1);
-	}
-
-	@Bean
-	public NewTopic bars() {
-		return new NewTopic("bars", 1, (short) 1);
 	}
 
 	@Bean
@@ -91,5 +58,4 @@ public class Application {
 			System.in.read();
 		};
 	}
-
 }

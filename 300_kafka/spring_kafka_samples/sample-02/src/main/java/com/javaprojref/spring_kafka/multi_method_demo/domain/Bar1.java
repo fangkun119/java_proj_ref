@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.javaprojref.spring_kafka.common;
+package com.javaprojref.spring_kafka.multi_method_demo.domain;
 
 /**
  * @author Gary Russell

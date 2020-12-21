@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package com.javaprojref.spring_kafka.simple_pnc_demo;
+package com.javaprojref.spring_kafka.multi_method_demo.config;
 
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import com.javaprojref.spring_kafka.common.Bar2;
-import com.javaprojref.spring_kafka.common.Foo2;
+import com.javaprojref.spring_kafka.multi_method_demo.domain.Bar2;
+import com.javaprojref.spring_kafka.multi_method_demo.domain.Foo2;
 
 /**
  * @author Gary Russell
  * @since 5.1
- *
  */
 @Component
 @KafkaListener(id = "multiGroup", topics = { "foos", "bars" })
 public class MultiMethods {
-
+	// 消费者，为不同类型的输入调用不同的方法
 	@KafkaHandler
 	public void foo(Foo2 foo) {
 		System.out.println("Received: " + foo);
@@ -46,5 +45,4 @@ public class MultiMethods {
 	public void unknown(Object object) {
 		System.out.println("Received unknown: " + object);
 	}
-
 }

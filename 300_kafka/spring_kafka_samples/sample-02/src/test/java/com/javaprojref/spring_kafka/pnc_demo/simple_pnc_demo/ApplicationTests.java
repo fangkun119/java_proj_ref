@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.javaprojref.spring_kafka.simple_pnc_demo;
+package com.javaprojref.spring_kafka.pnc_demo.simple_pnc_demo;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

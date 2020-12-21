@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.javaprojref.spring_kafka.simple_pnc_demo;
+package com.javaprojref.spring_kafka.multi_method_demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.javaprojref.spring_kafka.common.Bar1;
-import com.javaprojref.spring_kafka.common.Foo1;
+import com.javaprojref.spring_kafka.multi_method_demo.domain.Bar1;
+import com.javaprojref.spring_kafka.multi_method_demo.domain.Foo1;
 
 /**
  * @author Gary Russell
@@ -32,23 +32,21 @@ import com.javaprojref.spring_kafka.common.Foo1;
  */
 @RestController
 public class Controller {
-
 	@Autowired
 	private KafkaTemplate<Object, Object> template;
 
-	@PostMapping(path = "/send/foo/{what}")
-	public void sendFoo(@PathVariable String what) {
-		this.template.send("foos", new Foo1(what));
+	@PostMapping(path = "/send/foo/{message}")
+	public void sendFoo(@PathVariable String message) {
+		this.template.send("foos", new Foo1(message));
 	}
 
-	@PostMapping(path = "/send/bar/{what}")
-	public void sendBar(@PathVariable String what) {
-		this.template.send("bars", new Bar1(what));
+	@PostMapping(path = "/send/bar/{message}")
+	public void sendBar(@PathVariable String message) {
+		this.template.send("bars", new Bar1(message));
 	}
 
-	@PostMapping(path = "/send/unknown/{what}")
-	public void sendUnknown(@PathVariable String what) {
-		this.template.send("bars", what);
+	@PostMapping(path = "/send/unknown/{message}")
+	public void sendUnknown(@PathVariable String message) {
+		this.template.send("bars", message);
 	}
-
 }
