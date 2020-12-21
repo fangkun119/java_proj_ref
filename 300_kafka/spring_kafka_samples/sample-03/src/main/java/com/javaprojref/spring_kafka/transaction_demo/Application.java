@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.javaprojref.spring_kafka.simple_pnc_demo;
+package com.javaprojref.spring_kafka.pnc_demo.simple_pnc_demo;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,7 +36,7 @@ import org.springframework.kafka.support.converter.BatchMessagingMessageConverte
 import org.springframework.kafka.support.converter.RecordMessageConverter;
 import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 
-import com.javaprojref.spring_kafka.common.Foo2;
+import com.javaprojref.spring_kafka.pnc_demo.domain.Foo2;
 
 /**
  * Sample showing a batch listener and transactions.

@@ -81,6 +81,8 @@ public class KafkaConfig {
         this.exec.execute(() -> System.out.println("Hit Enter to terminate..."));
     }
 
+    // Consumer的反序列化配置，参考
+    // https://docs.spring.io/spring-kafka/docs/2.5.10.RELEASE/reference/html/#serdes
     @Bean
     public RecordMessageConverter converter() {
         return new StringJsonMessageConverter();
@@ -88,7 +90,8 @@ public class KafkaConfig {
 
     // 使用KafkaTemplate来发送数据，
     // 也可以不定义让框架来提供一个默认的template（相当于注释掉下面三个Bean）
-    // 可以在自定义全局的KafkaTemplate Bean，参考：https://docs.spring.io/spring-kafka/docs/2.5.10.RELEASE/reference/html/#kafka-template
+    // 可以在自定义全局的KafkaTemplate Bean，参考：
+    // https://docs.spring.io/spring-kafka/docs/2.5.10.RELEASE/reference/html/#kafka-template
     @Bean
     public Map<String, Object> producerConfigs() {
         Map<String, Object> props = new HashMap<>();

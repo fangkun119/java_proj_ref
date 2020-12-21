@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.javaprojref.spring_kafka.pnc_demo.common;
+package com.javaprojref.spring_kafka.pnc_demo.domain;
 
 /**
  * @author Gary Russell
  * @since 2.2.1
  *
  */
-public class Foo1 {
+public class Foo2 {
 
 	private String foo;
 
-	public Foo1() {
+	public Foo2() {
 	}
 
-	public Foo1(String foo) {
+	public Foo2(String foo) {
 		this.foo = foo;
 	}
 
@@ -42,7 +42,7 @@ public class Foo1 {
 
 	@Override
 	public String toString() {
-		return "Foo1 [foo=" + this.foo + "]";
+		return "Foo2 [foo=" + this.foo + "]";
 	}
 
 }
