@@ -6,7 +6,7 @@ The producer uses a `JsonSerializer`; the consumer uses the `StringDeserializer`
 
 Run the application and use curl to send some data:
 
-`$ curl -X POST http://localhost:8080/send/foo/bar`
+`$ curl -X POST http://localhost:8080/send/topic01/message01`
 
 Console:
 
@@ -14,7 +14,7 @@ Console:
 
 The consumer is configured with a `SeekToCurrentErrorHandler` which replays failed messages up to 2 times, each after a 1 second delay and, after retries are exhausted, sends a bad message to a dead-letter topic.
 
-`$ curl -X POST http://localhost:8080/send/foo/fail`
+`$ curl -X POST http://localhost:8080/send/topic01/fail`
 
 A second `@KafkaListener` consumes the raw JSON from the message.
 
