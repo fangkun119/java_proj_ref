@@ -35,7 +35,7 @@ public class KafkaConfig {
     private final Logger logger = LoggerFactory.getLogger(Application.class);
     private final TaskExecutor exec = new SimpleAsyncTaskExecutor();
 
-    // BootStrapServer地址，从配置文件application.yml注入
+    // BootStrapServer地址
     @Value("${spring.kafka.consumer.bootstrap-servers}")
     private String bootstrapServers;
 
