@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.javaprojref.spring_kafka.pnc_demo.common;
+package com.javaprojref.spring_kafka.pnc_demo.domain.consumer;
 
 /**
  * @author Gary Russell

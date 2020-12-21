@@ -1,6 +1,6 @@
 package com.javaprojref.spring_kafka.pnc_demo.controller;
 
-import com.javaprojref.spring_kafka.pnc_demo.common.Foo1;
+import com.javaprojref.spring_kafka.pnc_demo.domain.producer.Foo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.PathVariable;

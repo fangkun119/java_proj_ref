@@ -1,7 +1,7 @@
 package com.javaprojref.spring_kafka.pnc_demo.config;
 
 import com.javaprojref.spring_kafka.pnc_demo.Application;
-import com.javaprojref.spring_kafka.pnc_demo.common.Foo2;
+import com.javaprojref.spring_kafka.pnc_demo.domain.consumer.Foo2;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -9,7 +9,6 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -36,10 +35,9 @@ public class KafkaConfig {
     private final TaskExecutor exec = new SimpleAsyncTaskExecutor();
 
     // BootStrapServer地址
-    @Value("${spring.kafka.consumer.bootstrap-servers}")
-    private String bootstrapServers;
+    private final String bootstrapServers = "localhost:9092";
 
-    // KafkaAdmin：用于将Topic注入到Application Context中
+    // 调用KafkaAdmin创建Topic并将Topic注入到Application Context中
     // 参考：https://docs.spring.io/spring-kafka/docs/2.5.10.RELEASE/reference/html/#configuring-topics
     @Bean
     public KafkaAdmin admin() {
@@ -57,22 +55,25 @@ public class KafkaConfig {
     }
 
     @Bean
-    public NewTopic topic02() {
-        return new NewTopic("topic02", 1, (short) 1);
+    public NewTopic topic01DLT() {
+        return new NewTopic("topic01.DLT", 1, (short) 1);
     }
 
     // 使用KafkaListener接收数据，参考
     // https://docs.spring.io/spring-kafka/docs/2.5.10.RELEASE/reference/html/#kafka-listener-annotation
-    @KafkaListener(id = "fooListener", topics = "topic01")
+    @KafkaListener(id = "topic01Listener", topics = "topic01", properties = {
+            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG + "=" + bootstrapServers
+    })
     public void topic01Listener(Foo2 foo) {
-        logger.info("recieve message from topic01: " + foo);
+        logger.info("receive message from topic01: " + foo);
         if (foo.getFoo().startsWith("fail")) {
             throw new RuntimeException("failed"); //触发异常，交给errorHandler来处理
         }
         this.exec.execute(() -> System.out.println("Hit Enter to terminate..."));
     }
 
-    @KafkaListener(id = "id02", topics = "topic01.DLT", groupId = "failMsgCollectGroup", properties = {
+    @KafkaListener(id = "topic01DLTListener", topics = "topic01.DLT", groupId = "failMsgCollectGroup", properties = {
+            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG + "=" + bootstrapServers,
             ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=latest"
     })
     public void topic01DLTListener(String in) {

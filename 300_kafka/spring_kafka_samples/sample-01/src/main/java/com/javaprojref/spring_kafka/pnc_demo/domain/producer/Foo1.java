@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.javaprojref.spring_kafka.pnc_demo.common;
+package com.javaprojref.spring_kafka.pnc_demo.domain.producer;
 
 /**
  * @author Gary Russell
@@ -44,5 +44,4 @@ public class Foo1 {
 	public String toString() {
 		return "Foo1 [foo=" + this.foo + "]";
 	}
-
 }
