@@ -1,9 +1,11 @@
 spring:
   kafka:
     producer:
+      bootstrap-servers: localhost:9092
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       transaction-id-prefix: tx.
     consumer:
+      bootstrap-servers: localhost:9092
       properties:
         isolation.level: read_committed
     listener:

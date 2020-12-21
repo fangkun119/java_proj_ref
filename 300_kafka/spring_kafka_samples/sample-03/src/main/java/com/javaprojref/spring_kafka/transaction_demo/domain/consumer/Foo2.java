@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.javaprojref.spring_kafka.pnc_demo.domain;
+package com.javaprojref.spring_kafka.transaction_demo.domain.consumer;
 
 /**
  * @author Gary Russell
  * @since 2.2.1
- *
+ * @description message payload used by consumer
  */
 public class Foo2 {
 

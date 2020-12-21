@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.javaprojref.spring_kafka.pnc_demo.simple_pnc_demo;
+package com.javaprojref.spring_kafka.transaction_demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.javaprojref.spring_kafka.pnc_demo.domain.Foo1;
+import com.javaprojref.spring_kafka.transaction_demo.domain.producer.Foo1;
 
 /**
  * @author Gary Russell
@@ -35,12 +35,13 @@ public class Controller {
 	@Autowired
 	private KafkaTemplate<Object, Object> template;
 
-	@PostMapping(path = "/send/foos/{what}")
-	public void sendFoo(@PathVariable String what) {
+	@PostMapping(path = "/send/foos/{commaDelimitedMsgList}")
+	public void sendFoo(@PathVariable String commaDelimitedMsgList /*用逗号分隔的一组消息*/) {
+		// 在一个完整事务中发送一组消息
 		this.template.executeInTransaction(kafkaTemplate -> {
-			StringUtils.commaDelimitedListToSet(what).stream()
+			StringUtils.commaDelimitedListToSet(commaDelimitedMsgList).stream()
 				.map(s -> new Foo1(s))
-				.forEach(foo -> kafkaTemplate.send("topic2", foo));
+				.forEach(foo -> kafkaTemplate.send("topic02", foo));
 			return null;
 		});
 	}
