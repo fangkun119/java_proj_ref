@@ -19,7 +19,7 @@ package com.javaprojref.spring_kafka.multi_method_demo.domain.producer;
 /**
  * @author Gary Russell
  * @since 5.1
- * @description class type of the message used by producer
+ * @description message payload used by producer
  */
 public class Foo1 {
 

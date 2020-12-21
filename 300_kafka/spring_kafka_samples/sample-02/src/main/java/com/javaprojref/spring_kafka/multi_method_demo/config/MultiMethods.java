@@ -23,10 +23,8 @@ import org.springframework.stereotype.Component;
 import com.javaprojref.spring_kafka.multi_method_demo.domain.consumer.Bar2;
 import com.javaprojref.spring_kafka.multi_method_demo.domain.consumer.Foo2;
 
-/**
- * @author Gary Russell
- * @since 5.1
- */
+// 使用KafkaListener接收数据，参考
+// https://docs.spring.io/spring-kafka/docs/2.5.10.RELEASE/reference/html/#kafka-listener-annotation
 @Component
 @KafkaListener(id = "multiGroup", topics = { "foos", "bars" })
 public class MultiMethods {
