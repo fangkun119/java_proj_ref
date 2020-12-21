@@ -1,7 +1,7 @@
 package com.javaprojref.spring_kafka.multi_method_demo.config;
 
-import com.javaprojref.spring_kafka.multi_method_demo.domain.Bar2;
-import com.javaprojref.spring_kafka.multi_method_demo.domain.Foo2;
+import com.javaprojref.spring_kafka.multi_method_demo.domain.consumer.Bar2;
+import com.javaprojref.spring_kafka.multi_method_demo.domain.consumer.Foo2;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,7 +48,7 @@ public class KafkaConfig {
     public RecordMessageConverter converter() {
         // 生产者序列化时，如何设置类型TYPE_ID?
         //    在application.yml的spring.kafka.producer.properties.spring.json.type.mapping配置中可以看到
-        //    foo:com.javaprojref.spring_kafka.multi_method_demo.domain.Foo1,bar:com.javaprojref.spring_kafka.multi_method_demo.domain.Bar1
+        //    foo:com.javaprojref.spring_kafka.multi_method_demo.domain.producer.Foo1,bar:com.javaprojref.spring_kafka.multi_method_demo.domain.producer.Bar1
         //    它把Foo1类型数据的TYPE_ID设为foo，Bar1类型数据的TYPE_ID设为bar：
 
         // 消费者反序列化时如何根据TYPE_ID查找对应的类型？

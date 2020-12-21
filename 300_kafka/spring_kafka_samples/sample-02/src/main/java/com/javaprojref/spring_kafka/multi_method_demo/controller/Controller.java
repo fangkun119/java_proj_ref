@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.javaprojref.spring_kafka.multi_method_demo.domain.Bar1;
-import com.javaprojref.spring_kafka.multi_method_demo.domain.Foo1;
+import com.javaprojref.spring_kafka.multi_method_demo.domain.producer.Bar1;
+import com.javaprojref.spring_kafka.multi_method_demo.domain.producer.Foo1;
 
 /**
  * @author Gary Russell

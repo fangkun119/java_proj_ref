@@ -20,8 +20,8 @@ import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import com.javaprojref.spring_kafka.multi_method_demo.domain.Bar2;
-import com.javaprojref.spring_kafka.multi_method_demo.domain.Foo2;
+import com.javaprojref.spring_kafka.multi_method_demo.domain.consumer.Bar2;
+import com.javaprojref.spring_kafka.multi_method_demo.domain.consumer.Foo2;
 
 /**
  * @author Gary Russell

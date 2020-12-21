@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.javaprojref.spring_kafka.multi_method_demo.domain;
+package com.javaprojref.spring_kafka.multi_method_demo.domain.consumer;
 
 /**
  * @author Gary Russell
  * @since 2.2.1
- *
+ * @description class type of the message used by consumer
  */
-public class Bar1 {
+public class Bar2 {
 
 	public String bar;
 
-	public Bar1() {
+	public Bar2() {
 	}
 
-	public Bar1(String bar) {
+	public Bar2(String bar) {
 		this.bar = bar;
 	}
 
@@ -42,7 +42,7 @@ public class Bar1 {
 
 	@Override
 	public String toString() {
-		return "Bar1 [bar=" + this.bar + "]";
+		return "Bar2 [bar=" + this.bar + "]";
 	}
 
 }

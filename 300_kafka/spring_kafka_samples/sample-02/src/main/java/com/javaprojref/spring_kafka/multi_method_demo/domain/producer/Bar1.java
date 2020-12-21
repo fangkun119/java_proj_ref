@@ -14,35 +14,35 @@
  * limitations under the License.
  */
 
-package com.javaprojref.spring_kafka.multi_method_demo.domain;
+package com.javaprojref.spring_kafka.multi_method_demo.domain.producer;
 
 /**
  * @author Gary Russell
- * @since 5.1
- *
+ * @since 2.2.1
+ * @description class type of the message used by producer
  */
-public class Foo2 {
+public class Bar1 {
 
-	private String foo;
+	public String bar;
 
-	public Foo2() {
+	public Bar1() {
 	}
 
-	public Foo2(String foo) {
-		this.foo = foo;
+	public Bar1(String bar) {
+		this.bar = bar;
 	}
 
-	public String getFoo() {
-		return this.foo;
+	public String getBar() {
+		return this.bar;
 	}
 
-	public void setFoo(String foo) {
-		this.foo = foo;
+	public void setBar(String bar) {
+		this.bar = bar;
 	}
 
 	@Override
 	public String toString() {
-		return "Foo2 [foo=" + this.foo + "]";
+		return "Bar1 [bar=" + this.bar + "]";
 	}
 
 }
