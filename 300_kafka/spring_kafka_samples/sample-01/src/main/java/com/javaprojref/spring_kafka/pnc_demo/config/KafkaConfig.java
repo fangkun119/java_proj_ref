@@ -65,6 +65,7 @@ public class KafkaConfig {
             ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG + "=" + bootstrapServers
     })
     public void topic01Listener(Foo2 foo) {
+        // 业务逻辑增加时可进一步拆分到service层，参考项目：sample-03
         logger.info("receive message from topic01: " + foo);
         if (foo.getFoo().startsWith("fail")) {
             throw new RuntimeException("failed"); //触发异常，交给errorHandler来处理
@@ -77,6 +78,7 @@ public class KafkaConfig {
             ConsumerConfig.AUTO_OFFSET_RESET_CONFIG + "=latest"
     })
     public void topic01DLTListener(String in) {
+        // 业务逻辑增加时可进一步拆分到service层，参考项目：sample-03
         logger.info("receive message from topic01.DLT: " + in);
         this.exec.execute(() -> System.out.println("Hit Enter to terminate..."));
     }
@@ -113,7 +115,7 @@ public class KafkaConfig {
         return new KafkaTemplate<Object, Object>(producerFactory());
     }
 
-    // 错误处理，重试失败的record以及之后发送的record，参考：
+    // 错误恢复，重试失败的record以及之后发送的record，参考：
     // 1. https://docs.spring.io/spring-kafka/docs/2.5.10.RELEASE/reference/html/#seek-to-current
     // 2. https://docs.spring.io/spring-kafka/docs/2.5.10.RELEASE/reference/html/#dead-letters
     @Bean
