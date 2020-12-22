@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-public class ListenerHandler {
+public class KafkaListenerHandler {
     private final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
     @Autowired

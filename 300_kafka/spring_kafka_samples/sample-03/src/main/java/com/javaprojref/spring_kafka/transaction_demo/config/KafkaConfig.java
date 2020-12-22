@@ -2,7 +2,7 @@ package com.javaprojref.spring_kafka.transaction_demo.config;
 
 import com.javaprojref.spring_kafka.transaction_demo.Application;
 import com.javaprojref.spring_kafka.transaction_demo.domain.consumer.Foo2;
-import com.javaprojref.spring_kafka.transaction_demo.service.kafka_listener.ListenerHandler;
+import com.javaprojref.spring_kafka.transaction_demo.service.kafka_listener.KafkaListenerHandler;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +20,7 @@ import java.util.List;
 public class KafkaConfig {
     // 来自service层的业务逻辑
     @Autowired
-    ListenerHandler listenerHandler;
+    KafkaListenerHandler kafkaListenerHandler;
 
     // 调用KafkaAdmin创建Topic并将Topic注入到Application Context中
     // 参考：https://docs.spring.io/spring-kafka/docs/2.5.10.RELEASE/reference/html/#configuring-topics
@@ -38,12 +38,12 @@ public class KafkaConfig {
     // https://docs.spring.io/spring-kafka/docs/2.5.10.RELEASE/reference/html/#kafka-listener-annotation
     @KafkaListener(id = "topic02Listener", topics = "topic02")
     public void listen02(List<Foo2> foos) throws IOException {
-        listenerHandler.handleTopic02(foos);
+        kafkaListenerHandler.handleTopic02(foos);
     }
 
     @KafkaListener(id = "topic03listener", topics = "topic03")
     public void listen03(List<String> strList) {
-        listenerHandler.handleTopic03(strList);
+        kafkaListenerHandler.handleTopic03(strList);
         Application.APP_CLOSE_LATCH.countDown(); //触发主线程退出
     }
 
