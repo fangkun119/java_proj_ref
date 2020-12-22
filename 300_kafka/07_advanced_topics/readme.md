@@ -140,3 +140,277 @@
 > * [300_kafka/06_java_api_advanced/readme.md](https://github.com/fangkun119/java_proj_ref/tree/master/300_kafka/06_java_api_advanced)
 > * org.apache.kafka.clients.producer.KafkaProducer源代码注释
 
+## 3 spring-kafka
+
+> * 官网：[https://spring.io/projects/spring-kafka](https://spring.io/projects/spring-kafka)
+> * 文档：https://docs.spring.io/spring-kafka/docs/2.5.10.RELEASE/reference/html/#sending-messages
+> * 调试环境： [../02_single_node_setup/single_node_kafka_on_mac.md](../02_single_node_setup/single_node_kafka_on_mac.md)
+
+### 3.1 Demo 1:  基本功能以及错误恢复(Error Recovery)
+
+功能点：代码在[官方Demo: spring-kafka/samples/sample-01](https://github.com/spring-projects/spring-kafka/tree/master/samples/sample-01)的基础础上进行修改，包含如下功能
+
+> * 在SpringBoot项目中引入spring-kafka，实现生产者消费者功能
+> * 如何在[@Configuration类](../spring_kafka_samples/sample-01/src/main/java/com/javaprojref/spring_kafka/pnc_demo/config/KafkaConfig.java)中对生产者消费者进行配置
+> * 消费者接收消息处理出错时，进行2次重试，如果仍然失败则将消息转发到专门存放失败消息的topic中
+>
+> 各功能均注释了对应的文档链接
+
+Demo项目：
+
+> * [../spring_kafka_samples/sample-01/](../spring_kafka_samples/sample-01/)
+
+主要代码：
+
+> * [spring_kafka_sample/pnc_demo/controller/Controller.java](../spring_kafka_samples/sample-01/src/main/java/com/javaprojref/spring_kafka/pnc_demo/controller/Controller.java)
+> * [spring_kafka_sample/pnc_demo/config/KafkaConfig.java](../spring_kafka_samples/sample-01/src/main/java/com/javaprojref/spring_kafka/pnc_demo/config/KafkaConfig.java)
+
+运行：
+
+(1) 启动程序：SpringBoot启动、打印Spring和Kafka日志后，进入监听状态：
+
+(2) 在另一个终端窗口，发送一条正常的POST请求
+
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/tmp/
+> $ curl -X POST http://localhost:8080/send/topic01/message01
+> ~~~
+>
+> SpringBoot打印日志，表示已经收到该消息
+>
+> ~~~bash
+> 2020-12-21 15:59:26.010  INFO 33302 --- [oListener-0-C-1] com.example.Application                  : recieve message from topic01: Foo2 [foo=message01]
+> ~~~
+
+(3) 接下来发送一条会触发异常的请求
+
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/tmp/
+> $ curl -X POST http://localhost:8080/send/topic01/fail01
+> ~~~
+>
+> ```java
+> @KafkaListener(id = "fooListener", topics = "topic01")
+> public void topic01Listener(Foo2 foo) {
+>    logger.info("recieve message from topic01: " + foo);
+>    if (foo.getFoo().startsWith("fail")) {
+>       throw new RuntimeException("failed"); //触发异常，交给errorHandler来处理
+>    }
+>    this.exec.execute(() -> System.out.println("Hit Enter to terminate..."));
+> }
+> ```
+>
+> `spring-kafka`的Consumer会尝试处理这条来自topic01的消息三次（1次尝试、2次重试），第4次时放弃处理将其转发到topic01.DLT
+>
+> ~~~bash
+> Hit Enter to terminate...
+> 2020-12-21 16:01:44.679  INFO 33302 --- [oListener-0-C-1] com.example.Application                  : recieve message from topic01: Foo2 [foo=fail01]
+> 2020-12-21 16:01:45.684  INFO 33302 --- [oListener-0-C-1] o.a.k.clients.consumer.KafkaConsumer     : [Consumer clientId=consumer-fooListener-1, groupId=fooListener] Seeking to offset 1 for partition topic01-0
+> 2020-12-21 16:01:45.710 ERROR 33302 --- [oListener-0-C-1] essageListenerContainer$ListenerConsumer : Error handler threw an exception
+> ...
+> ...
+> ...
+> 2020-12-21 16:01:45.712  INFO 33302 --- [oListener-0-C-1] com.example.Application                  : recieve message from topic01: Foo2 [foo=fail01]
+> 2020-12-21 16:01:46.713  INFO 33302 --- [oListener-0-C-1] o.a.k.clients.consumer.KafkaConsumer     : [Consumer clientId=consumer-fooListener-1, groupId=fooListener] Seeking to offset 1 for partition topic01-0
+> 2020-12-21 16:01:46.714 ERROR 33302 --- [oListener-0-C-1] essageListenerContainer$ListenerConsumer : Error handler threw an exception
+> ...
+> ...
+> ...
+> 2020-12-21 16:01:45.712  INFO 33302 --- [oListener-0-C-1] com.example.Application                  : recieve message from topic01: Foo2 [foo=fail01]
+> 2020-12-21 16:01:46.713  INFO 33302 --- [oListener-0-C-1] o.a.k.clients.consumer.KafkaConsumer     : [Consumer clientId=consumer-fooListener-1, groupId=fooListener] Seeking to offset 1 for partition topic01-0
+> 2020-12-21 16:01:46.714 ERROR 33302 --- [oListener-0-C-1] essageListenerContainer$ListenerConsumer : Error handler threw an exception
+> ...
+> ...
+> ...
+> 2020-12-21 16:01:46.715  INFO 33302 --- [oListener-0-C-1] com.example.Application                  : recieve message from topic01: Foo2 [foo=fail01]
+> 2020-12-21 16:01:46.725  INFO 33302 --- [     id02-0-C-1] com.example.Application                  : receive message from topic01.DLT: {"foo":"fail01"}
+> Hit Enter to terminate...
+> ~~~
+
+(4) 关闭Spring Boot
+
+### 3.2 Demo 2：Multi-Method Lintener
+
+功能点：
+
+> * 生产者将不同类型的数据序列化成json时，标记不同的TYPE_ID
+>
+> * 消费者在接收数据时，根据TYPE_ID将json反序列化为不同类型的对象
+>
+> * 设置MultiMethodListener，为不同的对象类型指派不同的处理方法
+> * 在[application.yml](../spring_kafka_samples/sample-02/src/main/resources/application.yml)中配置Kafka的Producer和Consumer
+
+Demo项目：
+
+> * [../spring_kafka_samples/sample-02/](../spring_kafka_samples/sample-02/)
+
+主要代码：
+
+>* [spring_kafka/multi_method_demo/controller/Controller.java]( ../spring_kafka_samples/sample-02/src/main/java/com/javaprojref/spring_kafka/multi_method_demo/controller/Controller.java)
+>
+>* [spring_kafka/multi_method_demo/config/KafkaConfig.java](../spring_kafka_samples/sample-02/src/main/java/com/javaprojref/spring_kafka/multi_method_demo/config/KafkaConfig.java)
+>* [spring_kafka/multi_method_demo/config/KafkaListenerConfig.java](../spring_kafka_samples/sample-02/src/main/java/com/javaprojref/spring_kafka/multi_method_demo/config/KafkaListenerConfig.java)
+>* [application.yml](../spring_kafka_samples/sample-02/src/main/resources/application.yml)
+
+运行
+
+(1) 启动程序：SpringBoot启动、打印Spring和Kafka日志后，进入监听状态
+
+(2) 在另一个终端窗口，发送3个POST请求，会触发生产者发送三条消息
+
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/
+> $ curl -X POST http://localhost:8080/send/foo/bar
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/
+> $ curl -X POST http://localhost:8080/send/bar/baz
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/
+> $ curl -X POST http://localhost:8080/send/unknown/xxx
+> ~~~
+
+(3) 在Spring Boot的日志中可以看到，三条请求分别落到`MultiMethodsListener`的三个不同`Handler`中
+
+> ~~~bash
+> 2020-12-22 10:23:46.313  INFO 38904 --- [ad | producer-1] org.apache.kafka.clients.Metadata        : [Producer clientId=producer-1] Cluster ID: drZAbZHiRuK5iwtychQ2Qw
+> Received: Foo2 [foo=bar]
+> Received: Bar2 [bar=baz]
+> Received unknown: xxx
+> ~~~
+>
+> 对应的代码
+>
+> ```jade
+> @Component
+> @KafkaListener(id = "multiGroup", topics = { "foos", "bars" })
+> public class MultiMethodsListener {
+>    @KafkaHandler
+>    public void foo(Foo2 foo) {
+>       System.out.println("Received: " + foo);
+>    }
+> 
+>    @KafkaHandler
+>    public void bar(Bar2 bar) {
+>       System.out.println("Received: " + bar);
+>    }
+> 
+>    @KafkaHandler(isDefault = true)
+>    public void unknown(Object object) {
+>       System.out.println("Received unknown: " + object);
+>    }
+> }
+> ```
+
+(4) 关闭Spring  Boot
+
+## 3.3 Demo 3: 事务
+
+功能：
+
+> * 在application.yml中配置producer并开启事务特性，同时配置consumer
+> * 以事务的方式发送消息
+> * 使用`BatchMessagingMessageConverter`来对上游发来的一组消息进行反序列化
+> * 将消费者的处理逻辑拆分到service层
+
+主要代码：
+
+> * [application.yml](../spring_kafka_samples/sample-03/src/main/resources/application.yml)
+> * [transaction_demo/config/KafkaConfig.java](../spring_kafka_samples/sample-03/src/main/java/com/javaprojref/spring_kafka/transaction_demo/config/KafkaConfig.java)
+> * [transaction_demo/controller/Controller.java](../spring_kafka_samples/sample-03/src/main/java/com/javaprojref/spring_kafka/transaction_demo/controller/Controller.java)
+> * [transaction_demo/service/kafka_listener/KafkaListenerHandler.java](../spring_kafka_samples/sample-03/src/main/java/com/javaprojref/spring_kafka/transaction_demo/service/kafka_listener/KafkaListenerHandler.java)
+
+运行：
+
+(1) 启动程序：SpringBoot启动、打印Spring和Kafka日志后，进入监听状态
+
+> ~~~bash
+> ......
+> 2020-12-22 10:38:59.555  INFO 39003 --- [2Listener-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : topic02Listener: partitions assigned: [topic02-0]
+> ~~~
+
+(2) 在另一个终端窗口，发送POST请求，该请求携带5条消息，将触发生产者在1个事务中将其全部发送到topic02
+
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/
+> $ curl -X POST http://localhost:8080/send/foos/a,b,c,d,e
+> ~~~
+>
+> ```java
+> this.template.executeInTransaction(kafkaTemplate -> {
+>    StringUtils.commaDelimitedListToSet(commaDelimitedMsgList).stream()
+>       .map(s -> new Foo1(s))
+>       .forEach(foo -> kafkaTemplate.send("topic02", foo));
+>    return null;
+> });
+> ```
+
+(3) 可以看到
+
+> 消费者在一个事务中，收到来自topic02的5条消息
+>
+> ~~~bash
+> 2020-12-22 10:40:11.742  INFO 39003 --- [tener.topic02.0] o.a.k.c.p.internals.TransactionManager   : [Producer clientId=producer-tx.topic02Listener.topic02.0, transactionalId=tx.topic02Listener.topic02.0] ProducerId set to 4001 with epoch 5
+> 2020-12-22 10:40:11.742  INFO 39003 --- [2Listener-0-C-1] c.j.s.transaction_demo.Application       : Received: [Foo2 [foo=a], Foo2 [foo=b], Foo2 [foo=c], Foo2 [foo=d], Foo2 [foo=e]]
+> ~~~
+>
+> ```java
+> // 在一个完整事务中发送一组消息
+> this.template.executeInTransaction(kafkaTemplate -> {
+>    StringUtils.commaDelimitedListToSet(commaDelimitedMsgList).stream()
+>       .map(s -> new Foo1(s))
+>       .forEach(foo -> kafkaTemplate.send("topic02", foo));
+>    return null;
+> });
+> ```
+>
+> 随后生产者将这5条消息以非事务的方式转发到topic03
+>
+> ~~~bash
+> 2020-12-22 10:40:11.745  INFO 39003 --- [2Listener-0-C-1] c.j.s.transaction_demo.Application       : essages forwarded to topic03, hit Enter to continue
+> ~~~
+>
+> ```java
+> public void handleTopic02(List<Foo2> foos) throws IOException {
+>     LOGGER.info("Received: " + foos);
+>     foos.forEach(f -> kafkaTemplate.send("topic03", f.getFoo().toUpperCase()));
+>     LOGGER.info("Messages forwarded to topic03, hit Enter to continue");
+>     System.in.read();
+> }
+> ```
+>
+> 输入回车，消费者在topic03收到了转发的5条消息
+>
+> ~~~bash
+> o.a.k.c.p.internals.TransactionManager   : [Producer clientId=producer-tx.topic03listener.topic03.0, transactionalId=tx.topic03listener.topic03.0] ProducerId set to 4002 with epoch 1
+> 2020-12-22 10:40:20.644  INFO 39003 --- [3listener-0-C-1] c.j.s.transaction_demo.Application       : Received: [A, B, C, D, E]
+> ~~~
+>
+> 随后 根据主线程的计算逻辑、程序退出
+>
+> ~~~bash
+> 2020-12-22 10:40:20.647  INFO 39003 --- [tener.topic03.0] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+> 2020-12-22 10:40:25.700  INFO 39003 --- [           main] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=producer-tx.0, transactionalId=tx.0] Closing the Kafka producer with timeoutMillis = 30000 ms.
+> 
+> Process finished with exit code 
+> ~~~
+>
+> 在日志中还可以看到生产者和消费者的Kafka配置，如果有配置项需要修改，可以参考Demo1
+
+### 3.4 参考：
+
+> * [How to Work with Apache Kafka in Your Spring Boot Application](https://www.confluent.io/blog/apache-kafka-spring-boot-application/)
+> * [Spring for Apache Kafka Deep Dive - Part 1: Error Handling, Message Conversion and Transaction Support](https://www.confluent.io/blog/spring-for-apache-kafka-deep-dive-part-1-error-handling-message-conversion-transaction-support/)
+
+### 3.5 其他问题：
+
+##### (1) 多Listener以及多Kafka Template配置
+
+> * 如何配置多个Listener，并且容许他们有不同的配置（例如连接不同的Kafka集群的Bootstrap Servers）：在Demo1中有演示，可以在[@Configuration类](../spring_kafka_samples/sample-01/src/main/java/com/javaprojref/spring_kafka/pnc_demo/config/KafkaConfig.java)中向不同的Listener传入不同的配置
+> * 如何配置多个Kafka Template，并容许他们有不同的配置（例如向不同的Kafka集群发送消息）：
+>   * 目前这版spring-kafka不支持，只能配置1个Kafka Template，或者不配置（使用框架提供的默认template）
+>   * 文章[https://blog.csdn.net/u010218286/article/details/104897703](https://blog.csdn.net/u010218286/article/details/104897703)中对此问题进行了分析，同时使用`@Bean(name="someKafkaTemplateName")`和` @Autowired   @Qualifier("someKafkaTemplateName")`来让不同的template注入到不同的producer中。但是如果使用框架的其他功能，如Error Recovery功能等，仍然会面临该注入哪个template bean的问题。
+

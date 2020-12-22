@@ -166,15 +166,18 @@
 > ~~~bash
 > __________________________________________________________________
 > $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/tmp/
-> $ kafka-topics --bootstrap-server localhost:9092 --list
+> $  kafka-topics --bootstrap-server localhost:9092 --delete --topic ^.*
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/tmp/
+> $  kafka-topics --bootstrap-server localhost:9092 --list
 > 
 > __________________________________________________________________
 > $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/tmp/
-> $ kafka-topics --bootstrap-server localhost:9092 --create --topic topic01 --partitions 1 --replication-factor 1 #单节点只能有一个分区一个replica
+> $ kafka-topics --bootstrap-server localhost:9092 --create --topic topic01 --partitions 1 --replication-factor 1
 > Created topic topic01.
 > __________________________________________________________________
 > $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/tmp/
-> $ kafka-topics --bootstrap-server localhost:9092 --list
+> $  kafka-topics --bootstrap-server localhost:9092 --list
 > topic01
 > ~~~
 >
