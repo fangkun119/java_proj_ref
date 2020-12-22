@@ -1016,38 +1016,36 @@
 
 > 如果没有bug（如递归相关），可以增加`-Xss`设定
 
-### 4.6 监控JVM
+### 4.5 监控JVM
 
 > `jstat`， `jvisualvm`， `jprofiler`，`arthas`，`top` ……
 
-## 5 代码优化
-
-> 代码1：
->
-> ~~~java
-> for (int i = 0; i < 100; ++i) {
->   Object o = new Object();
->   // ...
-> }
-> ~~~
->
-> 代码2：
->
-> ~~~java
-> Object o = null;
-> for (int i = 0; i < 100; ++i) {
->   o = new Object();
->   // ...
-> }
-> ~~~
->
-> 相比代码1，代码2给JVM带来的负担更小，更加优化
-
-
-
 ## 其他
 
-### 安装`htop`
+### (1) 代码优化
+
+代码1：
+
+~~~java
+for (int i = 0; i < 100; ++i) {
+Object o = new Object();
+// ...
+}
+~~~
+
+代码2：
+
+~~~java
+Object o = null;
+for (int i = 0; i < 100; ++i) {
+o = new Object();
+// ...
+}
+~~~
+
+相比代码1，代码2给JVM带来的负担更小，更加优化
+
+### (2) 安装`htop`
 
 > Mac上的`top`命令的功能限制比较多、可是安装`htop`来实现查看线程等功能，但是Mac上的java程序运行与Linux差别还是很大，因此还是在Linux上进行JVM分析，最接近生产环境
 
