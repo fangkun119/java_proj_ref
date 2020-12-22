@@ -21,7 +21,7 @@ public class KafkaListenerHandler {
     public void handleTopic02(List<Foo2> foos) throws IOException {
         LOGGER.info("Received: " + foos);
         foos.forEach(f -> kafkaTemplate.send("topic03", f.getFoo().toUpperCase()));
-        LOGGER.info("Messages sent, hit Enter to commit tx");
+        LOGGER.info("Messages forwarded to topic03, hit Enter to continue");
         System.in.read();
     }
 
