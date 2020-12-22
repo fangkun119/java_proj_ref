@@ -26,6 +26,8 @@ import org.springframework.kafka.support.converter.BatchMessagingMessageConverte
 import org.springframework.kafka.support.converter.RecordMessageConverter;
 import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * Sample showing a batch listener and transactions.
  *
@@ -35,9 +37,11 @@ import org.springframework.kafka.support.converter.StringJsonMessageConverter;
  */
 @SpringBootApplication(scanBasePackages = "com.javaprojref.spring_kafka.transaction_demo")
 public class Application {
+	public final static CountDownLatch APP_CLOSE_LATCH = new CountDownLatch(1);
+
 	public static void main(String[] args) throws InterruptedException {
 		ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
-		KafkaConfig.APP_CLOSE_LATCH.await();
+		Application.APP_CLOSE_LATCH.await();
 		Thread.sleep(5_000);
 		context.close();
 	}

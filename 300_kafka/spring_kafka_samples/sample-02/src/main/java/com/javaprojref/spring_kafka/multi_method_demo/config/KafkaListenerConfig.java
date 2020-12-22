@@ -27,10 +27,10 @@ import com.javaprojref.spring_kafka.multi_method_demo.domain.consumer.Foo2;
 // https://docs.spring.io/spring-kafka/docs/2.5.10.RELEASE/reference/html/#kafka-listener-annotation
 @Component
 @KafkaListener(id = "multiGroup", topics = { "foos", "bars" })
-public class MultiMethodsListener {
-	// 消费者，为不同类型的输入调用不同的方法
+public class KafkaListenerConfig {
 	@KafkaHandler
 	public void foo(Foo2 foo) {
+		// 业务逻辑变复杂时可进步一拆分到service层，参考项目：sample-03
 		System.out.println("Received: " + foo);
 	}
 

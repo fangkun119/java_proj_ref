@@ -2,30 +2,25 @@ package com.javaprojref.spring_kafka.transaction_demo.config;
 
 import com.javaprojref.spring_kafka.transaction_demo.Application;
 import com.javaprojref.spring_kafka.transaction_demo.domain.consumer.Foo2;
+import com.javaprojref.spring_kafka.transaction_demo.service.kafka_listener.ListenerHandler;
 import org.apache.kafka.clients.admin.NewTopic;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.converter.BatchMessagingMessageConverter;
 import org.springframework.kafka.support.converter.RecordMessageConverter;
 import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 @Configuration
 public class KafkaConfig {
-    // 辅助对象
-    public final static CountDownLatch APP_CLOSE_LATCH = new CountDownLatch(1);
-    private final Logger LOGGER = LoggerFactory.getLogger(Application.class);
+    // 来自service层的业务逻辑
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    ListenerHandler listenerHandler;
 
     // 调用KafkaAdmin创建Topic并将Topic注入到Application Context中
     // 参考：https://docs.spring.io/spring-kafka/docs/2.5.10.RELEASE/reference/html/#configuring-topics
@@ -43,16 +38,13 @@ public class KafkaConfig {
     // https://docs.spring.io/spring-kafka/docs/2.5.10.RELEASE/reference/html/#kafka-listener-annotation
     @KafkaListener(id = "topic02Listener", topics = "topic02")
     public void listen02(List<Foo2> foos) throws IOException {
-        LOGGER.info("Received: " + foos);
-        foos.forEach(f -> kafkaTemplate.send("topic03", f.getFoo().toUpperCase()));
-        LOGGER.info("Messages sent, hit Enter to commit tx");
-        System.in.read();
+        listenerHandler.handleTopic02(foos);
     }
 
     @KafkaListener(id = "topic03listener", topics = "topic03")
-    public void listen03(List<String> in) {
-        LOGGER.info("Received: " + in);
-        APP_CLOSE_LATCH.countDown(); //触发主线程退出
+    public void listen03(List<String> strList) {
+        listenerHandler.handleTopic03(strList);
+        Application.APP_CLOSE_LATCH.countDown(); //触发主线程退出
     }
 
     // Consumer的反序列化配置，参考
