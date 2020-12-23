@@ -161,6 +161,7 @@ Spring Batch的特性（3.0.6）
 只需在`@SpringBootApplication`注解中加上`exclude = {DataSourceAutoConfiguration.class })`，就可以忽略`application.properties`中的配置、开启`memory based repository`
 
 > ```java
+> @EnableBatchProcessing
 > @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
 > public class SpringBatchApplication {
 >     public static void main(String[] args) {
@@ -199,29 +200,7 @@ Spring Batch的特性（3.0.6）
 
 > https://resources.oreilly.com/examples/0636920044673/tree/master/Learning%20Spring%20Batch%20-%20Working%20Files/Chapter%203/transitions
 
-#### 3.1.2 主要代码
-
-> ```java
-> @Bean
-> public Job transitionJobSimpleNext() {
->   	// start()：	表示起始step
->     // from() -> on() -> to()：相当于有向图中的一个箭头
->   	//		from()：	用来指定on()的基于哪个step的执行结果来做判断
->   	//		on()：		用来指定基于那种执行结果
->   	//		to()：		用来指定当前状态下下一步的操作
->   	// end(), stop(), fail()：停止状态
->   	//		end()：	表示job instance执行成功、该instance将不能再次执行
->   	//		fail()：	表示job instance执行失败并停止
->   	//		stop()：	表示触发了预设的程序停止的条件，同时如果使用stepAndRestart()还可以指定之后重启这个job instance时、从哪一步开始运行
->     return jobBuilderFactory.get("transitionJobNext")
->             .start(step1()).on("COMPLETED").to(step2())	// 从step1开始，step1成功
->             .from(step2()).on("COMPLETED").stopAndRestart(step3()) // 强制在step2和step3之间加入一个job instaance stop，例如可以在两个step之间执行人工操作
->             .from(step3()).end() //step3执行成功则认为job instance执行成功
->             .build();
-> }
-> ```
-
-#### 3.1.3 其他配置示例
+#### 3.1.2 简单串行step配置
 
 > ~~~java
 > @Bean
@@ -252,11 +231,137 @@ Spring Batch的特性（3.0.6）
 > >> This is step 3
 > ~~~
 
+#### 3.1.2 有向图step依赖配置
+
+> ```java
+> @Bean
+> public Job transitionJobSimpleNext() {
+>   	// start()：	表示起始step
+>     // from() -> on() -> to()：相当于有向图中的一个箭头
+>   	//		from()：	用来指定on()的基于哪个step的执行结果来做判断
+>   	//		on()：		用来指定基于那种执行结果
+>   	//		to()：		用来指定当前状态下下一步的操作
+>   	// end(), stop(), fail()：停止状态
+>   	//		end()：	表示job instance执行成功、该instance将不能再次执行
+>   	//		fail()：	表示job instance执行失败并停止
+>   	//		stop()：	表示触发了预设的程序停止的条件，同时如果使用stepAndRestart()还可以指定之后重启这个job instance时、从哪一步开始运行
+>     return jobBuilderFactory.get("transitionJobNext")
+>             .start(step1()).on("COMPLETED").to(step2())	// 从step1开始，step1成功
+>             .from(step2()).on("COMPLETED").stopAndRestart(step3()) // 强制在step2和step3之间加入一个job instaance stop，例如可以在两个step之间执行人工操作
+>             .from(step3()).end() //step3执行成功则认为job instance执行成功
+>             .build();
+> }
+> ```
+
 备注：使用`Spring Boot 2.4.1`（`Spring Batch 4.2.5`）参考2.4小节
 
 ### 3.2 Flows
 
+> 一组`Step`之间的步骤依赖形成的有向图可以抽象为一个`Flow`，有了这层依赖，就可以
+>
+> * 对`Flow`进行组合、产生更加复杂的`Flow`并配置在`Job`中
+> * 对`Flow`进行复用、降低代码复杂度
 
+### 3.2.1 Demo
+
+> https://resources.oreilly.com/examples/0636920044673/tree/master/Learning%20Spring%20Batch%20-%20Working%20Files/Chapter%203/flow
+
+### 3.2.2 另一个例子（在Demo基础上修改得到）
+
+配置2个Flow，给更复杂的外层Flow或Job复用
+
+> ```java
+> @Configuration
+> public class SharedFlowsConfiguration {
+>     @Autowired
+>     public StepBuilderFactory stepBuilderFactory;
+> 
+>     @Bean
+>     public Step innerStep1() {
+>         return stepBuilderFactory.get("innerStep1")
+>                 .tasklet((contribution, chunkContext) -> {
+>                     System.out.println("inner step 1");
+>                     return RepeatStatus.FINISHED;
+>                 }).build();
+>     }
+> 
+>     @Bean
+>     public Step innerStep2() {
+>         return stepBuilderFactory.get("innerStep2")
+>                 .tasklet((contribution, chunkContext) -> {
+>                     System.out.println("inner step 2");
+>                     return RepeatStatus.FINISHED;
+>                 }).build();
+>     }
+> 
+>     @Bean
+>     public Flow flowA() {
+>         FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("flowA");
+>         flowBuilder.start(innerStep1())
+>                 .next(innerStep2())
+>                 .end();
+>         return flowBuilder.build();
+>     }
+> 
+>     @Bean
+>     public Flow flowB() {
+>         FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("flowB");
+>         flowBuilder.start(innerStep1())
+>                 .next(innerStep2())
+>                 .end();
+>         return flowBuilder.build();
+>     }
+> }
+> ```
+
+外层代码可以把Flow和外层的Step组合在Job中
+
+> 例如
+>
+> ```java
+> @Bean
+> public Job flowAFirstJob(@Qualifier("flowA") Flow flowA) {
+>     return jobBuilderFactory.get("flowAFirstJob")
+>             .start(flowA)
+>             .next(outStep1())
+>             .next(outStep2())
+>             .end()
+>             .build();
+> }
+> ```
+>
+> 或者
+>
+> ```java
+> @Bean
+> public Job flowBLastJob(@Qualifier("flowB") Flow flowB) {
+>     return jobBuilderFactory.get("flowBLastJob")
+>             .start(outStep1())
+>             .next(outStep2())
+>             .on("COMPLETED").to(flowB)
+>             .end()
+>             .build();
+> }
+> ```
+
+也可以把这两个Flow组合成一个更复杂的Flow
+
+> ```java
+> @Bean
+> public Job parallelFlowsJob(@Qualifier("flowA") Flow flowA, @Qualifier("flowB") Flow flowB) {
+>     FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("parallelFlow");
+>     Flow parallelFlow = flowBuilder.split(new SimpleAsyncTaskExecutor())
+>             .add(flowA, flowB)
+>             .end();
+> 
+>     return jobBuilderFactory.get("splitJob")
+>             .start(outStep1())
+>             .next(outStep2())
+>             .on("COMPLETED").to(parallelFlow)
+>             .end()
+>             .build();
+> }
+> ```
 
 ### 3.3 Splits
 
