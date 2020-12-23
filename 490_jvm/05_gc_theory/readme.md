@@ -1,10 +1,12 @@
-# JVM调优理论知识：GC Collector三色标记
+# JVM调优理论知识和GC算法概要
+
+> 概括GC算法相关的内容，为JVM调优准备知识，更详细的GC算法介绍参考[../08_gc_algorithm/readme.md](../08_gc_algorithm/readme.md)
 
 ## 1 JVM如何找到垃圾对象
 
 <b>引用计数</b>为0的是垃圾对象；但引用计数不能解决循环引用问题，还需要<b>`Root  Searching`</b>，把那些不能从`root instances`抵达的对象也标记为垃圾对象
 
-> 	![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_root_searching.jpg)
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_root_searching.jpg)
 
 ## 2 GC算法
 
@@ -146,14 +148,14 @@ TLAB：`Thread Local Allocation Buffer`
 
 ### 4.3 CMS（`ConcurrentMarkSweep`)垃圾回收器
 
-列出`CMS`的四阶段回收过程、同时也有助于理解并发回收器
+列出四阶段的[CMS垃圾回收过程](https://www.cnblogs.com/zhangxiaoguang/p/5792468.html)、同时也有助于理解并发回收器
 
 > ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_gc_cms.jpg)
 > 
-> * 初始标记：标记根对象`root object`
-> * 并发标记：标记要回收的对象，该阶段耗时最高，因此与应用程序同时运行
-> * 重新标记：是一个`stop-the-world`，标记阶段2过程中重新产生的垃圾（因为垃圾数量少、STW的时间短）
-> * 并发清理：回收对象，与应用程序同时运行
+> * 初始标记：标记根对象`root object`（会**STW**，但时间非常短，因为根对象数量少）
+> * 并发标记：遍历整个老年代并且标记所有存活的对象，该阶段耗时最高，因此与应用程序同时运行
+> * 重新标记：标记老年代全部的存活对象，包括那些在并发标记阶段更改的或者新创建的引用对象（会**STW**，但是时间非常短，因为只是执行阶段2时新产生的垃圾，数量少）
+> * 并发清理：回收对象，与应用程序同时运行（其实在并发清理之前，还有两个准备阶段：Concurrent Preclean和Concurrent Abortable Preclean，因此有时也用六阶段来描述）
 
 CMS产生于小内存的时代，现在的主机内存量大，使用CMS有如下问题
 
