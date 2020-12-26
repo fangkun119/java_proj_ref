@@ -284,8 +284,6 @@ Flow的配置形式如下：
 >
 > 原Demo代码：`Learning Spring Batch - Working Files/Chapter 2/decisions`
 
-下面是对Demo的一些修改，主要是增加了`tasklet`的`bean`作用域，以及尝试在`next()`和`to()`之后使用`flow()`
-
 (1) 使用`split`让几个flow并发执行
 
 > 方法1：定义一个并行Flow，传给方法`start()`或者`to()`，如上一个demo
@@ -329,8 +327,11 @@ Flow的配置形式如下：
 >         return RepeatStatus.FINISHED;
 >     }
 > }
+> 
+> // 如果不设置StepScope，这个bean会是单例的
+> // 意味着全局共享同一个DemoTasklet对象，包括并发运行的两个Flow
 > @Bean
-> @Scope("prototype")  // 如果不设置"prototype"，那么这个bean是单例的，意味着CountingTasklet中任何成员变量都会被多线程同时访问
+> @StepScope 
 > public Tasklet tasklet() {
 >     return new DemoTasklet();
 > }
@@ -353,6 +354,27 @@ Flow的配置形式如下：
 >             .build();
 > }
 > ```
+>
+> 输出
+>
+> ~~~bash
+> INFO 63261 --- [  restartedMain] o.s.b.c.l.support.SimpleJobLauncher      : Job: [FlowJob: [name=job]] launched with the following parameters: [{}]
+> INFO 63261 --- [cTaskExecutor-1] o.s.batch.core.job.SimpleStepHandler     : Executing step: [step2]
+> INFO 63261 --- [cTaskExecutor-2] o.s.batch.core.job.SimpleStepHandler     : Executing step: [step1]
+> step2 has been executed on thread SimpleAsyncTaskExecutor-1
+> Tasklet hashcode: 181894191
+> step1 has been executed on thread SimpleAsyncTaskExecutor-2
+> Tasklet hashcode: 596123146
+> INFO 63261 --- [cTaskExecutor-2] o.s.batch.core.step.AbstractStep         : Step: [step1] executed in 34ms
+> INFO 63261 --- [cTaskExecutor-1] o.s.batch.core.step.AbstractStep         : Step: [step2] executed in 34ms
+> INFO 63261 --- [cTaskExecutor-1] o.s.batch.core.job.SimpleStepHandler     : Executing step: [step3]
+> step3 has been executed on thread SimpleAsyncTaskExecutor-1
+> Tasklet hashcode: 101957954
+> INFO 63261 --- [cTaskExecutor-1] o.s.batch.core.step.AbstractStep         : Step: [step3] executed in 16ms
+> INFO 63261 --- [  restartedMain] o.s.b.c.l.support.SimpleJobLauncher      : Job: [FlowJob: [name=job]] completed with the following parameters: [{}] and the following status: [COMPLETED] in 117ms
+> 
+> Process finished with exit code 0
+> ~~~
 
 ### 3.4 Decisions：在任务依赖中加入判断节点
 
@@ -360,29 +382,29 @@ Flow的配置形式如下：
 
 > 相当于在任务依赖的有向图中，加入一个判断节点；可以让某个step结束后执行该判断逻辑；也可以在判断逻辑中根据判断结果执行不同的step
 
-原Demo代码：`Learning Spring Batch - Working Files/Chapter 3/decision/`
+原Demo代码：`Learning Spring Batch - Working Files/Chapter 3/decisions/`
 
 定义判断节点
 
 > ```java
 > // 定义decider，它会放在一个Singleton Bean中
-> public static class OddDecider implements JobExecutionDecider {
->     private int count = 0;
+> public static class StepABDecider implements JobExecutionDecider {
 >     @Override
 >     public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
->         // 如果需要基于前一个Step的执行状态来做判断，可以使用stepExecution，例如stepExecution.getExitStatus()
->         count++;
->         if(count % 2 == 0) {
->             return new FlowExecutionStatus("EVEN");
->         } else {
->             return new FlowExecutionStatus("ODD");
+>         // 如果需要基于前一个Step的执行状态来做判断，可以使用stepExecution.getExitStatus()
+> 				switch (getXYZStatus()) {
+>         		case XYZStatus.X:
+>           	case XYZStatus.Y:   
+>             		return new FlowExecutionStatus("GO_STEP_A");
+>           	case XYZStatus.Z:
+>           	default:
+>             		return new FlowExecutionStatus("GO_STEP_B");          
 >         }
 >     }
 > }
-> 
 > @Bean
-> public JobExecutionDecider decider() {
->     return new OddDecider();
+> public JobExecutionDecider stepABDecider() {
+>     return new StepABDecider();
 > }
 > ```
 
@@ -392,11 +414,14 @@ Flow的配置形式如下：
 > @Bean
 > public Job job() {
 > 		return jobBuilderFactory.get("job")
-> 				.start(startStep())
-> 				.next(decider())														// `起始节点`执行成功之后进入`判断节点`、执行一次`decide()`方法
-> 				.from(decider()).on("ODD").to(oddStep())		// `判断节点`返回"ODD"时执行`oddStep`
-> 				.from(decider()).on("EVEN").to(evenStep())	// `判断节点`返回"EVEN"时执行`evenStep`
-> 				.from(oddStep()).on("*").to(decider())			// `oddStep`执行完毕不论结果如何，都跳转到判断节点，再执行一次`decide()`方法
+>       	// "起始节点"执行成功后进入"判断节点"，调用一次"decide()"
+> 				.start(startStep()).next(stepABDecider()) 				
+>       	// "判断节点"返回"GO_STEP_A"时执行"stepA()"
+> 				.from(stepABDecider()).on("GO_STEP_A").to(stepA())		
+>       	// "判断节点"返回"GO_STEP_B"时执行"stepB()"
+> 				.from(stepABDecider()).on("GO_STEP_B").to(stepB())
+>       	// 对于"stepA()"，不论执行结果如何，都跳转到"判断节点"进行判断
+> 				.from(stepA()).on("*").to(stepABDecider())
 > 				.end()
 > 				.build();
 > }
@@ -404,27 +429,488 @@ Flow的配置形式如下：
 
 ### 3.5 Nested Jobs
 
+介绍：让一个Job（Parent Job）在执行的过程总调用另一个Job（Child Job）
 
+原始Demo：`Learning Spring Batch - Working Files/Chapter 3/nestedJobs`
+
+嵌套Job的定义方法如下：
+
+> (1) 配置`Parent Job`
+>
+> ```java
+> // 注入在其他使用`@Configuration`注解类中定义的`Child Job`
+> @Autowired
+> private Job childJob;
+> 
+> // 新注JobLauncher，用来运行这个`Child Job`
+> @Autowired
+> private JobLauncher jobLauncher;
+> 
+> // 定义Parent Job
+> @Bean
+> public Job parentJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+>     // 把childJob包装在一个step中，这样它可以与普通的step和flow组合
+>     Step childJobStep = new JobStepBuilder(new StepBuilder("childJobStep"))
+> 						.job(childJob)
+>       			// 在child job的层级、需要显示地指定、不能自动注入
+> 						.launcher(jobLauncher).repository(jobRepository).transactionManager(transactionManager)
+>             .build();
+>     // 定义Parent Job，其中的step1只是parent job中的一个普通step
+>     return jobBuilderFactory.get("parentJob")
+>             .start(step1())
+>             .next(childJobStep)
+>             .build();
+> }
+> ```
+>
+> (2) `配置Child Job`：与之前Demo中的Job配置方法相同，其中`jobBuilderFactory.get("childJob")`将job name指定为`childJob`
+>
+> (3) 指定batch运行时启动哪个job：这时配置了两个、Job Bean，因此应当在`application.properties`中显示地指定使用哪个作为启动job
+>
+> ~~~properties
+> spring.batch.initialize-schema=always
+> spring.datasource.url=jdbc:mysql://localhost:3306/spring_batch_demo?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+> spring.datasource.username=root
+> spring.datasource.password=12345678
+> 
+> spring.batch.job.names=parentJob  
+> # spring.batch.job.names=childJob 
+> ~~~
+>
+> (4) 使用jdbc job repository，运行job之后，在`BATCH_JOB_EXECUTION`表中可以看到两条job记录
 
 ### 3.6 Listeners
 
+用途：Job Insance生命周期的各个时间节点执行预设的回调函数
 
+方法1：实现接口
+
+> Spring Batch提供了如下的Listener（接口定义在`org.springframework.batch.core`包中）
+>
+> * JobExecutionListener
+> * StepExecutionListener
+> * ChunkListener
+> * ItemReadListener
+> * ItemProcessListener
+> * ItemWriteListener
+>
+> 查看接口中的函数名，可以看到每个函数对应于job instance生命周期的哪个时间节点
+
+方法2：把注解加在POJO的方法上
+
+> 这些注解定义在`org.springframework.batch.core.annotation`包中，包括
+>
+> `@AfterChunk`，`@AfterChunkError`，`@AfterJob`，`@AfterProcess`，`@AfterRead`，`@AfterStep`，`@AfterWrtie`，`@BeforeChunk`，`@BeforeJob`，`@BeforeProcess`，`@BeforeWrite`，`@OnProcessError`，`@OnReadError`，`@OnSkipInProcess`，`@OnSkipInRead`，`@OnSkipInWrite`，`@OnWriteError`
+
+原始Demo：`Learning Spring Batch - Working Files/Chapter 3/listeners`（使用方法2）
+
+实现例子（使用方法1）
+
+(1) 定义和使用`ChunkListener`、`StepListener`
+
+> 定义ChunkListener
+>
+> ```java
+> public class MyChunkListener implements org.springframework.batch.core.ChunkListener {
+>     @Override
+>     public void beforeChunk(ChunkContext context) {
+>         System.out.println("MyChunkListener.beforeChunk is running");
+>     }
+> 
+>     @Override
+>     public void afterChunk(ChunkContext context) {
+>         System.out.println("MyChunkListener.afterChunk is running");
+>     }
+> 
+>     @Override
+>     public void afterChunkError(ChunkContext context) {
+>         System.out.println("MyChunkListener.afterChunkError is running");
+>     }
+> }
+> ```
+>
+> 定义StepListener
+>
+> ```java
+> public class MyStepListener implements org.springframework.batch.core.StepExecutionListener {
+>     @Override
+>     public void beforeStep(StepExecution stepExecution) {
+>         System.out.println("MyStepListener.beforeStep is running");
+>     }
+> 
+>     @Override
+>     public ExitStatus afterStep(StepExecution stepExecution) {
+>         System.out.println("MyStepListener.afterStep is running");
+>         return stepExecution.getExitStatus();
+>     }
+> }
+> ```
+>
+> 使用ChunkListener和StepListener
+>
+> ```java
+> @Bean
+> public Step step1() {
+>     return stepBuilderFactory.get("step1")
+>             .<String, String>chunk(2) // 每2条记录作为一个chunk，输入输出类型都是String
+>             .reader(reader()) 								// 设置reader
+>             .writer(writer()) 								// 设置writer
+>             .listener(new MyStepListener())  	// 设置step listener
+>             .listener(new MyChunkListener()) 	// 设置chunk listener
+>             .build();
+> }
+> ```
+
+(2) 定义和使用Job Listener
+
+> 定义Job Listener
+>
+> ```java
+> public class MyJobListener implements JobExecutionListener {
+>     @Override
+>     public void beforeJob(JobExecution jobExecution) {
+>         String jobName = jobExecution.getJobInstance().getJobName();
+>         System.out.println("jobListener.beforeJob is running");
+>     }
+> 
+>     @Override
+>     public void afterJob(JobExecution jobExecution) {
+>         System.out.println("JobListener.afterJob is running");
+>     }
+> }
+> ```
+>
+> 使用Job Listener
+>
+> ```java
+> @Bean
+> public Job listenerJob() {
+>     return jobBuilderFactory.get("listenerJob")
+>             .start(step1())
+>             .listener(new MyJobListener())
+>             .build();
+> }
+> ```
+
+(3) 程序日志
+
+> ~~~bash
+> INFO 63492 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=listenerJob]] launched with the following parameters: [{}]
+> obListener.beforeJob is running
+> INFO 63492 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [step1]
+> MyStepListener.beforeStep is running
+> MyChunkListener.beforeChunk is running
+> Writing item one
+> Writing item two
+> MyChunkListener.afterChunk is running
+> MyChunkListener.beforeChunk is running
+> Writing item three
+> MyChunkListener.afterChunk is running
+> MyStepListener.afterStep is running
+> INFO 63492 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [step1] executed in 35ms
+> JobListener.afterJob is running
+> INFO 63492 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=listenerJob]] completed with the following parameters: [{}] and the following status: [COMPLETED] in 57ms
+> ~~~
+
+另有的两块内容可以参考原始Demo
+
+> * 在定义Job时、可以注入JavaMailSender，这样Job Listener可以在Job的不同阶段发送邮件
+> * 可以用内存数据创建ItemReader和ItemWriter，来进行测试
 
 ### 3.8 Job Parameters
 
+介绍：向Batch Job传递参数
 
+原始Demo：`Learning Spring Batch - Working Files/Chapter 3/jobParameters`
+
+配置方法
+
+> 代码
+>
+> ```java
+> @Bean
+> @StepScope // Bean的生命周期是`StepScope`：就是说每个Step内，Bean对象时唯一的；在不同的Step中，Bean对象是不同的
+> public Tasklet helloWorldTasklet(
+>         // "#{jobParameters['message']}": SEPL Expression
+>         @Value("#{jobParameters['message']}") String message
+> ) {
+>     return (stepContribution, chunkContext) -> {
+>         System.out.println(this.hashCode() + ": " + message);
+>         return RepeatStatus.FINISHED;
+>     };
+> }
+> 
+> @Bean
+> public Step step1() {
+>     return stepBuilderFactory.get("step1")
+>             // 参数设为null，
+>             // 是因为Spring并不会在定义tasklet的时候传参、而是在运行时进行注入
+>             // 这里的null仅仅是占位用
+>             .tasklet(helloWorldTasklet(null))
+>             .build();
+> }
+> ```
+>
+> 运行（使用jdbc job repository），可以通过JVM命令行参数将传入（IDE使用run configuration传入）
+>
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/004_spring_batch/private/demos/g03_job_parameters/target/
+> $ java -jar g03_job_parameters-0.0.1-SNAPSHOT.jar message="hello"
+> ...
+> INFO 63222 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [step1]
+> 1839168128: hello
+> ...
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/004_spring_batch/private/demos/g03_job_parameters/target/
+> $ java -jar g03_job_parameters-0.0.1-SNAPSHOT.jar message="hello"
+> ERROR 63223 --- [           main] o.s.boot.SpringApplication               : Application run failed
+> ...
+> Caused by: org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException: A job instance already exists and is complete for parameters={message=hello}.  If you want to run this job again, change the parameters
+> ...
+> ~~~
+>
+> 其中Job Instance是根据Job Name和Job参数来唯一确定，因此相同的参数，运行第二次时，会抛异常，报告该Job Instance已经运行过一次
 
 ## 4 Input
 
+### 4.1 ItemReader Interface
 
+功能：通过实现`ItemReader<RecordType>`接口来定义一个bean
+
+> 编写一个实现了`ItemReader<RecordType>`接口类之后，就可以使用这个类的对象定义一个bean
+>
+> 该接口实现`RecordType read()`方法，每次调用返回一条记录
+
+`ItemREader<RecordType>`接口
+
+> ```java
+> public interface ItemReader<T> {
+>     @Nullable
+>     T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException;
+> }
+> ```
+>
+> 它会被Spring Batch框架反复调用，直到返回null
+>
+> 返回null意味着通知框架，所有的input都已经读取完毕
+
+原始Demo：`Learning Spring Batch - Working Files / Chapter 4 / inputInterfaces`
+
+例子：
+
+> 例如下面的`public class MyReader implements ItemReader<String>`它实现了接口要求的`public String read()`方法，然后进一步组装到`Step bean` 中
+>
+> ```java
+> @Bean
+> public MyReader myReader() {
+>   	//构造时传入字符串，每次调用read都返回其中一个，全部都返回之后返回null告诉框架读取完毕
+>   	//注意，如果MyReader如果不会return null，那么batch job就不会停止，它会无限运行下去
+> 		return new MyReader(Arrays.asList("Foo", "Bar", "Baz"));
+> }
+> 
+> @Bean
+> public Step step1() {
+> 		return stepBuilderFactory.get("step1")
+>          .<String, String>chunk(2) // 每2条记录作为1个chunk
+>          .reader(myReader())
+>          .writer(list -> {
+>             for (String curItem : list) {
+>                System.out.println("curItem = " + curItem);
+>             }
+>          }).build();
+> }
+> ```
+>
+> 备注：传给`write()`方法的`lambda表达式`它生成了一个类，该类实现了`ItemWriter<String>`接口
+>
+> ```java
+> public interface ItemWriter<T> {
+>     void write(List<? extends T> var1) throws Exception;
+> }
+> ```
+
+### 4.2 Reading From Database
+
+功能：使用JDBC访问数据库，作为Step的Reader，演示两种Reader：`JdbcCursorItemReader`和`JdbcPagingItemReader`
+
+原始Demo：`Learning Spring Batch - Working Files / Chapter 4 / databaseInput`
+
+(1) `JdbcCursorItemReader`
+
+> ```java
+> @Bean
+> public ItemReader<Customer> cursorItemReader() {
+>     JdbcCursorItemReader<Customer> reader = new JdbcCursorItemReader<>();
+>     reader.setSql("select id, firstName, lastName, birthdate from customer order by lastName, firstName");
+>     reader.setDataSource(this.dataSource);
+>     reader.setRowMapper(new CustomerRowMapper()); //Mapping each DB Item to POJO
+>     return reader;
+> }
+> ```
+>
+> JdbcCursorItemReader：基于游标的ItemReader
+>
+> * 工作过程 ：(1) 打开游标（2）运行SQL（3）得到数据集合（4）遍历集合、每次返回游标所在位置的行
+> * 遍历状态：靠游标的位置来实现
+> * 非线程安全，如果被多线程访问，他们会操作同一个游标
+
+(2) `JdbcPagingItemREader`
+
+> ```java
+> @Bean
+> public ItemReader<Customer> pagingItemReader() {
+> 	 // sort
+>    Map<String, Order> sortKeys = new HashMap<>(1);
+>    sortKeys.put("id", Order.ASCENDING);
+> 
+>    // query provider：用来生成返回1 page的SQL
+>    MySqlPagingQueryProvider queryProvider = new MySqlPagingQueryProvider();
+>    queryProvider.setSelectClause("id, firstName, lastName, birthdate");
+>    queryProvider.setFromClause("from customer");
+>    // 用来排序，也用来记录当前遍历到哪条记录，因此传入key需要能够区分每一条数据(unique key)
+>    queryProvider.setSortKeys(sortKeys); 
+> 
+>    // reader
+>    JdbcPagingItemReader<Customer> reader = new JdbcPagingItemReader<>();
+>        reader.setDataSource(this.dataSource);
+>        reader.setFetchSize(10); //每页10条，通常配成与chunk size相同的大小
+>        reader.setRowMapper(new CustomerRowMapper());
+>    reader.setQueryProvider(queryProvider);
+>    return reader;
+> }
+> ```
+>
+> `JdbcPagingItemReader`：基于分页的ItemReader
+>
+> * 工作方式：根据JDBC的实现，每次生成 一个返回当前页的SQL，一页一页地返回数据；具体逻辑封装在传入的`QueryProvider`中  
+> * 遍历状态：根据当前返回的最后一条数据的key来实现，因此key能够区分每一条数据 ，而执行的SQL也是需要根据key来排序
+> * 多线程安全
+
+其他 ：
+
+> *  `CustomerRowMapper`实现 了`org.springframework.jdbc.core.RowMapper<Customer>`接口，它的`mapRow`方法从`ResultSet`中取出数据，生成 `Customer`（POJO）。一个`Customer`  对象对应于数据表中的一行
+> * 参考：https://my.oschina.net/chkui/blog/3072495
+
+### 4.3 reading Flat Files
+
+功能 ：读取xml文件的ItemReader
+
+原始Demo：`Learning Spring Batch - Working Files / Chapter 4 / readingXML`
+
+装配用于读取XML文件的`StaxEventItemReader`
+
+> ```java
+> @Bean
+> public StaxEventItemReader<Customer> customerItemReader() {
+>    // unmarshaller规则：<customer>...</customer>标签反序列化为Customer（是一个POJO）
+>    Map<String, Class> aliases = new HashMap<>();
+>    aliases.put("customer", Customer.class);
+> 
+>    // unmarshaller
+>    XStreamMarshaller unmarshaller = new XStreamMarshaller();
+>    unmarshaller.setAliases(aliases);
+> 
+>    // ItemReader
+>    StaxEventItemReader<Customer> reader = new StaxEventItemReader<>();
+>    reader.setResource(new ClassPathResource("/data/customers.xml"));
+>    reader.setFragmentRootElementName("customer");
+>    reader.setUnmarshaller(unmarshaller);
+> 
+>    return reader;
+> }
+> ```
+
+数据样本：`src/main/resources/data/customers.xml`
+
+> ```xml
+> <?xml version="1.0" encoding="UTF-8" ?>
+> <customers>
+>    <customer>
+>       <id>1</id>
+>       <firstName>Mufutau</firstName>
+>       <lastName>Maddox</lastName>
+>       <birthdate>2016-06-05 19:43:51PM</birthdate>
+>    </customer>
+>    <customer>
+>       <id>2</id>
+>       <firstName>Brenden</firstName>
+>       <lastName>Cobb</lastName>
+>       <birthdate>2016-01-06 13:18:17PM</birthdate>
+>    </customer>
+>    ...
+> </customers>
+> ```
+
+pom.xml修改：需要增加两个依赖
+
+> ```xml
+> <!-- https://mvnrepository.com/artifact/org.springframework/spring-oxm -->
+> <dependency>
+>    <groupId>org.springframework</groupId>
+>    <artifactId>spring-oxm</artifactId>
+>    <version>5.3.2</version>
+> </dependency>
+> 
+> <!-- https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream -->
+> <dependency>
+>    <groupId>com.thoughtworks.xstream</groupId>
+>    <artifactId>xstream</artifactId>
+>    <version>1.4.15</version>
+> </dependency>
+> ```
+
+### 4.4 Reading From Multiple Sources
+
+> 
+
+### 4.5 ItemReader State
+
+> 
+
+### 4.6 ItemStream Interface
+
+> 
 
 ## 5 Output
 
+### 5.1 Interface ItemWrite
 
+>
+
+### 5.2 Writing to Database
+
+>  
+
+### 5.3 Writing Flat Files
+
+>  
+
+### 5.4 Writing to XML Files
+
+> 
+
+### 5.5 Writing to Multiple Destinations
+
+> 
 
 ## 6 Processing
 
+### 6.1 Interface: ItemProcessor 
 
+> 
+
+### 6.2 Filtering Items
+
+> 
+
+### 6.3 Validating Items
+
+> 
+
+### 6.4 CompositeItemProcessors
+
+> 
 
 ## 7 Error Handling
 
