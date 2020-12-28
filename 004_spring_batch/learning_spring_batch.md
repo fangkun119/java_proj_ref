@@ -1464,19 +1464,226 @@ StaxEventItemWriter：
 
 ### 6.1 Interface: ItemProcessor 
 
-> 
+内容：用于对item数据做加工的processor
+
+原始Demo：`Learning Spring Batch - Working Files / Chapter 5 / itemProcessorInterface`
+
+步骤：
+
+(1) 组装processor bean
+
+> processor的业务逻辑：UpperCaseItemProcessor.java
+>
+> ```java
+> public class UpperCaseItemProcessor implements ItemProcessor<Customer, Customer> {
+>    @Override
+>    public Customer process(Customer item) throws Exception {
+>       // 对每一个Item，都会调用一次process方法
+>       return new Customer(item.getId(),
+>             item.getFirstName().toUpperCase(),
+>             item.getLastName().toUpperCase(),
+>             item.getBirthdate());
+>    }
+> }
+> ```
+>
+> 在@configuration类中装配processor bean：JobConfiguration.java
+>
+> ```java
+> @Bean
+> public UpperCaseItemProcessor itemProcessor() {
+>    return new UpperCaseItemProcessor();
+> }
+> ```
+
+(2) 注入到step中 
+
+> 在@configuration类中装配step bean
+>
+> ```java
+> @Bean
+> public Step step1() throws Exception {
+>    return stepBuilderFactory.get("step1")
+>          .<Customer, Customer>chunk(10)
+>          .reader(pagingItemReader())
+>          .processor(itemProcessor())
+>          .writer(customerItemWriter())
+>          .build();
+> }
+> ```
+
+查看效果
+
+> 输出：
+>
+> ~~~bash
+> INFO 2496 --- [           main] .j.s.g.ItemProcessorInterfaceApplication : No active profile set, falling back to default profiles: default
+> >> Output Path: /var/folders/nb/n2wl0lms2g57q00_t5qd2nsc0000gn/T/customerOutput12962825073639398888.xml
+> ~~~
+>
+> 查看文件：可以看到firstName和lastName的值 都已经被改成了大写 
+>
+> ~~~bash
+> $ cat /var/folders/nb/n2wl0lms2g57q00_t5qd2nsc0000gn/T/customerOutput12962825073639398888.xml
+> <?xml version="1.0" encoding="UTF-8"?><customers><customer><id>1</id><firstName>STONE</firstName><lastName>BARRETT</lastName><birthdate class="sql-date">1964-10-19</birthdate></customer><customer><id>2</id><firstName>RAYMOND</firstName><lastName>PACE</lastName>…………
+> ~~~
 
 ### 6.2 Filtering Items
 
-> 
+内容：用于过滤item的processor
+
+原始Demo：`Learning Spring Batch - Working Files / Chapter 5 / filteringItemProcessor`
+
+步骤：
+
+(1) 组装processor bean
+
+> 业务逻辑
+>
+> ```java
+> public class FilteringItemProcessor implements ItemProcessor<Customer, Customer> {
+>    @Override
+>    public Customer process(Customer item) throws Exception {
+>       if(item.getId() % 2 == 0) {
+>          return null; //返回null表示过滤
+>       } else {
+>          return item;
+>       }
+>    }
+> }
+> ```
+>
+> 装配成bean
+>
+> ```java
+> @Bean
+> public FilteringItemProcessor itemProcessor() {
+>    return new FilteringItemProcessor();
+> }
+> ```
+
+(2) 将itemProcessor装配到step中：与6.1小节相同  
+
+查看效果 
+
+> 日志：
+>
+> ~~~bash
+> INFO 2562 --- [           main] .j.s.g.FilteringItemProcessorApplication : No active profile set, falling back to default profiles: default
+> >> Output Path: /var/folders/nb/n2wl0lms2g57q00_t5qd2nsc0000gn/T/customerOutput14479604712625325353.out
+> ~~~
+>
+> 查看文件：id为偶数的都被过滤了
+>
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/004_spring_batch/private/demos/g04_multiple_flat_files/ 
+> $ cat  /var/folders/nb/n2wl0lms2g57q00_t5qd2nsc0000gn/T/customerOutput14479604712625325353.out | head 
+> {"id":1,"firstName":"Stone","lastName":"Barrett","birthdate":-164188800000}
+> {"id":3,"firstName":"Armando","lastName":"Logan","birthdate":535737600000}
+> {"id":5,"firstName":"Cassandra","lastName":"Moses","birthdate":-419760000000}
+> {"id":7,"firstName":"Upton","lastName":"Morrow","birthdate":97516800000}
+> {"id":9,"firstName":"Sybill","lastName":"Nolan","birthdate":-584611200000}
+> {"id":11,"firstName":"Ingrid","lastName":"Jackson","birthdate":-388915200000}
+> {"id":13,"firstName":"Xaviera","lastName":"Gillespie","birthdate":-140688000000}
+> {"id":15,"firstName":"Fatima","lastName":"Combs","birthdate":296928000000}
+> {"id":17,"firstName":"Felicia","lastName":"Vinson","birthdate":-316771200000}
+> {"id":19,"firstName":"Ramona","lastName":"Acosta","birthdate":-237542400000}
+> ~~~
 
 ### 6.3 Validating Items
 
+内容：对ItemReader读入的数据进行业务检查
+
+原始Demo：`Learning Spring Batch - Working Files / Chapter 5 / itemValidation`
+
+步骤：
+
+(1) 组装processor bean
+
+> 业务逻辑
+>
+> ```java
+> public class CustomerValidator implements Validator<Customer> {
+>    @Override
+>    public void validate(Customer value) throws ValidationException {
+>       if(value.getFirstName().startsWith("A")) {
+>          throw new ValidationException("First names that begin with A are invalid: " + value);
+>       }
+>    }
+> }
+> ```
+>
+> 装配成bean
+>
+> ```java
+> @Bean
+> public ValidatingItemProcessor<Customer> itemProcessor() {
+>    ValidatingItemProcessor<Customer> customerValidatingItemProcessor =
+>          new ValidatingItemProcessor<>(new CustomerValidator());
+>    customerValidatingItemProcessor.setFilter(true);
 > 
+>    return customerValidatingItemProcessor;
+> }
+> ```
+
+(2) 将itemProcessor装配到step中：与6.1小节相同  
 
 ### 6.4 CompositeItemProcessors
 
+内容：将多个processor组装在一起
+
+原始Demo：`Learning Spring Batch - Working Files / Chapter 5 / compositeItemProcessor`
+
+步骤：
+
+(1) `UpperCaseItemProcessor`的业务逻辑：同6.1小节
+
+(2) `FilteringItemProcessor`的业务逻辑：同6.2小节
+
+(3) 装配`CompositeItemProcessors`
+
+> ```java
+> @Bean
+> public CompositeItemProcessor<Customer, Customer> itemProcessor() throws Exception {
+>    CompositeItemProcessor<Customer, Customer> compositeItemProcessor = new CompositeItemProcessor<>();
+>    compositeItemProcessor.setDelegates(
+>          Arrays.<ItemProcessor<Customer, Customer>>asList(
+>                new FilteringItemProcessor(), new UpperCaseItemProcessor()));
+>    compositeItemProcessor.afterPropertiesSet();
 > 
+>    return compositeItemProcessor;
+> }
+> ```
+
+(3) 将itemProcessor装配到step中：与6.1小节相同  
+
+查看效果
+
+> 日志 
+>
+> ~~~bash
+> INFO 2655 --- [           main] .j.s.g.CompositeItemProcessorApplication : No active profile set, falling back to default profiles: default
+> >> Output Path: /var/folders/nb/n2wl0lms2g57q00_t5qd2nsc0000gn/T/customerOutput13477426665290581876.out
+> ~~~
+>
+> 查看文件 
+>
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/004_spring_batch/private/demos/g04_multiple_flat_files/ 
+> $ head -n10 /var/folders/nb/n2wl0lms2g57q00_t5qd2nsc0000gn/T/customerOutput13477426665290581876.out
+> {"id":1,"firstName":"STONE","lastName":"BARRETT","birthdate":-164188800000}
+> {"id":3,"firstName":"ARMANDO","lastName":"LOGAN","birthdate":535737600000}
+> {"id":5,"firstName":"CASSANDRA","lastName":"MOSES","birthdate":-419760000000}
+> {"id":7,"firstName":"UPTON","lastName":"MORROW","birthdate":97516800000}
+> {"id":9,"firstName":"SYBILL","lastName":"NOLAN","birthdate":-584611200000}
+> {"id":11,"firstName":"INGRID","lastName":"JACKSON","birthdate":-388915200000}
+> {"id":13,"firstName":"XAVIERA","lastName":"GILLESPIE","birthdate":-140688000000}
+> {"id":15,"firstName":"FATIMA","lastName":"COMBS","birthdate":296928000000}
+> {"id":17,"firstName":"FELICIA","lastName":"VINSON","birthdate":-316771200000}
+> {"id":19,"firstName":"RAMONA","lastName":"ACOSTA","birthdate":-237542400000}
+> ~~~
 
 ## 7 Error Handling
 
