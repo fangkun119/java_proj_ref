@@ -175,18 +175,18 @@ Spring Batch的设计目标
 > @Bean
 > public Job transitionJobSimpleNext() {
 > 		//next(): transition to next step on successful completion of the current step. All other outcomes are treated as failures
->     return jobBuilderFactory.get("transitionJobNext")
->             .start(step1()) 
->             .next(step2()) 
->             .next(step3()) 
->             .build();			
->   	// 等价于
-> 		// return jobBuilderFactory.get("transitionJobNext")
->     //      .start(step1()).on("COMPLETED").to(step2())
->   	//			// 理解为有向图中的一条边，表示从<step2,COMPLETED>到<step3>的依赖关系
->     //      .from(step2()).on("COMPLETED").to(step3()) 
->     //      .from(step3()).on("COMPLETED").end()
->     //      .build();
+>        return jobBuilderFactory.get("transitionJobNext")
+>            .start(step1()) 
+>            .next(step2()) 
+>            .next(step3()) 
+>            .build();			
+>           // 等价于
+>         // return jobBuilderFactory.get("transitionJobNext")
+>            //      .start(step1()).on("COMPLETED").to(step2())
+>           //      // 理解为有向图中的一条边，表示从<step2,COMPLETED>到<step3>的依赖关系
+>            //      .from(step2()).on("COMPLETED").to(step3()) 
+>            //      .from(step3()).on("COMPLETED").end()
+>            //      .build();
 > }
 > ~~~
 
@@ -195,20 +195,20 @@ Spring Batch的设计目标
 > ```java
 > @Bean
 > public Job transitionJobSimpleNext() {
->     // from(),on(),to()：增加一条任务依赖，相当于向任务依赖有向图（DAG）中添加一条有向边
->   	//		from()	：用来指定基于哪个step的执行结果
->   	//		on()		：用来指定基于这个step的哪种执行结果
->   	//		to()		：用来指定满足from(),on()条件时，接下来执行哪个step
->   	// 整条有向边的起点是`(from(),on())`二元组所表示的状态，终点是`to()`
->     return jobBuilderFactory.get("transitionJobNext")
->       			// 从step1开始，step1成功后执行step2
->             .start(step1()).on("COMPLETED").to(step2())
->       			// 在step2、3之间加入instance stop
->       			// 程序会在step2成功后退出，下次执行从step3开始继续（需要jdbc job repository）
->       			// 使用场景例如需要在两个step之间执行人工操作等场景
->             .from(step2()).on("COMPLETED").stopAndRestart(step3()) 
->       			.from(step3()).end()
->       			.build();
+>        // from(),on(),to()：增加一条任务依赖，相当于向任务依赖有向图（DAG）中添加一条有向边
+>       //		from()	：用来指定基于哪个step的执行结果
+>       //		on()		：用来指定基于这个step的哪种执行结果
+>       //		to()		：用来指定满足from(),on()条件时，接下来执行哪个step
+>       // 整条有向边的起点是`(from(),on())`二元组所表示的状态，终点是`to()`
+>        return jobBuilderFactory.get("transitionJobNext")
+>            // 从step1开始，step1成功后执行step2
+>            .start(step1()).on("COMPLETED").to(step2())
+>            // 在step2、3之间加入instance stop
+>            // 程序会在step2成功后退出，下次执行从step3开始继续（需要jdbc job repository）
+>            // 使用场景例如需要在两个step之间执行人工操作等场景
+>            .from(step2()).on("COMPLETED").stopAndRestart(step3()) 
+>            .from(step3()).end()
+>            .build();
 > }
 > ```
 >
@@ -236,11 +236,11 @@ Flow的配置形式如下：
 > ```java
 > @Bean
 > public Flow flowA() {
->     FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("flowA");
->     flowBuilder.start(innerStep1())
+>        FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("flowA");
+>        flowBuilder.start(innerStep1())
 >             .next(innerStep2())
 >             .end();
->     return flowBuilder.build();
+>        return flowBuilder.build();
 > }
 > ```
 
@@ -249,12 +249,12 @@ Flow的配置形式如下：
 > ```java
 > @Bean
 > public Job flowBLastJob(@Qualifier("flowB") Flow flowB) {
->     return jobBuilderFactory.get("flowBLastJob")
->             .start(outStep1())
->             .next(outStep2())
->             .on("COMPLETED").to(flowB) //对于flow没有next()这样的快捷方式
->             .end()
->             .build();
+>        return jobBuilderFactory.get("flowBLastJob")
+>            .start(outStep1())
+>            .next(outStep2())
+>            .on("COMPLETED").to(flowB) //对于flow没有next()这样的快捷方式
+>            .end()
+>            .build();
 > }
 > ```
 
@@ -263,16 +263,16 @@ Flow的配置形式如下：
 > ```java
 > @Bean
 > public Job parallelFlowsJob(@Qualifier("flowA") Flow flowA, @Qualifier("flowB") Flow flowB) {
->     FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("parallelFlow");
->     Flow parallelFlow = flowBuilder
->       			.split(new SimpleAsyncTaskExecutor()).add(flowA, flowB)
->             .end();
->     return jobBuilderFactory.get("splitJob")
->             .start(outStep1())
->             .next(outStep2())
->             .on("COMPLETED").to(parallelFlow)
->             .end()
->             .build();
+>        FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("parallelFlow");
+>        Flow parallelFlow = flowBuilder
+>            .split(new SimpleAsyncTaskExecutor()).add(flowA, flowB)
+>            .end();
+>        return jobBuilderFactory.get("splitJob")
+>            .start(outStep1())
+>            .next(outStep2())
+>            .on("COMPLETED").to(parallelFlow)
+>            .end()
+>            .build();
 > }
 > ```
 
@@ -304,12 +304,12 @@ Flow的配置形式如下：
 > ```java
 > @Bean
 > public Job job() {
->     return jobBuilderFactory.get("job")
->       			// 如果在to()或者next()之后创建并发流，应当使用方法1
->       			// 方法2无法让flow2执行，即无法创建并发的flow
->             .start(flow1()).split(new SimpleAsyncTaskExecutor()).add(flow2())
->             .end()
->             .build();
+>        return jobBuilderFactory.get("job")
+>            // 如果在to()或者next()之后创建并发流，应当使用方法1
+>            // 方法2无法让flow2执行，即无法创建并发的flow
+>            .start(flow1()).split(new SimpleAsyncTaskExecutor()).add(flow2())
+>            .end()
+>            .build();
 > }
 > ```
 
@@ -320,9 +320,12 @@ Flow的配置形式如下：
 > ```java
 > public static class DemoTasklet implements Tasklet {
 >     @Override
->     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
->         System.out.println(String.format("%s has been executed on thread %s", chunkContext.getStepContext().getStepName(), Thread.currentThread().getName()));
->       	// 用来查看执行step的DemoTasklet对象是不是同一个对象
+>     public RepeatStatus execute(
+>         StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+>         System.out.println(String.format(
+>             "%s has been executed on thread %s",
+>             chunkContext.getStepContext().getStepName(), Thread.currentThread().getName()));
+>         // 用来查看执行step的DemoTasklet对象是不是同一个对象
 >         System.out.println("Tasklet hashcode: " + this.hashCode());
 >         return RepeatStatus.FINISHED;
 >     }
@@ -343,15 +346,16 @@ Flow的配置形式如下：
 > @Bean
 > public Flow flow1() {
 >     return new FlowBuilder<Flow>("flow1")
->             .start(stepBuilderFactory.get("step1").tasklet(tasklet()).build())
->             .build();
+>         .start(stepBuilderFactory.get("step1").tasklet(tasklet()).build())
+>         .build();
 > }
+> 
 > @Bean
 > public Flow flow2() {
 >     return new FlowBuilder<Flow>("flow2")
->             .start(stepBuilderFactory.get("step2").tasklet(tasklet()).build())
->             .next( stepBuilderFactory.get("step3").tasklet(tasklet()).build())
->             .build();
+>         .start(stepBuilderFactory.get("step2").tasklet(tasklet()).build())
+>         .next( stepBuilderFactory.get("step3").tasklet(tasklet()).build())
+>         .build();
 > }
 > ```
 >
@@ -392,16 +396,17 @@ Flow的配置形式如下：
 >     @Override
 >     public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
 >         // 如果需要基于前一个Step的执行状态来做判断，可以使用stepExecution.getExitStatus()
-> 				switch (getXYZStatus()) {
->         		case XYZStatus.X:
->           	case XYZStatus.Y:   
->             		return new FlowExecutionStatus("GO_STEP_A");
->           	case XYZStatus.Z:
->           	default:
->             		return new FlowExecutionStatus("GO_STEP_B");          
+>         switch (getXYZStatus()) {
+>             case XYZStatus.X:
+>             case XYZStatus.Y:   
+>                 return new FlowExecutionStatus("GO_STEP_A");
+>             case XYZStatus.Z:
+>             default:
+>                 return new FlowExecutionStatus("GO_STEP_B");          
 >         }
 >     }
 > }
+> 
 > @Bean
 > public JobExecutionDecider stepABDecider() {
 >     return new StepABDecider();
@@ -413,17 +418,17 @@ Flow的配置形式如下：
 > ```java
 > @Bean
 > public Job job() {
-> 		return jobBuilderFactory.get("job")
->       	// "起始节点"执行成功后进入"判断节点"，调用一次"decide()"
-> 				.start(startStep()).next(stepABDecider()) 				
->       	// "判断节点"返回"GO_STEP_A"时执行"stepA()"
-> 				.from(stepABDecider()).on("GO_STEP_A").to(stepA())		
->       	// "判断节点"返回"GO_STEP_B"时执行"stepB()"
-> 				.from(stepABDecider()).on("GO_STEP_B").to(stepB())
->       	// 对于"stepA()"，不论执行结果如何，都跳转到"判断节点"进行判断
-> 				.from(stepA()).on("*").to(stepABDecider())
-> 				.end()
-> 				.build();
+>     return jobBuilderFactory.get("job")
+>            // "起始节点"执行成功后进入"判断节点"，调用一次"decide()"
+>         .start(startStep()).next(stepABDecider()) 				
+>            // "判断节点"返回"GO_STEP_A"时执行"stepA()"
+>         .from(stepABDecider()).on("GO_STEP_A").to(stepA())		
+>            // "判断节点"返回"GO_STEP_B"时执行"stepB()"
+>         .from(stepABDecider()).on("GO_STEP_B").to(stepB())
+>            // 对于"stepA()"，不论执行结果如何，都跳转到"判断节点"进行判断
+>         .from(stepA()).on("*").to(stepABDecider())
+>         .end()
+>         .build();
 > }
 > ```
 
@@ -451,15 +456,16 @@ Flow的配置形式如下：
 > public Job parentJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 >     // 把childJob包装在一个step中，这样它可以与普通的step和flow组合
 >     Step childJobStep = new JobStepBuilder(new StepBuilder("childJobStep"))
-> 						.job(childJob)
->       			// 在child job的层级、需要显示地指定、不能自动注入
-> 						.launcher(jobLauncher).repository(jobRepository).transactionManager(transactionManager)
->             .build();
+>         .job(childJob)
+>         // 在child job的层级、需要显示地指定、不能自动注入
+>         .launcher(jobLauncher).repository(jobRepository).transactionManager(transactionManager)
+>         .build();
+> 
 >     // 定义Parent Job，其中的step1只是parent job中的一个普通step
 >     return jobBuilderFactory.get("parentJob")
->             .start(step1())
->             .next(childJobStep)
->             .build();
+>         .start(step1())
+>         .next(childJobStep)
+>         .build();
 > }
 > ```
 >
@@ -512,20 +518,20 @@ Flow的配置形式如下：
 >
 > ```java
 > public class MyChunkListener implements org.springframework.batch.core.ChunkListener {
->     @Override
->     public void beforeChunk(ChunkContext context) {
->         System.out.println("MyChunkListener.beforeChunk is running");
->     }
+>         @Override
+>         public void beforeChunk(ChunkContext context) {
+>             System.out.println("MyChunkListener.beforeChunk is running");
+>         }
 > 
->     @Override
->     public void afterChunk(ChunkContext context) {
->         System.out.println("MyChunkListener.afterChunk is running");
->     }
+>         @Override
+>         public void afterChunk(ChunkContext context) {
+>             System.out.println("MyChunkListener.afterChunk is running");
+>         }
 > 
->     @Override
->     public void afterChunkError(ChunkContext context) {
->         System.out.println("MyChunkListener.afterChunkError is running");
->     }
+>         @Override
+>         public void afterChunkError(ChunkContext context) {
+>             System.out.println("MyChunkListener.afterChunkError is running");
+>         }
 > }
 > ```
 >
@@ -533,16 +539,16 @@ Flow的配置形式如下：
 >
 > ```java
 > public class MyStepListener implements org.springframework.batch.core.StepExecutionListener {
->     @Override
->     public void beforeStep(StepExecution stepExecution) {
->         System.out.println("MyStepListener.beforeStep is running");
->     }
+>         @Override
+>         public void beforeStep(StepExecution stepExecution) {
+>             System.out.println("MyStepListener.beforeStep is running");
+>         }
 > 
->     @Override
->     public ExitStatus afterStep(StepExecution stepExecution) {
->         System.out.println("MyStepListener.afterStep is running");
->         return stepExecution.getExitStatus();
->     }
+>         @Override
+>         public ExitStatus afterStep(StepExecution stepExecution) {
+>             System.out.println("MyStepListener.afterStep is running");
+>             return stepExecution.getExitStatus();
+>         }
 > }
 > ```
 >
@@ -567,16 +573,16 @@ Flow的配置形式如下：
 >
 > ```java
 > public class MyJobListener implements JobExecutionListener {
->     @Override
->     public void beforeJob(JobExecution jobExecution) {
->         String jobName = jobExecution.getJobInstance().getJobName();
->         System.out.println("jobListener.beforeJob is running");
->     }
+>         @Override
+>         public void beforeJob(JobExecution jobExecution) {
+>             String jobName = jobExecution.getJobInstance().getJobName();
+>             System.out.println("jobListener.beforeJob is running");
+>         }
 > 
->     @Override
->     public void afterJob(JobExecution jobExecution) {
->         System.out.println("JobListener.afterJob is running");
->     }
+>         @Override
+>         public void afterJob(JobExecution jobExecution) {
+>             System.out.println("JobListener.afterJob is running");
+>         }
 > }
 > ```
 >
@@ -634,15 +640,15 @@ Flow的配置形式如下：
 >         // "#{jobParameters['message']}": SEPL Expression
 >         @Value("#{jobParameters['message']}") String message
 > ) {
->     return (stepContribution, chunkContext) -> {
->         System.out.println(this.hashCode() + ": " + message);
->         return RepeatStatus.FINISHED;
->     };
+>         return (stepContribution, chunkContext) -> {
+>             System.out.println(this.hashCode() + ": " + message);
+>             return RepeatStatus.FINISHED;
+>         };
 > }
 > 
 > @Bean
 > public Step step1() {
->     return stepBuilderFactory.get("step1")
+>     	return stepBuilderFactory.get("step1")
 >             // 参数设为null，
 >             // 是因为Spring并不会在定义tasklet的时候传参、而是在运行时进行注入
 >             // 这里的null仅仅是占位用
@@ -676,7 +682,7 @@ Flow的配置形式如下：
 
 ### 4.1 ItemReader Interface
 
-功能：通过实现`ItemReader<RecordType>`接口来定义一个bean
+功能：通过实现`ItemReader<RecordType>`接口来定义一个ItermReader bean
 
 > 编写一个实现了`ItemReader<RecordType>`接口类之后，就可以使用这个类的对象定义一个bean
 >
@@ -704,21 +710,21 @@ Flow的配置形式如下：
 > ```java
 > @Bean
 > public MyReader myReader() {
->   	//构造时传入字符串，每次调用read都返回其中一个，全部都返回之后返回null告诉框架读取完毕
->   	//注意，如果MyReader如果不会return null，那么batch job就不会停止，它会无限运行下去
-> 		return new MyReader(Arrays.asList("Foo", "Bar", "Baz"));
+>       //构造时传入字符串，每次调用read都返回其中一个，全部都返回之后返回null告诉框架读取完毕
+>       //注意，如果MyReader如果不会return null，那么batch job就不会停止，它会无限运行下去
+>     return new MyReader(Arrays.asList("Foo", "Bar", "Baz"));
 > }
 > 
 > @Bean
 > public Step step1() {
-> 		return stepBuilderFactory.get("step1")
->          .<String, String>chunk(2) // 每2条记录作为1个chunk
->          .reader(myReader())
->          .writer(list -> {
->             for (String curItem : list) {
+>     return stepBuilderFactory.get("step1")
+>            .<String, String>chunk(2) // 每2条记录作为1个chunk
+>            .reader(myReader())
+>            .writer(list -> {
+>                for (String curItem : list) {
 >                System.out.println("curItem = " + curItem);
->             }
->          }).build();
+>            }
+>        }).build();
 > }
 > ```
 >
@@ -726,7 +732,7 @@ Flow的配置形式如下：
 >
 > ```java
 > public interface ItemWriter<T> {
->     void write(List<? extends T> var1) throws Exception;
+>        void write(List<? extends T> var1) throws Exception;
 > }
 > ```
 
@@ -741,11 +747,11 @@ Flow的配置形式如下：
 > ```java
 > @Bean
 > public ItemReader<Customer> cursorItemReader() {
->     JdbcCursorItemReader<Customer> reader = new JdbcCursorItemReader<>();
->     reader.setSql("select id, firstName, lastName, birthdate from customer order by lastName, firstName");
->     reader.setDataSource(this.dataSource);
->     reader.setRowMapper(new CustomerRowMapper()); //Mapping each DB Item to POJO
->     return reader;
+>         JdbcCursorItemReader<Customer> reader = new JdbcCursorItemReader<>();
+>         reader.setSql("select id, firstName, lastName, birthdate from customer order by lastName, firstName");
+>         reader.setDataSource(this.dataSource);
+>         reader.setRowMapper(new CustomerRowMapper()); //Mapping each DB Item to POJO
+>         return reader;
 > }
 > ```
 >
@@ -761,23 +767,24 @@ Flow的配置形式如下：
 > @Bean
 > public ItemReader<Customer> pagingItemReader() {
 > 	 // sort
->    Map<String, Order> sortKeys = new HashMap<>(1);
->    sortKeys.put("id", Order.ASCENDING);
+>         Map<String, Order> sortKeys = new HashMap<>(1);
+>         sortKeys.put("id", Order.ASCENDING);
 > 
->    // query provider：用来生成返回1 page的SQL
->    MySqlPagingQueryProvider queryProvider = new MySqlPagingQueryProvider();
->    queryProvider.setSelectClause("id, firstName, lastName, birthdate");
->    queryProvider.setFromClause("from customer");
->    // 用来排序，也用来记录当前遍历到哪条记录，因此传入key需要能够区分每一条数据(unique key)
->    queryProvider.setSortKeys(sortKeys); 
+>         // query provider：用来生成返回1 page的SQL
+>         MySqlPagingQueryProvider queryProvider = new MySqlPagingQueryProvider();
+>         queryProvider.setSelectClause("id, firstName, lastName, birthdate");
+>         queryProvider.setFromClause("from customer");
+>         // JdbcPagingItemReader会为每一页生成一个SQL，为了保证这些SQL获取的数据之间连贯一致，必须进行排序
+>           // 同时JdbcPagingItemReader也根据sorting key来判断下一页从哪里开始，因此也需要这个key是unique key
+>         queryProvider.setSortKeys(sortKeys); 
 > 
->    // reader
->    JdbcPagingItemReader<Customer> reader = new JdbcPagingItemReader<>();
->        reader.setDataSource(this.dataSource);
->        reader.setFetchSize(10); //每页10条，通常配成与chunk size相同的大小
->        reader.setRowMapper(new CustomerRowMapper());
->    reader.setQueryProvider(queryProvider);
->    return reader;
+>         // reader
+>         JdbcPagingItemReader<Customer> reader = new JdbcPagingItemReader<>();
+>             reader.setDataSource(this.dataSource);
+>             reader.setFetchSize(10); //每页10条，通常配成与chunk size相同的大小
+>             reader.setRowMapper(new CustomerRowMapper());
+>         reader.setQueryProvider(queryProvider);
+>         return reader;
 > }
 > ```
 >
@@ -803,21 +810,21 @@ Flow的配置形式如下：
 > ```java
 > @Bean
 > public StaxEventItemReader<Customer> customerItemReader() {
->    // unmarshaller规则
->    Map<String, Class> aliases = new HashMap<>();
->    aliases.put("customer"/*xml tag*/, Customer.class /*Domain Object Class*/); 
+>        // unmarshaller规则
+>        Map<String, Class> aliases = new HashMap<>();
+>        aliases.put("customer"/*xml tag*/, Customer.class /*Domain Object Class*/); 
 > 
->    // unmarshaller
->    XStreamMarshaller unmarshaller = new XStreamMarshaller();
->    unmarshaller.setAliases(aliases);
+>        // unmarshaller
+>        XStreamMarshaller unmarshaller = new XStreamMarshaller();
+>        unmarshaller.setAliases(aliases);
 > 
->    // ItemReader
->    StaxEventItemReader<Customer> reader = new StaxEventItemReader<>();
->    reader.setResource(new ClassPathResource("/data/customers.xml"));
->    reader.setFragmentRootElementName("customer"); //reader负责找到customer tag
->    reader.setUnmarshaller(unmarshaller); // unmarshaller负责生成Domain Object
+>        // ItemReader
+>        StaxEventItemReader<Customer> reader = new StaxEventItemReader<>();
+>        reader.setResource(new ClassPathResource("/data/customers.xml"));
+>        reader.setFragmentRootElementName("customer"); //reader负责找到customer tag
+>        reader.setUnmarshaller(unmarshaller); // unmarshaller负责生成Domain Object
 > 
->    return reader;
+>        return reader;
 > }
 > ```
 
@@ -871,22 +878,22 @@ pom.xml修改：`Spring Boot 2.4.1`（`Spring Batch 4.2.5`）创建项目时，�
 > ```java
 > @Bean
 > public FlatFileItemReader<Customer> customerItemReader() {
->    //（1） DelimitedLineTokenizer：将一行数据按照分隔符分成列映射到FieldSet中的各个field中
->    DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
->    tokenizer.setNames(new String[] {"id", "firstName", "lastName", "birthdate"}); // 列名 
+>        //（1） DelimitedLineTokenizer：将一行数据按照分隔符分成列映射到FieldSet中的各个field中
+>        DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
+>        tokenizer.setNames(new String[] {"id", "firstName", "lastName", "birthdate"}); // 列名 
 > 
->    // (2) DefaultLineMapper<Customer>：将一行数据转换成一个Domain Ojbect
->    DefaultLineMapper<Customer> customerLineMapper = new DefaultLineMapper<>();
->    customerLineMapper.setLineTokenizer(tokenizer);// 把一个String转换成一个FieldSet
->    customerLineMapper.setFieldSetMapper(new CustomerFieldSetMapper()); 
->    customerLineMapper.afterPropertiesSet();
+>        // (2) DefaultLineMapper<Customer>：将一行数据转换成一个Domain Ojbect
+>        DefaultLineMapper<Customer> customerLineMapper = new DefaultLineMapper<>();
+>        customerLineMapper.setLineTokenizer(tokenizer);// 把一个String转换成一个FieldSet
+>        customerLineMapper.setFieldSetMapper(new CustomerFieldSetMapper()); 
+>        customerLineMapper.afterPropertiesSet();
 > 
->    // (3) FlatFileItemReader：组装处理csv文件用的ItemReader
->    FlatFileItemReader<Customer> reader = new FlatFileItemReader<>();
->    reader.setLinesToSkip(1);
->    reader.setResource(new ClassPathResource("/data/customer.csv"));
->    reader.setLineMapper(customerLineMapper);
->    return reader;
+>        // (3) FlatFileItemReader：组装处理csv文件用的ItemReader
+>        FlatFileItemReader<Customer> reader = new FlatFileItemReader<>();
+>        reader.setLinesToSkip(1);
+>        reader.setResource(new ClassPathResource("/data/customer.csv"));
+>        reader.setLineMapper(customerLineMapper);
+>        return reader;
 > }	
 > ```
 
@@ -894,13 +901,13 @@ pom.xml修改：`Spring Boot 2.4.1`（`Spring Batch 4.2.5`）创建项目时，�
 
 > ```java
 > public class CustomerFieldSetMapper implements FieldSetMapper<Customer> {
->    @Override
->    public Customer mapFieldSet(FieldSet fieldSet) throws BindException {
->       return new Customer(fieldSet.readLong("id"),
->             fieldSet.readString("firstName"),
->             fieldSet.readString("lastName"),
->             fieldSet.readDate("birthdate", "yyyy-MM-dd HH:mm:ss"));
->    }
+>        @Override
+>        public Customer mapFieldSet(FieldSet fieldSet) throws BindException {
+>           return new Customer(fieldSet.readLong("id"),
+>                 fieldSet.readString("firstName"),
+>                 fieldSet.readString("lastName"),
+>                 fieldSet.readDate("birthdate", "yyyy-MM-dd HH:mm:ss"));
+>        }
 > }
 > ```
 
@@ -938,16 +945,16 @@ pom.xml修改：`Spring Boot 2.4.1`（`Spring Batch 4.2.5`）创建项目时，�
 > 
 > @Bean
 > public FlatFileItemReader<Customer> customerItemReader() {
->   // 参考上一小节或原始demo的代码，与上一小有差异的点列在本节的说明中
+>       // 参考上一小节或原始demo的代码，与上一小有差异的点列在本节的说明中
 > }
 > 
 > @Bean
 > public MultiResourceItemReader<Customer> multiResourceItemReader() {
->    MultiResourceItemReader<Customer> reader = new MultiResourceItemReader<>();
->    // 读取单个文件的任务代理给customerItemReader
->    reader.setDelegate(customerItemReader()); 
->    reader.setResources(inputFiles);
->    return reader;
+>        MultiResourceItemReader<Customer> reader = new MultiResourceItemReader<>();
+>        // 读取单个文件的任务代理给customerItemReader
+>        reader.setDelegate(customerItemReader()); 
+>        reader.setResources(inputFiles);
+>        return reader;
 > }
 > ```
 >
@@ -1064,39 +1071,39 @@ ItemReader State通过三部分来实现
 
 > ```java
 > public class StatefulItemReader implements ItemStreamReader<String> {
->    // 用来表示当前读取状态的成员变量  
->    private int curIndex = -1;	
->    ......
+>        // 用来表示当前读取状态的成员变量  
+>        private int curIndex = -1;	
+>        ......
 >    
->    @Override
->    public String read() throws Exception {
->       //每次调用会返回一个Item
->       ......
->    }
+>        @Override
+>        public String read() throws Exception {
+>           //每次调用会返回一个Item
+>           ......
+>        }
 > 
->    // 每次step启动时被调用
->    @Override
->    public void open(ExecutionContext executionContext) throws ItemStreamException {
->       if(executionContext.containsKey("curIndex")) {
->          // job重启时能够根据Context中state，从上次失败时的位置开始继续执行
->          this.curIndex = executionContext.getInt("curIndex");
->       } else {
->          this.curIndex = 0;
->          executionContext.put("curIndex", this.curIndex);
->       }
->    }
+>        // 每次step启动时被调用
+>        @Override
+>        public void open(ExecutionContext executionContext) throws ItemStreamException {
+>           if(executionContext.containsKey("curIndex")) {
+>              // job重启时能够根据Context中state，从上次失败时的位置开始继续执行
+>              this.curIndex = executionContext.getInt("curIndex");
+>           } else {
+>              this.curIndex = 0;
+>              executionContext.put("curIndex", this.curIndex);
+>           }
+>        }
 > 
->    // 每个chunk处理结束时被调用
->    @Override
->    public void update(ExecutionContext executionContext) throws ItemStreamException {
->       // 记录当前的状态到job repository
->       executionContext.put("curIndex", this.curIndex);
->    }
+>        // 每个chunk处理结束时被调用
+>        @Override
+>        public void update(ExecutionContext executionContext) throws ItemStreamException {
+>           // 记录当前的状态到job repository
+>           executionContext.put("curIndex", this.curIndex);
+>        }
 > 
->    // 所有数据都处理完时被调用
->    @Override
->    public void close() throws ItemStreamException {
->    }
+>        // 所有数据都处理完时被调用
+>        @Override
+>        public void close() throws ItemStreamException {
+>        }
 > }
 > 
 > @Bean
@@ -1132,29 +1139,326 @@ ItemReader State通过三部分来实现
 > {"@class":"java.util.HashMap","batch.taskletType":"org.springframework.batch.core.step.item.ChunkOrientedTasklet","curIndex":100,"batch.stepType":"org.springframework.batch.core.step.tasklet.TaskletStep"}
 > ~~~
 >
-> 
+
+### 4.8 JsonItemReader
+
+> https://spring.io/blog/2018/05/31/spring-batch-4-1-0-m1-released
 
 ## 5 Output
 
-### 5.1 Interface ItemWrite
+### 5.1 Interface ItemWriter
 
+内容：通过实现`ItemWriter`接口来装配一个`ItemWriter` bean
+
+原始Demo：`Learning Spring Batch - Working Files / Chapter 4 / itemWriter`
+
+实现`ItemWriter`接口
+
+> ```java
+> public class SysOutItemWriter implements ItemWriter<String> {
+>       // 在一个chunk被处理完时被调用
+>       @Override
+>       public void write(List<? extends String> items /*一个chunck的所有item*/) throws Exception {
+>            // 打印日志观察write方法何时被调用
+>            System.out.println("The size of this chunk was: " + items.size());
+>            // 打印Item观察每次调用传给writer哪些数据
+>            for (String item : items) {
+>                System.out.println(">> " + item);
+>            }
+>       }
+> }
+> ```
+
+装配
+
+> ```java
+> @Bean
+> public SysOutItemWriter itemWriter() {
+>        return new SysOutItemWriter();
+> }
+> 
+> @Bean
+> public Step step() {
+>        return stepBuilderFactory.get("item_writer_demo_step")
+>            .<String, String>chunk(10)  //每10条数据一个chunk
+>            .reader(itemReader())
+>            .writer(itemWriter())
+>            .build();
+> }
+> ```
+
+运行日志中可以看到，每个chunk（10条数据）挑用一次 `SysOutItemWriter`的`write`方法，而传给write方法的`List`就是当前chuck的所有数据
+
+> ~~~bash
+> The size of this chunk was: 10
+> >> 71
+> >> 72
+> >> 73
+> >> 74
+> >> 75
+> >> 76
+> >> 77
+> >> 78
+> >> 79
+> >> 80
+> The size of this chunk was: 10
+> >> 81
+> >> 82
+> >> 83
+> >> 84
+> >> 85
+> >> 86
+> >> 87
+> >> 88
+> >> 89
+> >> 90
+> ~~~
 >
+> 输入数据是用`ListItemReader<Integer>`构造的测试数据，数据内容为1到100
 
 ### 5.2 Writing to Database
 
->  
+内容：装配能够像数据库写数据的`ItemWriter` bean
+
+原始Demo：`Learning Spring Batch - Working Files / Chapter 4 / databaseOutput`
+
+装配`JdbcBatchItemWriter`
+
+> ```java
+> @Bean
+> public JdbcBatchItemWriter<Customer> customerItemWriter() {
+>      // JdbcBatchItemWriter在一个jdbc batch update中写入所有数据
+>      // 线程安全，write方法在一个事务中被执行
+>       JdbcBatchItemWriter<Customer> itemWriter = new JdbcBatchItemWriter<>();
+> 		
+>      // 设置DataSource、SQL模板、SQL模板参数Provider
+>       itemWriter.setDataSource(this.dataSource);
+>       itemWriter.setSql(
+>          "INSERT INTO CUSTOMER VALUES (:id, :firstName, :lastName, :birthdate)");
+>       itemWriter.setItemSqlParameterSourceProvider(
+>          new BeanPropertyItemSqlParameterSourceProvider());
+>   
+>      // 检查必须的properties是否都已经设置，并返回ItemWriter
+>       itemWriter.afterPropertiesSet();
+>       return itemWriter;
+> }
+> 
+> @Bean
+> public Step step1() {
+>        return stepBuilderFactory.get("step1")
+>            .<Customer, Customer>chunk(10) //每10条记录一个chunk
+>            .reader(customerItemReader())
+>            .writer(customerItemWriter())
+>            .build();
+> }
+> ```
+>
+> `Customer`是普通的domain object
+>
+> 除了`JdbcBatchItemWriter`，还有`JpaItemWriter`，`HibernateItemWriter`，其他开源的lib也提供自己的ItemWriter，例如Mybatis提供的`MyBatisItemWriter`
 
 ### 5.3 Writing Flat Files
 
->  
+内容：装配能够写普通文件的`ItemWriter` bean
+
+原始Demo：`Learning Spring Batch - Working Files / Chapter 4 / flatFileOutput`
+
+`FlatFileItemWriter`：
+
+> 在一个chunck的最后时刻执行写操作，在job instance失败的情况下，如何fault tolerance，见后续的第7小节
+
+在@Configuration类中装配Item Writer Bean
+
+> ```java
+> @Bean
+> public FlatFileItemWriter<Customer> customerItemWriter() throws Exception {
+>        // file resource generated from template
+>        String customerOutputPath = File.createTempFile("customerOutput_", ".out").getAbsolutePath();
+>        System.out.println(">> Output Path: " + customerOutputPath);
+>        Resource resource = new FileSystemResource(customerOutputPath);
+> 
+>        // item reader
+>        FlatFileItemWriter<Customer> itemWriter = new FlatFileItemWriter<>();
+>        // (1) aggregator：决定Domain Object如何map到写文件的格式中
+>        // itemWriter.setLineAggregator(new PassThroughLineAggregator<>());
+>        itemWriter.setLineAggregator(new CustomerLineAggregator());
+>        // (2) 设置resource
+>        itemWriter.setResource(new FileSystemResource(customerOutputPath));
+>        // (3) 检查是否所有的必需的properties都已经设置
+>        itemWriter.afterPropertiesSet();
+>        return itemWriter;
+> }
+> ```
+
+`PassThroughLineAggregator`
+
+> 如果使用`PassThroughLineAggregator`，将直接调用domain object的`toString()`方法来输出
+
+`CustomerLineAggregator()`
+
+> 自定义输出格式，例如下面的代码，使用`jackson.databind.ObjectMapper`将domain object序列化成Json
+>
+> ```java
+> package com.javaprojref.springbatch.g05_flat_file_output.domain;
+> 
+> import com.fasterxml.jackson.core.JsonProcessingException;
+> import com.fasterxml.jackson.databind.ObjectMapper;
+> import org.springframework.batch.item.file.transform.LineAggregator;
+> 
+> public class CustomerLineAggregator implements LineAggregator<Customer> {
+>        private ObjectMapper objectMapper = new ObjectMapper();
+> 		
+>        @Override
+>        public String aggregate(Customer item) {
+>            try {
+>                return objectMapper.writeValueAsString(item);
+>            } catch (JsonProcessingException e) {
+>                throw new RuntimeException("Unable to serialize Customer", e);
+>            }
+>     }
+> }
+> ```
 
 ### 5.4 Writing to XML Files
 
+内容：装配能够写XML文件的`ItemWriter` bean
+
+原始Demo：`Learning Spring Batch - Working Files / Chapter 4 / xmlFileOutput`
+
+StaxEventItemWriter：
+
+> 在一个chunck的最后时刻执行写操作，在job instance失败的情况下，如何fault tolerance，见后续的第7小节
+
+装配`ItemWriter`
+
+> ```java
+> @Bean
+> public StaxEventItemWriter<Customer> customerItemWriter() throws Exception {
+>        // XML标签、与Domain Object的映射关系
+>        Map<String, Class> aliases = new HashMap<>();
+>        aliases.put("customer", Customer.class); 
 > 
+>        // marshaller：使用了XMLStreamMarshaller
+>        // 也可以使用任何实现org.springframework.oxm.Marshaller接口的类
+>        XStreamMarshaller marshaller = new XStreamMarshaller();
+>        marshaller.setAliases(aliases);
+> 
+>        // 输出文件、文件名根据模板生成
+>        String customerOutputPath 
+>            = File.createTempFile("customerOutput", ".xml").getAbsolutePath();
+>        System.out.println(">> Output Path: " + customerOutputPath);
+>        Resource outputResource = new FileSystemResource(customerOutputPath);
+> 
+>        // Item Writer
+>        StaxEventItemWriter<Customer> itemWriter = new StaxEventItemWriter<>();
+>        itemWriter.setRootTagName("customers"); // root element名称
+>        itemWriter.setMarshaller(marshaller);
+>        itemWriter.setResource(outputResource);
+>        itemWriter.afterPropertiesSet(); //检查属性设置
+>   		return itemWriter;
+> }
+> ```
+>
+> 其中的Customer是普通的POJO
 
 ### 5.5 Writing to Multiple Destinations
 
+内容：装配能够向多个Destination写数据的`ItemWriter` bean
+
+原始Demo：`Learning Spring Batch - Working Files / Chapter 4 / writingMultipleDestinations`
+
+步骤：
+
+(1) 装配一个`StaxEventItemWriter<Customer>` bean，与5.4节的一样
+
+(2) 装配一个`FlatFileItemWriter<Customer>` bean，与5.3节的一样
+
+(3.A) 如果想让每条数据都输出两份，一份输出到`(1)`一份输出到`(2)`
+
+> 装配一个CompositeItemWriter
+>
+> ```java
+> @Bean
+> public CompositeItemWriter<Customer> itemWriter() throws Exception {
+>     List<ItemWriter<? super Customer>> writers = new ArrayList<>(2);
 > 
+>     writers.add(xmlItemWriter());
+>     writers.add(jsonItemWriter());
+> 
+>     CompositeItemWriter<Customer> itemWriter = new CompositeItemWriter<>();
+> 
+>     itemWriter.setDelegates(writers);
+>     itemWriter.afterPropertiesSet();
+> 
+>     return itemWriter;
+> }
+> ```
+>
+> 装配Step，因为`CompositeItemWriter`实现了`ItemStream`接口，因此不需要像（3.B）那样调用`.stream`来显示注册
+>
+> ~~~java
+> @Bean
+> public Step step1() throws Exception {
+> return stepBuilderFactory.get("step1")
+>       .<Customer, Customer>chunk(10)
+>       .reader(pagingItemReader())
+>       .writer(itemWriter())
+>       // .stream(xmlItemWriter())
+>       // .stream(jsonItemWriter())
+>       .build();
+> }
+> ~~~
+
+(3.B) 如果想让数据一部分输出到`(1)`，一部分输出到`(2)`
+
+>  编写一个`Classifier<Customer, ItemWriter<? super Customer>>`类，用来决定将每个`Customer`交给哪个ItemWriter来处理
+>
+>  ```java
+>  public class CustomerClassifier implements Classifier<Customer, ItemWriter<? super Customer>> {
+>        private ItemWriter<Customer> evenItemWriter;
+>      private ItemWriter<Customer> oddItemWriter;
+>  
+>      public CustomerClassifier(
+>        ItemWriter<Customer> evenItemWriter, ItemWriter<Customer> oddItemWriter) {
+>      this.evenItemWriter = evenItemWriter;
+>      this.oddItemWriter = oddItemWriter;
+>        } 
+>    
+>      @Override
+>      public ItemWriter<? super Customer> classify(Customer customer) {
+>        return customer.getId() % 2 == 0 ? evenItemWriter : oddItemWriter;
+>      }
+>  }
+>  ```
+>  
+>  装配`ClassifierCompositeItemWriter<Customer>`：它使用`(3)`提供的`Classifier`将`(1)`和`(2)`提供的`ItemWriter<Customer>`组合在一起
+>
+>  ```java
+>@Bean
+>  public ClassifierCompositeItemWriter<Customer> itemWriter() throws Exception {
+>      ClassifierCompositeItemWriter<Customer> itemWriter = new ClassifierCompositeItemWriter<>();
+>      itemWriter.setClassifier(new CustomerClassifier(xmlItemWriter(), jsonItemWriter()));
+>        return itemWriter;
+>    }
+>    ```
+>  
+>  注册被代理的Item Writer为`ItemStream``
+>
+>  * `StaxEventItemWriter`和`FlatFileItemWriter`都实现了`ItemStream`，都能够在写数据时保存当前的state到job repository。
+>* 然而在这个例子中，他们被`ClassifierCompositeItemWriter`代理，同时这个writer又没有实现`ItemStream`接口，框架无法感知到这两个`ItemStream`。因此需要显式地使用`.stream`方法来注册他们。
+>  
+>  ```java
+>@Bean
+>  public Step step1() throws Exception {
+>      return stepBuilderFactory.get("step1")
+>            .<Customer, Customer>chunk(10)
+>            .reader(pagingItemReader())
+>            .writer(itemWriter())
+>            .stream(xmlItemWriter())
+>            .stream(jsonItemWriter())
+>            .build();
+>  }
+>  ```
 
 ## 6 Processing
 
