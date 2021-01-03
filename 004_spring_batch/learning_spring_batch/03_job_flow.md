@@ -396,9 +396,10 @@ Flow的配置形式如下：
 > @Bean
 > public Step step1() {
 >  return stepBuilderFactory.get("step1")
->          .<String, String>chunk(2) // 每2条记录作为一个chunk，输入输出类型都是String
->          .reader(reader()) 								// 设置reader
->          .writer(writer()) 								// 设置writer
+>          // 每2条记录作为一个chunk，输入输出类型都是String
+>          .<String, String>chunk(2) 
+>          .reader(reader()) 					// 设置reader
+>          .writer(writer()) 					// 设置writer
 >          .listener(new MyStepListener())  	// 设置step listener
 >          .listener(new MyChunkListener()) 	// 设置chunk listener
 >          .build();
@@ -429,10 +430,10 @@ Flow的配置形式如下：
 > ```java
 > @Bean
 > public Job listenerJob() {
->  return jobBuilderFactory.get("listenerJob")
->          .start(step1())
->          .listener(new MyJobListener())
->          .build();
+> 	return jobBuilderFactory.get("listenerJob")
+> 		.start(step1())
+> 		.listener(new MyJobListener())
+> 		.build();
 > }
 > ```
 
@@ -472,8 +473,11 @@ Flow的配置形式如下：
 > 代码
 >
 > ```java
+> // Bean的生命周期是`StepScope`：
+> //		就是说每个Step内，Bean对象时唯一的
+> //		在不同的Step中，Bean对象是不同的
 > @Bean
-> @StepScope // Bean的生命周期是`StepScope`：就是说每个Step内，Bean对象时唯一的；在不同的Step中，Bean对象是不同的
+> @StepScope 
 > public Tasklet helloWorldTasklet(
 >      // "#{jobParameters['message']}": SEPL Expression
 >      @Value("#{jobParameters['message']}") String message
@@ -486,16 +490,18 @@ Flow的配置形式如下：
 > 
 > @Bean
 > public Step step1() {
->  	return stepBuilderFactory.get("step1")
->          // 参数设为null，
->          // 是因为Spring并不会在定义tasklet的时候传参、而是在运行时进行注入
->          // 这里的null仅仅是占位用
->          .tasklet(helloWorldTasklet(null))
->          .build();
+> 	return stepBuilderFactory.get("step1")
+> 		// 参数设为null，
+> 		// 是因为Spring并不会在定义tasklet的时候传参、而是在运行时进行注入
+> 		// 这里的null仅仅是占位用
+> 		.tasklet(helloWorldTasklet(null))
+> 		.build();
 > }
 > ```
 >
-> 运行（使用jdbc job repository），可以通过JVM命令行参数将传入（IDE使用run configuration传入）
+> 需要使用`jdbc job repository`来持久化job instance运行记录
+>
+> 参数message="hello"可以通过JVM命令行参数将传入（IDE使用run configuration传入）
 >
 > ~~~bash
 > __________________________________________________________________

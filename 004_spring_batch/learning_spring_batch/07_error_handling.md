@@ -150,7 +150,7 @@
 > 				throw new CustomRetryableException("process failed, attempt: " + attemptCount);
 > 			} else {
 > 				// 未开启retry功能，抛出其他异常
-> 				throw new RuntimeException("process failed and can not retry");
+> 				throw new Exception("process failed and can not retry");
 > 			}
 > 		}
 > 		// (2) 没发生故障时，正常处理
@@ -168,31 +168,544 @@
 
 (2) Writer业务逻辑
 
+> 也Processor类似，假定`item  -84`在写入时会出现故障
+>
+> * 如果已经开启retry，会抛出CustomRetryableException
+> * 如果没有开启retry，会抛出其他Exception
+
+(3) 装配`RetryItemProcessor`和`RetryItemWriter`，设置容许触发retry的Exception类，并指定retry上限
+
+> ```java
+> @Bean
+> @StepScope
+> public RetryItemProcessor processor(@Value("#{jobParameters['retry']}")String retry) {
+>    RetryItemProcessor processor = new RetryItemProcessor();
+>    boolean enableRetry = StringUtils.hasText(retry)
+>          && Arrays.stream(retry.split(",")).anyMatch(
+>                param -> param.equalsIgnoreCase("processor"));
+>    processor.setEnableRetry(enableRetry);
+>    return processor;
+> }
+> 
+> @Bean
+> @StepScope
+> public RetryItemWriter writer(@Value("#{jobParameters['retry']}")String retry) {
+>    RetryItemWriter writer = new RetryItemWriter();
+>    boolean enableRetry = StringUtils.hasText(retry)
+>          && Arrays.stream(retry.split(",")).anyMatch(
+>          param -> param.equalsIgnoreCase("writer"));
+>    writer.setEnableRetry(enableRetry);
+>    return writer;
+> }
+> 
+> @Bean
+> public Step step1() {
+>    return stepBuilderFactory.get("step")
+>          .<String, String>chunk(10)
+>          .reader(reader())
+>          .processor(processor(null))
+>          .writer(writer(null))
+>        	 // 调用`falultTolerent()`将返回一个能使用retry等方法的Builder
+>          .faultTolerant() 
+>          // 捕获CustomRetryableException时重试，捕获其他Exception会导致job fail
+>          .retry(CustomRetryableException.class)
+>        	 // 这个step最多retry 15次
+>          .retryLimit(15)
+>          .build();
+> }
+> ```
+
+测试：不传入命令行参数，让step跑其他Exception时，会触发异常，job失败
+
+> ~~~
+> -28
+> -29
+> process：30 --> -30
+> process：31 --> -31
+> process：32 --> -32
+> process：33 --> -33
+> process：34 --> -34
+> process：35 --> -35
+> process：36 --> -36
+> process：37 --> -37
+> process：38 --> -38
+> process：39 --> -39
+> begin writing items: 
+> -30
+> -31
+> -32
+> -33
+> -34
+> -35
+> -36
+> -37
+> -38
+> -39
+> process：40 --> -40
+> process：41 --> -41
+> process：40 --> -40
+> process：41 --> -41
+> ERROR 7672 --- [           main] o.s.batch.core.step.AbstractStep         : Encountered an error executing step step in job job
+> 
+> ...
+> 
+> INFO 7672 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [step] executed in 223ms
+> INFO 7672 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=job]] completed with the following parameters: [{}] and the following status: [FAILED] in 301ms
+> ~~~
+
+测试：传入命令行参数`retry=processor`
+
+> 可以看到在ItemProcessor处理数据时，发生了5次chunk重试，直到第6次业务逻辑不再抛出异常
+>
+> 但是会在writing的时候job失败
+>
+> ~~~
+> -38
+> -39
+> process：40 --> -40
+> process：41 --> -41
+> process item 42 failed, will retry
+> process：40 --> -40
+> process：41 --> -41
+> process item 42 failed, will retry
+> process：40 --> -40
+> process：41 --> -41
+> process item 42 failed, will retry
+> process：40 --> -40
+> process：41 --> -41
+> process item 42 failed, will retry
+> process：40 --> -40
+> process：41 --> -41
+> process item 42 failed, will retry
+> process：40 --> -40
+> process：41 --> -41
+> process item 42 failed, will retry
+> process：40 --> -40
+> process：41 --> -41
+> process：42 --> -42
+> process：43 --> -43
+> process：44 --> -44
+> process：45 --> -45
+> process：46 --> -46
+> process：47 --> -47
+> process：48 --> -48
+> process：49 --> -49
+> begin writing items: 
+> -40
+> -41
+> -42
+> -43
+> -44
+> -45
+> -46
+> -47
+> -48
+> -49
+> 
+> ......
+> 
+> begin writing items: 
+> -80
+> -81
+> -82
+> -83
+> process：80 --> -80
+> ERROR 7785 --- [           main] o.s.batch.core.step.AbstractStep         : Encountered an error executing step step in job job
+> ~~~
+
+测试：传入命令行参数`retry=processor,writer`，可以看到程序在5次chunk重试，直到业务逻辑不再抛出异常时执行成功
+
+> ~~~bash
+> begin writing items: 
+> -80
+> -81
+> -82
+> -83
+> writing item -84 failed, will retry
+> process：80 --> -80
+> process：81 --> -81
+> process：82 --> -82
+> process：83 --> -83
+> process：84 --> -84
+> process：85 --> -85
+> process：86 --> -86
+> process：87 --> -87
+> process：88 --> -88
+> process：89 --> -89
+> begin writing items: 
+> -80
+> -81
+> -82
+> -83
+> -84
+> -85
+> -86
+> -87
+> -88
+> -89
+> ~~~
+
 ### 7.3 Skip
 
-内容：
+内容：跳过处理失败的Item
 
 原始Demo：`Learning Spring Batch - Working Files / Chapter 7 / skip`
 
 步骤：
 
+(1) Processor业务逻辑：
 
+> 与7.2小节类似，假定item 42会引发故障：
+>
+> * 如果开启enableSkip，会抛出`CustomSkipableException`
+> * 如果未开启enableSkip，会抛出其他异常
+>
+> ```java
+> public class SkipItemProcessor implements ItemProcessor<String, String> {
+>    private boolean enableSkip = false;
+> 
+>    @Override
+>    public String process(String item) throws Exception {
+>       // 假定item 42会有导致ItemProcessor发送异常的故障
+>       boolean hasError = item.equalsIgnoreCase("42");
+>       // (1) 发生故障时
+>       if (hasError) {
+>          if (enableSkip) {
+>             // 开启retry功能时抛出CustomSkipException
+>             System.out.println("process item " + item + " failed, skip");
+>             throw new CustomSkipException("process failed，skip");
+>          } else {
+>             // 未开启retry功能时抛出其他异常
+>             throw new Exception("process failed and can not retry");
+>          }
+>       }
+>       // (2) 没发生故障时，正常处理
+>       String result = String.valueOf(Integer.valueOf(item) * -1);
+>       System.out.println("process：" + item + " --> " + result);
+>       return result;
+>    }
+> 
+>    public void setEnableSkip(boolean enableSkip) {
+>       this.enableSkip = enableSkip;
+>    }
+> }
+> ```
+
+(2) Writer业务逻辑
+
+> 与processor类似，假定`Item -84`会引发故障
+>
+> * 如果开启enableSkip，会抛出`CustomSkipableException`
+> * 如果未开启enableSkip，会抛出其他异常
+
+(3) 装配`SkipItemProcessor`和`SkipItemWriter`
+
+> ```java
+> @Bean
+> @StepScope
+> public SkipItemProcessor processor(@Value("#{jobParameters['skip']}")String skip) {
+>    SkipItemProcessor processor = new SkipItemProcessor();
+>    boolean enableSkip = StringUtils.hasText(skip)
+>          && Arrays.stream(skip.split(",")).anyMatch(
+>                param -> param.equalsIgnoreCase("processor"));
+>    processor.setEnableSkip(enableSkip);
+>    return processor;
+> }
+> 
+> @Bean
+> @StepScope
+> public SkipItemWriter writer(@Value("#{jobParameters['skip']}")String skip) {
+>    SkipItemWriter writer = new SkipItemWriter();
+>    boolean enableSkip = StringUtils.hasText(skip)
+>          && Arrays.stream(skip.split(",")).anyMatch(
+>                param -> param.equalsIgnoreCase("processor"));
+>    writer.setEnableSkip(enableSkip);
+>    return writer;
+> }
+> 
+> @Bean
+> public Step step1() {
+>    return stepBuilderFactory.get("step")
+>          .<String, String>chunk(10)
+>          .reader(reader())
+>          .processor(processor(null))
+>          .writer(writer(null))
+>          .faultTolerant()
+>          .skip(CustomSkipException.class)
+>          .skipLimit(15)
+>          .build();
+> }
+> ```
+
+运行：命令行参数`skip=processor,writer`
+
+> 对于ItemProcessor阶段的故障，直接跳过出错的`Item 42`
+>
+> 对于ItemWriter阶段的故障
+>
+> * 虽说会跳过出错`Item -84`，但是`Item -84`所在的整个chunk都要重写。
+> * 并且与之前一次写入整个chunck不同，skip时，会一个record一个record地重写，这是因为框架需要找到是哪个item导致了chunk写失败
+>
+> ~~~bash
+> process：40 --> -40
+> process：41 --> -41
+> process item 42 failed, skip
+> process：40 --> -40
+> process：41 --> -41
+> 
+> ...
+> 
+> process：88 --> -88
+> process：89 --> -89
+> begin writing items: 
+> -80
+> -81
+> -82
+> -83
+> writing item -84 failed, skip
+> process：80 --> -80
+> begin writing items: 
+> -80
+> process：81 --> -81
+> begin writing items: 
+> -81
+> process：82 --> -82
+> begin writing items: 
+> -82
+> process：83 --> -83
+> begin writing items: 
+> -83
+> process：84 --> -84
+> begin writing items: 
+> writing item -84 failed, skip
+> process：85 --> -85
+> begin writing items: 
+> -85
+> process：86 --> -86
+> begin writing items: 
+> -86
+> process：87 --> -87
+> begin writing items: 
+> -87
+> process：88 --> -88
+> begin writing items: 
+> -88
+> process：89 --> -89
+> begin writing items: 
+> -89
+> process：90 --> -90
+> process：91 --> -91
+> process：92 --> -92
+> process：93 --> -93
+> process：94 --> -94
+> process：95 --> -95
+> process：96 --> -96
+> process：97 --> -97
+> process：98 --> -98
+> process：99 --> -99
+> begin writing items: 
+> -90
+> -91
+> -92
+> -93
+> -94
+> -95
+> -96
+> -97
+> -98
+> -99
+> ~~~
 
 ### 7.4 Listeners
 
-内容：
+内容：设置监听器来让框架在程序运行的特定阶段调用预设的回调函数
 
 原始Demo：`Learning Spring Batch - Working Files / Chapter 7 / listeners`
 
-步骤：
+步骤：与3.6节相同
 
+###  7.5 SkipListeners
 
-
-###  7.5 SkipRetryListeners
-
-内容：
+内容：使用之前的`Skip`容错机制，同时设置监听器监听`Skip`事件的发生
 
 原始Demo：`Learning Spring Batch - Working Files / Chapter 7 / skipRetryListeners`
 
 步骤：
 
+(1) processor跳过错误数据的处理逻辑
+
+> ```java
+> public class SkipItemProcessor implements ItemProcessor<String, String> {
+> 	@Override
+> 	public String process(String item) throws Exception {
+> 		// 假定item 42会有导致ItemProcessor发送异常的故障
+> 		boolean hasError = item.equalsIgnoreCase("42");
+> 		if (hasError) {
+> 			// (1) 发生故障时
+> 			System.out.println("process item " + item + " skip");
+> 			throw new CustomSkipException("process failed，item: " + item);
+> 		} else {
+> 			// (2) 没发生故障时，正常处理
+> 			String result = String.valueOf(Integer.valueOf(item) * -1);
+> 			System.out.println("process：" + item + " --> " + result);
+> 			return result;
+> 		}
+> 	}
+> }
+> ```
+
+(2) writer跳过错误数据的处理逻辑
+
+> ```java
+> public class SkipItemWriter implements ItemWriter<String> {
+> 	@Override
+> 	public void write(List<? extends String> items) throws Exception {
+> 		System.out.println("begin writing items: ");
+> 		for (String item : items) {
+> 			// 假定item -84会有导致ItemWriter发送异常的故障
+> 			boolean hasError = item.equalsIgnoreCase("-84");
+> 			if (hasError) {
+> 				System.out.println("writing item " + item + " failed, skip");
+>                 throw new CustomSkipException("write fail, item: " + item);
+> 			} else {
+> 				// 没有故障
+> 				System.out.println(item);
+> 			}
+> 		}
+> 	}
+> }
+> ```
+
+(2) skip listener
+
+> ```java
+> public class CustomSkipListener implements SkipListener {
+>    @Override
+>    public void onSkipInRead(Throwable t) {
+>        //拿不到record，但是可以在Reader代码中提供一些信息
+>    }
+> 
+>    @Override
+>    public void onSkipInWrite(Object item, Throwable t) {
+>       System.out.println(">> Skipping " + item + " because writing it caused the error: " + t.getMessage());
+>    }
+> 
+>    @Override
+>    public void onSkipInProcess(Object item, Throwable t) {
+>       System.out.println(">> Skipping " + item + " because processing it caused the error: " + t.getMessage());
+>    }
+> }
+> ```
+
+(3) 装配
+
+> ```java
+> @Bean
+> @StepScope
+> public SkipItemProcessor processor() {
+>    return new SkipItemProcessor();
+> }
+> 
+> @Bean
+> @StepScope
+> public SkipItemWriter writer() {
+>    return new SkipItemWriter();
+> }
+> 
+> @Bean
+> public Step step1() {
+>    return stepBuilderFactory.get("step")
+>          .<String, String>chunk(10)
+>          .reader(reader())
+>          .processor(processor())
+>          .writer(writer())
+>          .faultTolerant() //返回FaultStepBuilder以提供skip等方法
+>          .skip(CustomSkipException.class)
+>          .skipLimit(15) //skip超过15个item时会job fail
+>          .listener(new CustomSkipListener())
+>          .build();
+> }
+> ```
+
+运行：
+
+> 对于ItemProcessor的故障，可以看到日志">> Skipping 42 because processing it caused the error: process failed，item: 42"，说明Listener中的回调函数被执行
+>
+> ~~~bash
+> process：40 --> -40
+> process：41 --> -41
+> process item 42 skip
+> process：40 --> -40
+> process：41 --> -41
+> process：43 --> -43
+> process：44 --> -44
+> process：45 --> -45
+> process：46 --> -46
+> process：47 --> -47
+> process：48 --> -48
+> process：49 --> -49
+> begin writing items: 
+> -40
+> -41
+> -43
+> -44
+> -45
+> -46
+> -47
+> -48
+> -49
+> >> Skipping 42 because processing it caused the error: process failed，item: 42
+> ~~~
+>
+> 对于ItemWriter的故障，同样可以看到”>> Skipping -84 because writing it caused the error: write fail, item: -84“，说明Listener的回调函数被执行
+>
+> ~~~bash
+> process：85 --> -85
+> process：86 --> -86
+> process：87 --> -87
+> process：88 --> -88
+> process：89 --> -89
+> begin writing items: 
+> -80
+> -81
+> -82
+> -83
+> writing item -84 failed, skip
+> process：80 --> -80
+> begin writing items: 
+> -80
+> process：81 --> -81
+> begin writing items: 
+> -81
+> process：82 --> -82
+> begin writing items: 
+> -82
+> process：83 --> -83
+> begin writing items: 
+> -83
+> process：84 --> -84
+> begin writing items: 
+> writing item -84 failed, skip
+> process：85 --> -85
+> begin writing items: 
+> -85
+> >> Skipping -84 because writing it caused the error: write fail, item: -84
+> process：86 --> -86
+> begin writing items: 
+> -86
+> process：87 --> -87
+> begin writing items: 
+> -87
+> process：88 --> -88
+> begin writing items: 
+> -88
+> process：89 --> -89
+> begin writing items: 
+> -89
+> process：90 --> -90
+> process：91 --> -91
+> process：92 --> -92
+> process：93 --> -93
+> process：94 --> -94
+> process：95 --> -95
+> ~~~

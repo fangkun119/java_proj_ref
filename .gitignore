@@ -13,5 +13,5 @@
 **/kf_raw
 **/kf_tool
 /*.sql
-**/private/demos/**/src/
+**/private/
 /tmp_*
