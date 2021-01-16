@@ -17,7 +17,7 @@ import com.javaref.spring.entity.User;
 //@Repository与@Component一样，让类可以被自动装配
 @Repository("daoMysql")
 public class UserDaoMysqlImpl implements UserDao {
-	@Autowired
+	@Autowired()
 	User user;
 	
 	public User getUserByName(String name) {

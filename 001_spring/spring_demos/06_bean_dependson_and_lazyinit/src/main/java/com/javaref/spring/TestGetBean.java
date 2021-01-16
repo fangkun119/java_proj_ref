@@ -6,10 +6,10 @@ public class TestGetBean {
 	public static void main(String[] args) {
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 
-		A a1 = ctx.getBean("A1",A.class);
+		A a1 = ctx.getBean("A1", A.class);
 		System.out.println(a1);
 
-		A a2 = ctx.getBean("A2",A.class);
+		A a2 = ctx.getBean("A2", A.class);
 		System.out.println(a2);
 
 		C c1 = ctx.getBean("C1", C.class);

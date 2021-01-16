@@ -1,4 +1,6 @@
-# Spring IOC
+# Spring IOC简单示例
+
+[TOC]
 
 ##  1 概念
 
@@ -43,11 +45,11 @@
 > </bean>
 > ~~~
 
-##  2 基于XML的依赖注入
+##  2 XML依赖注入配置语法
 
 ### 2.1 使用多个xml配置文件
 
-####  方法1： 初始化容器时，指定多个xml配置文件
+####  方法1：初始化容器时，指定多个xml配置文件
 
 > ~~~java
 > ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationCon>text(
@@ -72,7 +74,7 @@
 >
 > Demo：
 >
-> [demos/01_rawproj_and_construct_inject/src/applicationContext.xml](demos/01_rawproj_and_construct_inject/src/applicationContext.xml)
+> [../spring_demos/01_rawproj_and_construct_inject/src/applicationContext.xml](../spring_demos/01_rawproj_and_construct_inject/src/applicationContext.xml)
 
 ### 2.2 XML配置、构造函数注入
 
@@ -89,8 +91,8 @@
 >
 > Demo： 
 > 
-> * [demos/01_rawproj_and_construct_inject/src/applicationContext.xml](demos/01_rawproj_and_construct_inject/src/applicationContext.xml)
-> * [demos/01_rawproj_and_construct_inject/src/com/javaref/spring/TestGetBean.java](demos/01_rawproj_and_construct_inject/src/com/javaref/spring/TestGetBean.java)
+> * [../spring_demos/01_rawproj_and_construct_inject/src/applicationContext.xml](../spring_demos/01_rawproj_and_construct_inject/src/applicationContext.xml)
+> * [../spring_demos/01_rawproj_and_construct_inject/src/com/javaref/spring/TestGetBean.java](../spring_demos/01_rawproj_and_construct_inject/src/com/javaref/spring/TestGetBean.java)
 
 ### 2.3 XML配置、属性注入
 
@@ -139,8 +141,8 @@
 >
 > Demo：
 >
-> * [demos/02_mvn_and_setter_inject/src/main/resources/applicationContext.xml](demos/02_mvn_and_setter_inject/src/main/resources/applicationContext.xml)
-> * [demos/02_mvn_and_setter_inject/src/main/java/com/javaref/spring/TestGetBean.java](demos/02_mvn_and_setter_inject/src/main/java/com/javaref/spring/TestGetBean.java)
+> * [../spring_demos/02_mvn_and_setter_inject/src/main/resources/applicationContext.xml](../spring_demos/02_mvn_and_setter_inject/src/main/resources/applicationContext.xml)
+> * [../spring_demos/02_mvn_and_setter_inject/src/main/java/com/javaref/spring/TestGetBean.java](../spring_demos/02_mvn_and_setter_inject/src/main/java/com/javaref/spring/TestGetBean.java)
 
 #### (4) 注入List、Set、Map类型、以及注入到java.util.Properties类型的属性上
 
@@ -219,15 +221,15 @@
 >
 > Demo：
 >
-> [demos/03_inject_collection_and_life_cycle/src/main/resources/applicationContext.xml](demos/03_inject_collection_and_life_cycle/src/main/resources/applicationContext.xml)
+> [../spring_demos/03_inject_collection_and_life_cycle/src/main/resources/applicationContext.xml](../spring_demos/03_inject_collection_and_life_cycle/src/main/resources/applicationContext.xml)
 >
-> [demos/03_inject_collection_and_life_cycle/src/main/java/com/javaref/spring/Person.java](demos/03_inject_collection_and_life_cycle/src/main/java/com/javaref/spring/Person.java)
+> [../spring_demos/03_inject_collection_and_life_cycle/src/main/java/com/javaref/spring/Person.java](../spring_demos/03_inject_collection_and_life_cycle/src/main/java/com/javaref/spring/Person.java)
 >
-> [demos/03_inject_collection_and_life_cycle/src/main/java/com/javaref/spring/TestGetBean.java](demos/03_inject_collection_and_life_cycle/src/main/java/com/javaref/spring/TestGetBean.java)]
+> [../spring_demos/03_inject_collection_and_life_cycle/src/main/java/com/javaref/spring/TestGetBean.java](../spring_demos/03_inject_collection_and_life_cycle/src/main/java/com/javaref/spring/TestGetBean.java)]
 
-### (5) 通过工厂来注入bean
+#### (5) 通过工厂来注入bean
 
-#### 动态工厂 
+##### 动态工厂 
 
 > 注入时通过调用`工厂bean`的`non-static`方法来创建对象
 >
@@ -241,7 +243,7 @@
 > <!-- 再通过工厂bean来创建bean -->
 > <bean id="car1" factory-bean="dynamicCarFactory" factory-method="getCar">
 > 	<!-- 传给getCar方法参数name的值时"audi"，用于构造Car对象 -->
->   <constructor-arg name="name" value="audi"/>
+>   	<constructor-arg name="name" value="audi"/>
 > </bean>
 > ~~~
 >
@@ -263,7 +265,7 @@
 > }
 > ~~~
 
-#### 静态工厂 
+##### 静态工厂 
 
 > 注入时调用工厂类的静态方法创建对象
 >
@@ -289,11 +291,11 @@
 >
 > Demo：
 >
-> * [demos/04_inject_with_factory/src/main/resources/applicationContext.xml](demos/04_inject_with_factory/src/main/resources/applicationContext.xml)
-> * [demos/04_inject_with_factory/src/main/java/com/javaref/spring/TestGetBean.java](demos/04_inject_with_factory/src/main/java/com/javaref/spring/TestGetBean.java)
-> * [demos/04_inject_with_factory/src/main/java/com/javaref/spring/CarFactory.java](demos/04_inject_with_factory/src/main/java/com/javaref/spring/CarFactory.java)
+> * [../spring_demos/04_inject_with_factory/src/main/resources/applicationContext.xml](../spring_demos/04_inject_with_factory/src/main/resources/applicationContext.xml)
+> * [../spring_demos/04_inject_with_factory/src/main/java/com/javaref/spring/TestGetBean.java](../spring_demos/04_inject_with_factory/src/main/java/com/javaref/spring/TestGetBean.java)
+> * [../spring_demos/04_inject_with_factory/src/main/java/com/javaref/spring/CarFactory.java](../spring_demos/04_inject_with_factory/src/main/java/com/javaref/spring/CarFactory.java)
 
-###  2.N 其他 
+###  2.4 其他 
 
 #### (1) `alias`: 为bean指定别名
 
@@ -316,9 +318,8 @@
 > System.out.println(ToStringBuilder.reflectionToString(person1));
 > //输出：
 > //com.javaref.spring.Person@6321e813[name=Jerry,age=18,food=com.javaref.spring.Food@3224f60b]
-> 
 > ~~~
->
+> 
 
 ####  (2) `lazy-init`和`depends-on`
 
@@ -365,10 +366,131 @@
 >
 > Demo：
 >
-> * [demos/06_bean_dependson_and_lazyinit/src/main/resources/applicationContext.xml](demos/06_bean_dependson_and_lazyinit/src/main/resources/applicationContext.xml)
-> * [demos/06_bean_dependson_and_lazyinit/src/main/java/com/javaref/spring/TestGetBean.java](demos/06_bean_dependson_and_lazyinit/src/main/java/com/javaref/spring/TestGetBean.java)
+> * [../spring_demos/06_bean_dependson_and_lazyinit/src/main/resources/applicationContext.xml](../spring_demos/06_bean_dependson_and_lazyinit/src/main/resources/applicationContext.xml)
+> * [../spring_demos/06_bean_dependson_and_lazyinit/src/main/java/com/javaref/spring/TestGetBean.java](../spring_demos/06_bean_dependson_and_lazyinit/src/main/java/com/javaref/spring/TestGetBean.java)
 
-## 3 基于注解的依赖注入
+## 3 自动装配
+
+### 3.1 基于XML的自动装配
+
+#### (1) 解决的问题
+
+> 解决项目变大以后配置内容庞大的问题
+>
+> 使用自动装配，只需要指定为哪些bean来自动装配他们的依赖项，而不需要配置具体的依赖关系，避免配置文件变得庞大
+
+#### (2) 哪些Bean的依赖可被自动装配
+
+#####  所有bean
+
+> `<beans>`标签的`default-autowire`属性设为`byType`或`byName`
+>
+> ```xml
+> <?xml version="1.0" encoding="UTF-8"?>
+> <beans xmlns="http://www.springframework.org/schema/beans"
+>        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+>        default-autowire="byType"
+> >
+>     ...
+> </beans>
+> ```
+
+##### 特定的bean
+
+> <bean>标签的`autowire`属性设为`byType`或`byName`，例如
+>
+> ```xml
+> <bean id="beanD" class="com.javaref.spring.D" autowire="byType"></bean>
+> ```
+
+#### (3) 如何找到依赖项
+
+##### `byType`
+
+要求：每种被依赖的class只能生成一个bean
+
+> ```xml
+> <!-- autowire="byName"要求dependent bean的id (singleTonB/C)与成员变量（以及get,set方法）命名相一致 -->
+> <bean id="beanD" class="com.javaref.spring.D" autowire="byType"></bean>
+> <bean id="beanE" class="com.javaref.spring.E" autowire="byType"></bean>
+> <bean id="beamF" class="com.javaref.spring.F" autowire="byType"></bean>
+> ```
+
+##### `byName`
+
+要求：因为是通过属性注入的，因此要求`dependent bean的id`与`成员变量（以及get,set方法）`命名相一致。这样框架才能够进行名称匹配
+
+> ```xml
+> <!-- autowire="byName"要求dependent bean的id (singleTonB/C)与成员变量（以及get,set方法）命名相一致 -->
+> <bean id="singletonA" class="com.javaref.spring.A" autowire="byName"></bean>
+> <bean id="singletonB" class="com.javaref.spring.B" autowire="byName"></bean>
+> <bean id="singletonC" class="com.javaref.spring.C" autowire="byName"></bean>
+> ```
+
+#### (4) 代码
+
+> * [../spring_demos/07_bean_autowire_01_by_xml/src/main/resources/applicationContext.xml](../spring_demos/07_bean_autowire_01_by_xml/src/main/resources/applicationContext.xml)
+>
+> * [../spring_demos/07_bean_autowire_02_by_annotation/src/main/java/com/javaref/spring/TestGetBean.java](../spring_demos/07_bean_autowire_02_by_annotation/src/main/java/com/javaref/spring/TestGetBean.java)
+
+### 3.2 基于注解的自动装配
+
+#### (1) 简单例子
+
+开启自动注解，并指定bean扫描范围
+
+> ```xml
+> <?xml version="1.0" encoding="UTF-8"?>
+> <!-- 需要引入命名空间xmlns:context，并且在schemaLocation中指定context相关的配置 -->
+> <beans xmlns="http://www.springframework.org/schema/beans"
+>    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>    xmlns:p="http://www.springframework.org/schema/p"
+>    xmlns:context="http://www.springframework.org/schema/context"
+>    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+>    >
+>    <!-- 指定component-scan的package，该package下的带有Component标签(或其他实现了@Component的标签）的类，会纳入spring管理 -->
+>    <!-- 也可以在base-package中添加多个包 -->
+>    <context:component-scan base-package="com.javaref.spring"></context:component-scan>
+> </beans>
+> ```
+
+在定义bean的位置，用@Component，或者`@Controller`、`@Repository`、`@Service`等具化的注解来标注，例如
+
+> ```java
+> @Repository("daoMysql")
+> public class UserDaoMysqlImpl implements UserDao {
+>    @Autowired()
+>    User user;
+>    
+>    public User getUserByName(String name) {
+>       ...
+>    }
+> }
+> ```
+>
+> ```java
+> @Repository("daoSS")
+> public class UserDaoSqlServerImpl implements UserDao {
+>    ...
+> }
+> ```
+
+在需要注入的位置，使用`@Autowire`注解来自动装配
+
+> ```java
+> @Service
+> public class MainService {
+>    @Autowired
+>    @Qualifier("daoMysql")
+>    UserDao dao;
+>    ...
+> }
+> ```
+
+Demo:
+
+> [../spring_demos/07_bean_autowire_02_by_annotation/](../spring_demos/07_bean_autowire_02_by_annotation/pom)
 
 ## 4 Bean的作用域
 
@@ -401,8 +523,8 @@ MVC中`Controller`是单例的，`Model`中的`Service`、`DAO`等等也是单�
 
 Demo：
 
-> * [demos/03_inject_collection_and_life_cycle/src/main/resources/applicationContext.xml](demos/03_inject_collection_and_life_cycle/src/main/resources/applicationContext.xml)
-> * [demos/03_inject_collection_and_life_cycle/src/main/java/com/javaref/spring/TestGetBean.java](demos/03_inject_collection_and_life_cycle/src/main/java/com/javaref/spring/TestGetBean.java)
+> * [../spring_demos/03_inject_collection_and_life_cycle/src/main/resources/applicationContext.xml](../spring_demos/03_inject_collection_and_life_cycle/src/main/resources/applicationContext.xml)
+> * [../spring_demos/03_inject_collection_and_life_cycle/src/main/java/com/javaref/spring/TestGetBean.java](../spring_demos/03_inject_collection_and_life_cycle/src/main/java/com/javaref/spring/TestGetBean.java)
 
 ## 5 Bean循环依赖问题 
 
@@ -497,18 +619,12 @@ Demo：
 > // true  // B虽然是prototype，但是都来自于单例A，因此对象地址的hashCode都相同，要小心多线程问题
 > ```
 
-Demo：
+Demo
 
-> * [demos/05_circular_reference/src/main/resources/applicationContext.xml](demos/05_circular_reference/src/main/resources/applicationContext.xml)
-> * [demos/05_circular_reference/src/main/java/com/javaref/spring/TestGetBean.java](demos/05_circular_reference/src/main/java/com/javaref/spring/TestGetBean.java)
+> * [../spring_demos/05_circular_reference/src/main/resources/applicationContext.xml](../spring_demos/05_circular_reference/src/main/resources/applicationContext.xml)
+> * [../spring_demos/05_circular_reference/src/main/java/com/javaref/spring/TestGetBean.java](../spring_demos/05_circular_reference/src/main/java/com/javaref/spring/TestGetBean.java)
 
-
-
-
-
-
-
-##  N. 技巧 
+##  6 编码小技巧 
 
 ###  (1) `ToStringBuilder`：为对象提供`toString`代码支持
 
@@ -533,5 +649,5 @@ maven依赖
 > 
 > ~~~
 
-### 
+
 

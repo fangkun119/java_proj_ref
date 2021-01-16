@@ -21,6 +21,7 @@
     -->
 
     <!-- 因为每个Bean都只初始化一次，因此可以考虑自动装配，而省去上面繁琐的配置 -->
+    <!-- 下面的注释是相关java代码，以显示这些类之间的依赖关系 -->
     <!--
         public class A {
             private B singletonB;
@@ -34,6 +35,7 @@
         }
         ...
     -->
+
     <!-- autowire="byName"要求dependent bean的id (singleTonB/C)与成员变量（以及get,set方法）命名相一致 -->
     <bean id="singletonA" class="com.javaref.spring.A" autowire="byName"></bean>
     <bean id="singletonB" class="com.javaref.spring.B" autowire="byName"></bean>
