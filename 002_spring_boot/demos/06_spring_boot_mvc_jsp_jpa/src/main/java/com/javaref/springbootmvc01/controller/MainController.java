@@ -18,8 +18,8 @@ public class MainController {
 
     // 建表SQL：resources/sql/dbname1.city.sql
 
-    // 测试url：localhost:8080/list/10
-    @RequestMapping("list/{id}")
+    // 测试url：localhost:8080/city/10
+    @RequestMapping("{id}")
     public String getOne(@PathVariable("id") Integer id, Model map) {
         City city = citySrv.findOne(id);
         map.addAttribute("city", city);

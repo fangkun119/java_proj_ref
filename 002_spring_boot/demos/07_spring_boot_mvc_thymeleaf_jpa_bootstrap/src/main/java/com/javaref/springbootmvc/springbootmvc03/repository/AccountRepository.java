@@ -20,7 +20,8 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     @Query("select acc from Account acc where acc.id=?1 ")
     List<Account> queryWithHQL2(int id);
 
-    // 除了HQL，JPA也支持动态拼接SQL，SQL；太复杂的查询也放在这一层，但是会使用ES，Solr等
+    // 除了HQL，JPA也支持动态拼接SQL，SQL；
+    // 太复杂的查询也放在这一层，但是会使用ES，Solr等
     // 更多JPA相关内容，见附加的JPA文档
 
     // Spring JPA在跨表查询时，问题会非常多，并且需要深入学习JPA及Hibernate底层的知识

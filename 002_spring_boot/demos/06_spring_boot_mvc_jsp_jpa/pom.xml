@@ -19,10 +19,12 @@
     </properties>
 
     <dependencies>
+        <!-- Spring Boot MVC -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
         <!-- 如果引入thymeleaf，Controller返回的string会被当做thyemleaf模板来处理，而不会当做JSP -->
         <!--
         <dependency>
@@ -30,16 +32,30 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
         -->
+
+        <!-- 添加JSP要用到的依赖, Spring Boot没有针对JSP的Starter，需要手动添加 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <scope>provided</scope>
         </dependency>
 
+        <!-- 数据库连接 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- 测试 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -50,20 +66,6 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <!-- 添加JSP要用到的dependencies, Spring Boot没有针对JSP的Starter，需要手动添加 -->
-        <!-- jstl -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
-        </dependency>
-
-        <!-- jasper -->
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-jasper</artifactId>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

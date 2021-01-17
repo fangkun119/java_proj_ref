@@ -64,6 +64,7 @@ public class MainController {
 	// 如果需要用 @RequestParam 注解的参数太多，也可以用 @ModelAttribute 注解一个封装了参数的对象
 	@PostMapping("/add2")
 	public String add2(@ModelAttribute City city, Model map) {
+		// 备注：这类参数检查可以使用SpringValidate来简化代码
 		String result = "";
 		if (null == city.getId() || null == city.getName()) {
 			result = "参数错误";

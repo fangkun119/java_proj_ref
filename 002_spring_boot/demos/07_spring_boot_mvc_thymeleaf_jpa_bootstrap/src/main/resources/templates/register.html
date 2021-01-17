@@ -25,10 +25,9 @@
 <body>
 
 <!-- 用thymeleaf条件表达式，来让下面的标签仅在Controller设置的"stat"属性不为null时显示 -->
-<p th:text="${stat == null ? '' : stat.message}" class="bg-danger">...</p>
 <!-- class="bg-danger" 来自 https://v3.bootcss.com/css/#helper-classes -->
 <!-- <p class="bg-danger">...</p> -->
-
+<p th:text="${stat == null ? '' : stat.message}" class="bg-danger">...</p>
 <a th:href="@{/list}">用户列表</a>
 <a th:href="@{/register}">用户注册</a>
 <!-- 更多的thymeleaf相关的内容，参考附加的thymeleaf文档 -->
@@ -39,6 +38,7 @@
     拷贝 bootstrap.min.css 到 src/main/resources/static/css/
     拷贝 bootstrap.min.js  到 src/main/resources/static/js/
 -->
+
 <!-- 从 https://v3.bootcss.com/css/#forms-example 拷贝的form标签并粘贴到下方，根据需要进行修改 -->
 <!-- 增加表单提交时，对应的路径和方法 -->
 <form action="register" method="post">
