@@ -6,11 +6,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class MainController {
-
 	@RequestMapping("/")
 	public String defaultPage() {
 		return "index";
 	}
-
 }
 

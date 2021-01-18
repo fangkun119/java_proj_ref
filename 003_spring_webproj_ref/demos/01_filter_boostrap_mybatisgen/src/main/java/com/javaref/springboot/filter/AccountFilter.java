@@ -7,33 +7,33 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 /***************************************************
  * 用户权限处理
  */
 
-@Component                      // 使这个类对象可以被Spring注入
-@WebFilter(urlPatterns = "/*")  // urlPatterns = "/*"： 所有url都要被Filter匹配
+@Component  // 使这个类对象可以被Spring注入
+@WebFilter(urlPatterns = "/*" /*所有url都要被Filter匹配*/)
 public class AccountFilter implements Filter {
+    // doFilter方法执行过滤时，遇到下列uri跳过不做处理
+    private final String[] IGNORE_URIS = {
+            "/index",  "/css/", "/js/", "/images/",  "/account/login", "/account/logOut", "/account/validateAccount"};
 
-    // 不需要Filter的URI
-    private final String[] ignoreURIs = {
-            "/index",  "/css/", "/js/", "/images/",
-            "/account/login",
-            "/account/logOut",
-            "/account/validateAccount"
-    };
+    private boolean isInIgnoreList(String uri) {
+        boolean isMatchIgnore = Stream.of(IGNORE_URIS).anyMatch((ignPrefix) -> uri.startsWith(ignPrefix));
+        return isMatchIgnore;
+    }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
             throws IOException, ServletException {
-        // 查看哪些资源的访问，经过了这个Filter
+        // 执行过滤操作的URI
         HttpServletRequest  httpReq  = (HttpServletRequest)req;
         HttpServletResponse httpResp = (HttpServletResponse)resp;
         String uri = httpReq.getRequestURI();
-        System.out.println("....... filter ........ "  + uri);
 
-        // 当前访问的URI是不是在ignore列表中
+        // 如果再忽略列表中，则跳过
         if (isInIgnoreList(uri)) {
             chain.doFilter(req,resp);
             // 不要忘记return，否则doFilter之后，还会继续后面的步骤
@@ -45,35 +45,18 @@ public class AccountFilter implements Filter {
         Object account = httpReq.getSession().getAttribute("account");
         System.out.println("get SessionAccount: " + account);
         if (null == account) {
-            // 跳转登录页面
+            // 如果没有登录，则跳转登录页面
             httpResp.sendRedirect("/account/login");
             return;
         }
 
-        //    1.1 找到、放行
-        //    1.2 找不到、
-        //    1.3 当前访问的URI是不是在ignore列表中
-
-
+        // 检查结束，放行，由下一个Filter（如果有）继续处理
         chain.doFilter(req, resp);
-    }
-
-    private boolean isInIgnoreList(String uri) {
-        for (String ignore : ignoreURIs) {
-            if (uri.startsWith(ignore)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        // 这里可以添加代码：
-        //  加载Filter启动需要的资源
-        //  打印启动日志等
-
-        System.out.println("....... Account Filter init........");
+        //  这里可以添加代码：加载Filter启动需要的资源，打印启动日志等
         Filter.super.init(filterConfig);
     }
 }

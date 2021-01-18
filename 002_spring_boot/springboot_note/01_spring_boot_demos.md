@@ -525,7 +525,7 @@ Spring项目结构
 > }
 > ```
 
-###  6.4 使用自动翻页
+###  6.4 分页器（后端部分）
 
 >  Controller：[/src/main/java/.../controller/MainController.java](../demos/08_spring_boot_mvc_mybatis/src/main/java/com/javaref/springboot/controller/MainController.java)
 >

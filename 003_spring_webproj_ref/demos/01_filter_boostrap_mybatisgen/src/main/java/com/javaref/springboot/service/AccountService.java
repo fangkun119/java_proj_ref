@@ -1,7 +1,6 @@
 package com.javaref.springboot.service;
 
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.javaref.springboot.entity.Account;
 import com.javaref.springboot.mapper.AccountExample;
 import com.javaref.springboot.mapper.AccountMapper;
@@ -12,21 +11,22 @@ import java.util.List;
 
 @Service
 public class AccountService {
-
     @Autowired
-    AccountMapper  accountMapper;
+    AccountMapper accountMapper;
 
     public Account findByLoginNameAndPassword(String loginName, String password) {
+        // 设置查询条件
         AccountExample example = new AccountExample();
         example.createCriteria()
                 .andLoginNameEqualTo(loginName)
                 .andPasswordEqualTo(password);
 
-        // 数据库中给loginName设置了unique约束
+        // 调用DAO层进行查询
         List<Account> accounts = accountMapper.selectByExample(example);
         if (null == accounts || 0 == accounts.size()) {
             return null;
         } else {
+            // 数据库中给loginName设置了unique约束
             return accounts.get(0);
         }
     }

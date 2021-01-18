@@ -20,12 +20,8 @@
 	<!--
 		内容：
 		1. 传统项目（SSM，Spring-SpringMVC-MyBatis）中MyBatis的XML配置方式
-		2. MyBatis与SpringBoot整合：相比SSM省略了很多配置文件
-		3. 增删查改、注解查询、Mapper查找
-		4. 分页
-		5. Mapper自动生成（根据数据库表反向生成）
-		6. 数据库连接池
-		7. 反向查询
+		2. MyBatis Generator GUIMapper：根据数据库表反向生成DAO及MyBatis配置
+		3. 分页
 
 		底层：
 		SQLSessionFactory
@@ -37,7 +33,6 @@
 					需要
 					* 用@MapperScan(value = "${mybatis.type-aliases-package})注解SpringBootMvc04Application类
 					* 或者用@Mapper注解AccountMapper类
-
 		-> Executor
 		-> ResultSet（对象映射配置）
 		-> 实体类
@@ -57,43 +52,43 @@
 		ActiveRecord：通过实体类的方法来CURD
 	-->
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
+		<!-- Spring Boot MVC -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- MyBatis用到的依赖 -->
+		<!-- Thymeleaf HTML模板引擎 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+
+		<!-- MyBatis及DB Connector -->
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
 			<version>2.0.1</version>
 		</dependency>
-
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
+		<!-- 分页插件 -->
+		<!-- https://mvnrepository.com/artifact/com.github.pagehelper/pagehelper-spring-boot-starter -->
+		<dependency>
+			<groupId>com.github.pagehelper</groupId>
+			<artifactId>pagehelper-spring-boot-starter</artifactId>
+			<version>1.2.12</version>
+		</dependency>
+
+		<!-- 测试 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-		</dependency>
-		
-		<!-- 分页插件 -->
-		<!-- https://mvnrepository.com/artifact/com.github.pagehelper/pagehelper-spring-boot-starter -->
-		<dependency>
-		    <groupId>com.github.pagehelper</groupId>
-		    <artifactId>pagehelper-spring-boot-starter</artifactId>
-		    <version>1.2.12</version>  
 		</dependency>
 	</dependencies>
 

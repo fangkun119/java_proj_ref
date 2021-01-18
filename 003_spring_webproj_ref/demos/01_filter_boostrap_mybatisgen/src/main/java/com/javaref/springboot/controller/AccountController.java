@@ -17,7 +17,6 @@ import java.util.List;
 @Controller
 @RequestMapping("/account")
 public class AccountController {
-
     @Autowired
     AccountService accountSrv;
 
