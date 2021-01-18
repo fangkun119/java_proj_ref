@@ -160,7 +160,7 @@
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from account
     where id = #{id,jdbcType=INTEGER}
-  </delete>
+    </delete>
     <delete id="deleteByExample" parameterType="com.javaref.springboot.mapper.AccountExample">
         delete from account
         <if test="_parameter != null">
@@ -175,7 +175,7 @@
     values (#{loginName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{nickName,jdbcType=VARCHAR}, 
       #{age,jdbcType=INTEGER}, #{location,jdbcType=VARCHAR}, #{role,jdbcType=VARCHAR}
       )
-  </insert>
+    </insert>
     <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.javaref.springboot.entity.Account"
             useGeneratedKeys="true">
         insert into account

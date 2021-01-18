@@ -5,6 +5,7 @@ import com.javaref.springboot.entity.Permission;
 import com.javaref.springboot.service.PermissionService;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +24,7 @@ public class PermissionManagerRestController {
     PermissionService permissionSrv;
 
     // 新建或更新Permission
-    @RequestMapping("set")
+    @PostMapping("set")
     public RespStat setPermission(@RequestBody Permission permission) {
         System.out.println("permission:" + ToStringBuilder.reflectionToString(permission));
         // 检查是add，还是update
@@ -35,14 +36,4 @@ public class PermissionManagerRestController {
         // 返回结果
         return RespStat.build(200);
     }
-
-    // update 不需要了
-    /*
-    @RequestMapping("update")
-    public RespStat update(@RequestBody Permission permission) {
-        System.out.println("permission:" + ToStringBuilder.reflectionToString(permission));
-        permissionSrv.update(permission);
-        return RespStat.build(200);
-    }
-     */
 }

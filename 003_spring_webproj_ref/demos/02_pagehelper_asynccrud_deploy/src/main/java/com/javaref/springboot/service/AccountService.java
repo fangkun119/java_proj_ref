@@ -13,19 +13,19 @@ import java.util.List;
 
 @Service
 public class AccountService {
-
     @Autowired
     AccountMapper  accountMapper;
 
     public Account findByLoginNameAndPassword(String loginName, String password) {
+        // 设置DB查询条件
         AccountExample example = new AccountExample();
         example.createCriteria()
                 .andLoginNameEqualTo(loginName)
                 .andPasswordEqualTo(password);
-
-        // 数据库中给loginName设置了unique约束
+        // 调用DAO进行查询
         List<Account> accounts = accountMapper.selectByExample(example);
         if (null == accounts || 0 == accounts.size()) {
+            // 数据库中给loginName设置了unique约束
             return null;
         } else {
             return accounts.get(0);
@@ -37,25 +37,22 @@ public class AccountService {
         return accountMapper.selectByExample(example);
     }
 
-
     public PageInfo<Account> findByPage(int pageNum, int pageSize) {
-        PageHelper.startPage(pageNum, pageSize); //设置AOP
+        // 设置AOP，它会影响底层数据库访问的操作
+        PageHelper.startPage(pageNum, pageSize);
 
+        // 调用DAO层返回数据
         AccountExample example = new AccountExample();
         List<Account> accountList = accountMapper.selectByExample(example);
 
         // 构造PageInfo时，设置分页器只显示临近的5页（默认是8页）
         return new PageInfo<>(accountList, 5);
 
-        // 点到PageInfo的代码中，
-        // 可以看到PageInfo给前端的分页控件交互时，会用到哪些信息，这可以帮助我们理解还如何实现分页的前后端交互
-        // 不过PageHelper已经提供了该功能，就不需要自己实现了
-        /*
-        pageNum, pageSize, size, startRow, endRow, pages
-        prePage, nextPage, isFirstPage, isLastPage,
-        hasPreviousPage，hasNextPage，navigatePages，
-        navigatepageNums, navigateFirstPage, pnavigateLastPage
-        */
+        // 封装在PageInfo中的数据（也可以看出分页器API的设计思路）
+        // pageNum, pageSize, size, startRow, endRow, pages
+        // prePage, nextPage, isFirstPage, isLastPage,
+        // hasPreviousPage，hasNextPage，navigatePages，
+        // navigatepageNums, navigateFirstPage, pnavigateLastPage
     }
 
     public RespStat deleteById(int id) {

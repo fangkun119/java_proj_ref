@@ -1,11 +1,8 @@
 package com.javaref.springboot.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 
-/**
- * @author 
- * 
- */
 public class Role implements Serializable {
     private Integer id;
 
@@ -30,28 +27,20 @@ public class Role implements Serializable {
     }
 
     @Override
-    public boolean equals(Object that) {
-        if (this == that) {
+    public boolean equals(Object role) {
+        if (this == role) {
             return true;
         }
-        if (that == null) {
+        if (role == null || getClass() != role.getClass()) {
             return false;
         }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        Role other = (Role) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()));
+        return Objects.equals(this.getId(),   ((Role) role).getId())
+            && Objects.equals(this.getName(), ((Role) role).getName());
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
-        return result;
+        return Objects.hash(this.getId(), this.getName());
     }
 
     @Override

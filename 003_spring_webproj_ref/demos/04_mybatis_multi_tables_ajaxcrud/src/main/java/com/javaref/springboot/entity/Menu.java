@@ -1,11 +1,8 @@
 package com.javaref.springboot.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 
-/**
- * menu
- * @author 
- */
 public class Menu implements Serializable {
     private Integer id;
 
@@ -54,28 +51,20 @@ public class Menu implements Serializable {
         if (this == that) {
             return true;
         }
-        if (that == null) {
+        if (that == null || getClass() != that.getClass()) {
             return false;
         }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        Menu other = (Menu) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
-            && (this.getRoles() == null ? other.getRoles() == null : this.getRoles().equals(other.getRoles()))
-            && (this.getIndex() == null ? other.getIndex() == null : this.getIndex().equals(other.getIndex()));
+        Menu menu = (Menu) that;
+        return Objects.equals(this.getId(), menu.getId())
+                && Objects.equals(this.getName(), menu.getName())
+                && Objects.equals(this.getRoles(), menu.getRoles())
+                && Objects.equals(this.getIndex(), menu.getIndex())
+                ;
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
-        result = prime * result + ((getRoles() == null) ? 0 : getRoles().hashCode());
-        result = prime * result + ((getIndex() == null) ? 0 : getIndex().hashCode());
-        return result;
+        return Objects.hash(this.getId(), this.getName(), this.getRoles(), this.getIndex());
     }
 
     @Override

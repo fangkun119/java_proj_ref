@@ -1,11 +1,8 @@
 package com.javaref.springboot.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 
-/**
- * @author 
- * 
- */
 public class Permission implements Serializable {
     private Integer id;
 
@@ -84,34 +81,23 @@ public class Permission implements Serializable {
         if (this == that) {
             return true;
         }
-        if (that == null) {
+        if (that == null || getClass() != that.getClass()) {
             return false;
         }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        Permission other = (Permission) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getUri() == null ? other.getUri() == null : this.getUri().equals(other.getUri()))
-            && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
-            && (this.getC() == null ? other.getC() == null : this.getC().equals(other.getC()))
-            && (this.getR() == null ? other.getR() == null : this.getR().equals(other.getR()))
-            && (this.getU() == null ? other.getU() == null : this.getU().equals(other.getU()))
-            && (this.getD() == null ? other.getD() == null : this.getD().equals(other.getD()));
+        Permission permission = (Permission) that;
+        return Objects.equals(this.getId(),   permission.getId())
+                && Objects.equals(this.getUri(),  permission.getUri())
+                && Objects.equals(this.getName(), permission.getName())
+                && Objects.equals(this.getC(),    permission.getC())
+                && Objects.equals(this.getR(),    permission.getR())
+                && Objects.equals(this.getU(),    permission.getU())
+                && Objects.equals(this.getD(),    permission.getD())
+                ;
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getUri() == null) ? 0 : getUri().hashCode());
-        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
-        result = prime * result + ((getC() == null) ? 0 : getC().hashCode());
-        result = prime * result + ((getR() == null) ? 0 : getR().hashCode());
-        result = prime * result + ((getU() == null) ? 0 : getU().hashCode());
-        result = prime * result + ((getD() == null) ? 0 : getD().hashCode());
-        return result;
+        return Objects.hash(getId(), getUri(), getName(), getC(), getR(), getU(), getD());
     }
 
     @Override

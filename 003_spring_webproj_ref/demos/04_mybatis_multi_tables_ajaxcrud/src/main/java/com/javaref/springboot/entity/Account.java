@@ -2,11 +2,8 @@ package com.javaref.springboot.entity;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
-/**
- * account
- * @author 
- */
 public class Account implements Serializable {
     private static final long serialVersionUID = 1L;
     private Integer id;
@@ -19,27 +16,33 @@ public class Account implements Serializable {
     // 在MyBatis Generator生成的Account类基础上做修改
     // 添加这个Account的角色，与account_role, role联表得到
     private List<Role> roleList;
+
     public List<Role> getRoleList() {
         return roleList;
     }
+
     public void setRoleList(List<Role> roleList) {
         this.roleList = roleList;
     }
 
     // 添加这个Account具有的权限，与account_role, role, role_permission, permission联表得到
     private List<Permission> permissionList;
+
     public List<Permission> getPermissionList() {
-		return permissionList;
-	}
-	public void setPermissionList(List<Permission> permissionList) {
-		this.permissionList = permissionList;
-	}
+        return permissionList;
+    }
+
+    public void setPermissionList(List<Permission> permissionList) {
+        this.permissionList = permissionList;
+    }
 
     // 这个字段可以不用了: 从accout表以及代码中移除
     private String role;
+
     public String getRole() {
         return role;
     }
+
     public void setRole(String role) {
         this.role = role;
     }
@@ -47,6 +50,7 @@ public class Account implements Serializable {
     public Integer getId() {
         return id;
     }
+
     public void setId(Integer id) {
         this.id = id;
     }
@@ -54,6 +58,7 @@ public class Account implements Serializable {
     public String getLoginName() {
         return loginName;
     }
+
     public void setLoginName(String loginName) {
         this.loginName = loginName;
     }
@@ -61,6 +66,7 @@ public class Account implements Serializable {
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -68,6 +74,7 @@ public class Account implements Serializable {
     public String getNickName() {
         return nickName;
     }
+
     public void setNickName(String nickName) {
         this.nickName = nickName;
     }
@@ -75,6 +82,7 @@ public class Account implements Serializable {
     public Integer getAge() {
         return age;
     }
+
     public void setAge(Integer age) {
         this.age = age;
     }
@@ -82,43 +90,32 @@ public class Account implements Serializable {
     public String getLocation() {
         return location;
     }
+
     public void setLocation(String location) {
         this.location = location;
     }
 
-    // TODO: 下面的方法也应该对应着修改
     @Override
     public boolean equals(Object that) {
         if (this == that) {
             return true;
         }
-        if (that == null) {
+        if (that == null || getClass() != that.getClass()) {
             return false;
         }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        Account other = (Account) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getLoginName() == null ? other.getLoginName() == null : this.getLoginName().equals(other.getLoginName()))
-            && (this.getPassword() == null ? other.getPassword() == null : this.getPassword().equals(other.getPassword()))
-            && (this.getNickName() == null ? other.getNickName() == null : this.getNickName().equals(other.getNickName()))
-            && (this.getAge() == null ? other.getAge() == null : this.getAge().equals(other.getAge()))
-            && (this.getLocation() == null ? other.getLocation() == null : this.getLocation().equals(other.getLocation()))
-            && (this.getRole() == null ? other.getRole() == null : this.getRole().equals(other.getRole()));
+        Account acct = (Account) that;
+        return Objects.equals(this.getId(), acct.getId())
+                && Objects.equals(this.getLoginName(), acct.getLoginName())
+                && Objects.equals(this.getPassword(), acct.getPassword())
+                && Objects.equals(this.getNickName(), acct.getNickName())
+                && Objects.equals(this.getAge(), acct.getAge())
+                && Objects.equals(this.getLocation(), acct.getLocation())
+                && Objects.equals(this.getRole(), acct.getLocation())
+                ;
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getLoginName() == null) ? 0 : getLoginName().hashCode());
-        result = prime * result + ((getPassword() == null) ? 0 : getPassword().hashCode());
-        result = prime * result + ((getNickName() == null) ? 0 : getNickName().hashCode());
-        result = prime * result + ((getAge() == null) ? 0 : getAge().hashCode());
-        result = prime * result + ((getLocation() == null) ? 0 : getLocation().hashCode());
-        result = prime * result + ((getRole() == null) ? 0 : getRole().hashCode());
-        return result;
+        return Objects.hash(getId(), getLoginName(), getPassword(), getNickName(), getAge(), getLocation(), getRole());
     }
 }

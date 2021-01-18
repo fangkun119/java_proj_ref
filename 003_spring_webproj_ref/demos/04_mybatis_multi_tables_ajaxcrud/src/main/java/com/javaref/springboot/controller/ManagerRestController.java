@@ -14,7 +14,6 @@ import com.javaref.springboot.service.PermissionService;
  * restful风格URI的controller
  * 只和用户交换JSON数据
  */
-
 //用@RestController来注解，Rest的Request路径要加上版本号
 @RestController
 @RequestMapping("/api/v1/manager/permission")

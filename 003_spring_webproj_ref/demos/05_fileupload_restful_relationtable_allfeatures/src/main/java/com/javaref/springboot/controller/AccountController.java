@@ -85,7 +85,7 @@ public class AccountController {
         try {
             // 存放在当前项目的目录下：
             // 缺点是用jar包启动时这是个临时目录，另外路径中如果出现中文路径会转义成url encoding字符串导致无法上传
-            File path = new File(ResourceUtils.getURL("classpath:").getPath());
+            File path   = new File(ResourceUtils.getURL("classpath:").getPath());
             File upload = new File(path.getAbsolutePath(), "static/uploads/" + account.getLoginName());
 
             // 存放在系统指定的目录中：需要在配置文件的 spring.resources.static-locations 一项中配文件静态目录映射

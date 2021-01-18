@@ -267,9 +267,9 @@
     function deleteById(id) {
         console.log("id:" + id)
         // 异步通过ajax 去访问 带有json访问结果的controller
-        //	showTip("haha", 5000, function() {});
-        //	showMsg("haha", function() {});
-        showConfirm("haha", function () {
+        //	showTip("xxx", 5000, function() {});
+        //	showMsg("xxx", function() {});
+        showConfirm("是否要删除", function () {
             // 确认删除
             var url = "/account/deleteById";
             var args = {id: id};
@@ -285,7 +285,6 @@
             });
         });
     }
-    // 锋利的jQuery
 </script>
 </body>
 </html>

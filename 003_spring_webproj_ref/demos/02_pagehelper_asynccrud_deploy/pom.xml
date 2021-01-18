@@ -27,9 +27,8 @@
 		项目部署：有两种方式
 		1. 旧的方法：生成War包，放入tomcat中
 		(1) 在<build></build>子标签内，添加<packaging>war</packaging>
-		(2) 引入spring-boot-starter-tomcat依赖，让这个包在packaging阶段被exclude，避免tomcat相关的包被重复打包
-			该依赖理论上可以参与编译，测试，运行等周期。相当于compile，但是打包阶段做了exclude操作
-			运行时由外部设施的tomcat来提供，因此不打在war包中
+		(2) 引入`spring-boot-starter-tomcat`依赖并让它在packaging阶段被exclude，
+		    避免tomcat相关的包被编译到war包中（而是在运行时由外部设施的tomcat来提供）
 			<dependency>
     			<groupId>org.springframework.boot</groupId>
     			<artifactId>spring-boot-starter-tomcat</artifactId>
@@ -52,43 +51,43 @@
 		这个jar包内置了tomcat，运行java -jar ${jar_file_path}，就可以启动
 	-->
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
+		<!-- Spring Boot MVC -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- MyBatis用到的依赖 -->
+		<!-- HTML模板引擎Thymeleaf -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+
+		<!-- MyBatis以及DB connector -->
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
 			<version>2.0.1</version>
 		</dependency>
-
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-		</dependency>
-		
+
 		<!-- 分页插件 -->
 		<!-- https://mvnrepository.com/artifact/com.github.pagehelper/pagehelper-spring-boot-starter -->
 		<dependency>
 		    <groupId>com.github.pagehelper</groupId>
 		    <artifactId>pagehelper-spring-boot-starter</artifactId>
 		    <version>1.2.12</version>  
+		</dependency>
+
+		<!-- 测试 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
