@@ -43,11 +43,145 @@ Spring项目结构
 
 ## 02 Spring MVC
 
-> Thymeleaf，Controller，Service，DAO；URL路径映射
+### 2.1 Demo
+
+> 代码位置：[../demos/demos/04_spring_boot_mvc_thymeleaf/](../demos/demos/04_spring_boot_mvc_thymeleaf/)
 >
-> 传递数据给Thymeleaf
+> 项目结构：
 >
-> 项目位置：[../demos/demos/04_spring_boot_mvc_thymeleaf/](../demos/demos/04_spring_boot_mvc_thymeleaf/)
+> * Controller，Service，DAO，Thymeleaf模板
+>
+> * 传递数据给Thymeleaf
+
+### 2.2 常用表单数据接收方式
+
+#### Path Variable
+
+> ~~~java
+> @GetMapping(value = "/hello/{id}")
+> public String hello(@PathVariable("id") Integer id){
+> 	return "ID:" + id;
+> }
+> ~~~
+
+#### url参数名
+
+> ~~~java
+> @PostMapping(value = "/post")
+> public String post(@RequestParam(name = "name") String name,
+>                    @RequestParam(name = "age") Integer age) {
+>     String content = String.format("name = %s,age = %d", name, age);
+>     return content;
+> }
+> ~~~
+
+#### 普通实体对象
+
+> ~~~java
+> @PostMapping(value = "/user")
+> public User saveUser2(User user) {
+>     return user;
+> }
+> ~~~
+
+#### Json数据
+
+> ~~~java
+> @PostMapping(value = "/user")
+> public User saveUser2(@RequestBody User user) {
+>     return user;
+> }
+> ~~~
+
+### 2.3 后端参数校验
+
+#### 例子
+
+> ~~~java
+> @Getter
+> @Setter
+> @ToString
+> public class Person {
+>     @NotNull
+>     private String name;
+>     
+>     @NotNull
+>     @Positive
+>     private Integer age;
+> 
+>     @Valid // 让InnerChild的属性也参与校验
+>     @NotNull
+>     private InnerChild child;
+> 
+>     @Getter
+>     @Setter
+>     @ToString
+>     public static class InnerChild {
+>         @NotNull
+>         private String name;
+>         @NotNull
+>         @Positive
+>         private Integer age;
+>     }
+> }
+> 
+> @RestController
+> @RequestMapping
+> public class HelloController {
+>     @PostMapping("/hello")
+>     public Object helloPost(@Valid @RequestBody Person person, BindingResult result) {
+>         System.out.println(result.getErrorCount());
+>         System.out.println(result.getAllErrors());
+>         return person;
+>     }
+> }
+> ~~~
+
+#### 常用注解
+
+> `@NotBlank`判断字符创是否是null或者是空串(去掉首尾空格)。
+>
+> `@NotEmpty`判断字符串是否为null会者是空串。
+>
+> `@Length`判断字符的长度（最大或最小）
+>
+> `@Min`判断数值最小值
+>
+> `@Max`判断数值最大值
+>
+> `@Email`判断邮箱是否合法
+>
+> `@Null`限制只能为null
+>
+> `@NotNull`限制必须不为null
+>
+> `@AssertFalse`限制必须为false
+>
+> `@AssertTrue`限制必须为true
+>
+> `@DecimalMax(value)`限制必须为一个不大于指定值的数字
+>
+> `@DecimalMin(value)`限制必须为一个不小于指定值的数字
+>
+> `@Digits(integer,fraction)`限制必须为一个小数，且整数部分的位数不能超过integer，小数部分的位数不能超过fractio
+>
+> `@Max(value)`限制必须为一个不大于指定值的数字
+>
+> `@Min(value)`限制必须为一个不小于指定值的数字
+>
+> `@Future`限制必须是一个将来的日期
+>
+> `@Past`限制必须是一个过去的日期
+>
+> `@Pattern(value)`限制必须符合指定的正则表达式
+>
+> `@Size(max,min)`限制字符长度必须在min到max之间
+>
+> `@NotEmpty`验证注解的元素值不为null且不为空（字符串长度不为0、集合大小不为0）
+>
+> `@NotBlank`验证注解的元素值不为空（不为null、去除首尾空格后长度不为0），不同于@NotEmpty，@NotBlank只应用于字符串且在比较时会去除字符串的空格
+>
+> `@Email`验证注解的元素值是Email，也可以通过正则表达式和flag指定自定义的email格式
 
 ## 03 用JPA实现DAO
 
@@ -470,22 +604,22 @@ Spring项目结构
 > ```xml
 > <!-- MyBatis及DB Connector -->
 > <dependency>
->    <groupId>org.mybatis.spring.boot</groupId>
->    <artifactId>mybatis-spring-boot-starter</artifactId>
->    <version>2.0.1</version>
+> <groupId>org.mybatis.spring.boot</groupId>
+> <artifactId>mybatis-spring-boot-starter</artifactId>
+> <version>2.0.1</version>
 > </dependency>
 > <dependency>
->    <groupId>mysql</groupId>
->    <artifactId>mysql-connector-java</artifactId>
->    <scope>runtime</scope>
+> <groupId>mysql</groupId>
+> <artifactId>mysql-connector-java</artifactId>
+> <scope>runtime</scope>
 > </dependency>
 > 
 > <!-- 分页插件 -->
 > <!-- https://mvnrepository.com/artifact/com.github.pagehelper/pagehelper-spring-boot-starter -->
 > <dependency>
->    <groupId>com.github.pagehelper</groupId>
->    <artifactId>pagehelper-spring-boot-starter</artifactId>
->    <version>1.2.12</version>
+> <groupId>com.github.pagehelper</groupId>
+> <artifactId>pagehelper-spring-boot-starter</artifactId>
+> <version>1.2.12</version>
 > </dependency>
 > ```
 >
@@ -502,6 +636,7 @@ Spring项目结构
 > mybatis.type-aliases-package=com.javaref.springboot.mapper
 > # <Mapper方法,SQL>映射配置文件的位置，其中classpath在代码中对应于src/main/resources
 > mybatis.mapper-locations=classpath:mybatis/mapper/*.xml
+> 
 > # 在日志中打印SQL
 > logging.level.com.mashibing.springboot.mapper=debug
 > ```
@@ -512,9 +647,9 @@ Spring项目结构
 > @SpringBootApplication
 > @MapperScan(value = "com.javaref.springboot.mapper")
 > public class SpringBootMvc04Application {
->        public static void main(String[] args) {
->           SpringApplication.run(SpringBootMvc04Application.class, args);
->        }
+>     public static void main(String[] args) {
+>        SpringApplication.run(SpringBootMvc04Application.class, args);
+>     }
 > }
 > ```
 
