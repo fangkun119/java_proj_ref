@@ -32,14 +32,9 @@ public class MainController {
     }
 
     // 测试url: http://localhost:8080/account/register
-    @PostMapping("register")
+    @RequestMapping("register")
     public String registerPost(HttpServletRequest request, Account account) {
         // 获取表单数据，可以通过HttpServletRequest，也可以通过注入@Entity对象account注入来获取
-        // 处于演示需要，这里两种方式一起使用
-        String loginName = (String)request.getAttribute("loginName");
-        System.out.println("============= Post ============");
-        System.out.println("loginName=" + loginName);
-        System.out.println("account: " + ToStringBuilder.reflectionToString(account));
 
         // 注册用户，结果存入context
         RespStat stat = accSrv.save(account);

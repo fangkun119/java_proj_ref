@@ -25,6 +25,22 @@ Spring项目结构
 
 > 项目位置：[../demos/03_spring_boot_proj_structure/](../demos/03_spring_boot_proj_structure/)
 
+有多个main方法时，指定使用哪一个
+
+> ```xml
+> <build>
+>    <plugins>
+>       <plugin>
+>          <groupId>org.springframework.boot</groupId>
+>          <artifactId>spring-boot-maven-plugin</artifactId>
+>          <configuration>
+>             <mainClass>com.javaref.springboot02.FirstSpringBoot02Application</mainClass>
+>          </configuration>
+>       </plugin>
+>    </plugins>
+> </build>
+> ```
+
 ## 02 Spring MVC
 
 > Thymeleaf，Controller，Service，DAO；URL路径映射
@@ -33,9 +49,9 @@ Spring项目结构
 >
 > 项目位置：[../demos/demos/04_spring_boot_mvc_thymeleaf/](../demos/demos/04_spring_boot_mvc_thymeleaf/)
 
-## 03 JPA
+## 03 用JPA实现DAO
 
-用JPA来实现DAO
+### 3.1 Demo
 
 代码位置：[../demos/05_spring_boot_mvc_thymeleaf_jpa/](../demos/05_spring_boot_mvc_thymeleaf_jpa/)
 
@@ -46,14 +62,29 @@ Spring项目结构
 > ```xml
 > <!-- 用JPA连接MySQL来实现DAO-->
 > <dependency>
->     <groupId>org.springframework.boot</groupId>
->     <artifactId>spring-boot-starter-data-jpa</artifactId>
+> 	<groupId>org.springframework.boot</groupId>
+> 	<artifactId>spring-boot-starter-data-jpa</artifactId>
 > </dependency>
 > <dependency>
->     <groupId>mysql</groupId>
->     <artifactId>mysql-connector-java</artifactId>
->     <scope>runtime</scope>
+> 	<groupId>mysql</groupId>
+> 	<artifactId>mysql-connector-java</artifactId>
+> 	<scope>runtime</scope>
 > </dependency>
+> ```
+>
+> Entity：[/src/main/java/.../entity/City.java](../demos/05_spring_boot_mvc_thymeleaf_jpa/src/main/java/com/javaref/springbootmvc01/entity/City.java)
+>
+> ```java
+> // 想让JPA能够识别并处理City类，需要增加相关的javax.persistence.*注解
+> @Entity
+> @Table(name = "city")
+> public class City {
+> 	@Id
+> 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+> 	private Integer id;
+> 	private String name;
+> 	...    
+> }
 > ```
 >
 > DAO：[/src/main/java/.../dao/CityRepository.java](../demos/05_spring_boot_mvc_thymeleaf_jpa/src/main/java/com/javaref/springbootmvc01/dao/CityRepository.java)
@@ -65,22 +96,29 @@ Spring项目结构
 > }
 > ~~~
 >
-> Entity：[/src/main/java/.../entity/City.java](../demos/05_spring_boot_mvc_thymeleaf_jpa/src/main/java/com/javaref/springbootmvc01/entity/City.java)
->
-> ```java
-> // 想让JPA能够识别并处理City类，需要增加相关的javax.persistence.*注解
-> @Entity
-> @Table(name = "city")
-> public class City {
->     @Id
->     @GeneratedValue(strategy = GenerationType.IDENTITY)
->     private Integer id;
->     private String name;
-> 	...    
-> }
-> ```
->
 > Service：[src/main/java/.../service/CityService.java](../demos/05_spring_boot_mvc_thymeleaf_jpa/src/main/java/com/javaref/springbootmvc01/service/CityService.java)
+>
+> 使用JPA后、DAO会继承大量的方法，可以在Service层中使用
+>
+> ~~~java
+> @Service
+> public class CityService {
+>     // 使用JPA，这里要指向一个CityRepository接口，而不是类
+>     @Autowired
+>     CityRepository cityRepo;
+> 
+>     public List<City> findAll() {
+>         // CityRepository extends JpaRepository<City, Integer>之后，具有findAll方法
+>         // JpaRepository<City, Integer>是个接口
+>         // 该接口的方法由JPA来实现
+>         return cityRepo.findAll();
+>     }
+> 
+>     public City findOne(Integer id) {
+>         return cityRepo.getOne(id);
+>     }
+> }
+> ~~~
 >
 > Controller：[/src/main/java/.../controller/MainController.java](../demos/05_spring_boot_mvc_thymeleaf_jpa/src/main/java/com/javaref/springbootmvc01/controller/MainController.java)
 >
@@ -91,6 +129,27 @@ Spring项目结构
 > spring.datasource.username=root
 > spring.datasource.password=12345678
 > ```
+
+### 3.2 JAP常用API
+
+> ~~~txt
+> And     	--- 等价于 SQL 中的 and 关键字，比如 findByUsernameAndPassword(String user, Striang pwd)；
+> Or      	--- 等价于 SQL 中的 or 关键字，比如 findByUsernameOrAddress(String user, String addr)；
+> Between  	--- 等价于 SQL 中的 between 关键字，比如 findBySalaryBetween(int max, int min)；
+> LessThan 	--- 等价于 SQL 中的 "<"，比如 findBySalaryLessThan(int max)；
+> GreaterThan --- 等价于 SQL 中的">"，比如 findBySalaryGreaterThan(int min)；
+> IsNull   	--- 等价于 SQL 中的 "is null"，比如 findByUsernameIsNull()；
+> IsNotNull 	--- 等价于 SQL 中的 "is not null"，比如 findByUsernameIsNotNull()；
+> NotNull 	--- 与 IsNotNull 等价；
+> Like    	--- 等价于 SQL 中的 "like"，比如 findByUsernameLike(String user)；
+> NotLike 	--- 等价于 SQL 中的 "not like"，比如 findByUsernameNotLike(String user)；
+> OrderBy 	--- 等价于 SQL 中的 "order by"，比如 findByUsernameOrderBySalaryAsc(String user)；
+> Not     	--- 等价于 SQL 中的 "！ ="，比如 findByUsernameNot(String user)；
+> In      	--- 等价于 SQL 中的 "in"，比如 findByUsernameIn(Collection<String> userList) ，方法的参数可以是 Collection 类型，也可以是数组或者不定长参数；
+> NotIn   	--- 等价于 SQL 中的 "not in"，比如 findByUsernameNotIn(Collection<String> userList) ，方法的参数可以是 Collection 类型，也可以是数组或者不定长参数；
+> ~~~
+>
+> 还可以使用`@Qurey`注解为`添加定制查询`，参考小节`5.2 JPA定制查询`
 
 ## 04 JSP 
 
@@ -104,20 +163,20 @@ Spring项目结构
 > <!-- 如果引入thymeleaf，Controller返回的string会被当做thyemleaf模板来处理，而不会当做JSP -->
 > <!--
 > <dependency>
->     <groupId>org.springframework.boot</groupId>
->     <artifactId>spring-boot-starter-thymeleaf</artifactId>
+>    	<groupId>org.springframework.boot</groupId>
+>    	<artifactId>spring-boot-starter-thymeleaf</artifactId>
 > </dependency>
 > -->
 > 
 > <!-- 添加JSP要用到的依赖, Spring Boot没有针对JSP的Starter，需要手动添加 -->
 > <dependency>
->     <groupId>javax.servlet</groupId>
->     <artifactId>jstl</artifactId>
+>    	<groupId>javax.servlet</groupId>
+>    	<artifactId>jstl</artifactId>
 > </dependency>
 > <dependency>
->     <groupId>org.apache.tomcat.embed</groupId>
->     <artifactId>tomcat-embed-jasper</artifactId>
->     <scope>provided</scope>
+>    	<groupId>org.apache.tomcat.embed</groupId>
+>    	<artifactId>tomcat-embed-jasper</artifactId>
+>    	<scope>provided</scope>
 > </dependency>
 > ```
 >
@@ -143,40 +202,44 @@ Spring项目结构
 > @Controller
 > @RequestMapping("/city")
 > public class MainController {
->     @Autowired
->     CityService citySrv;
->     // 测试url：localhost:8080/city/10
->     @RequestMapping("{id}")
->     public String getOne(@PathVariable("id") Integer id, Model map) {
->         City city = citySrv.findOne(id);
->         map.addAttribute("city", city);
+>    	@Autowired
+>    	CityService citySrv;
+>    	// 测试url：localhost:8080/city/10
+>    	@RequestMapping("{id}")
+>    	public String getOne(@PathVariable("id") Integer id, Model map) {
+>    		City city = citySrv.findOne(id);
+>    		map.addAttribute("city", city);
 > 
->         // 如果使用thymeleaf（在pom.xml中引入spring-boot-starter-thymeleaf）
->         // 返回"one"，Spring Boot会用src/main/resourcestemplates/one.html作为模板来生成返回页面
->         // return "one";
+>    		// 如果使用thymeleaf（在pom.xml中引入spring-boot-starter-thymeleaf）
+>    		// 返回"one"，Spring Boot会用src/main/resourcestemplates/one.html作为模板来生成返回页面
+>    		// return "one";
 > 
->         // 如果使用JSP
->         // 1. 在pom.xml中不引入spring-boot-starter-thymeleaf，它会去templates下查找thymeleaf模板
->         // 2. 在pom.xml中引入jstl, tomcat-embed-jasper，开启对JSP的支持
->         // 3. 在application.properties中配置
->         //      spring.mvc.view.prefix=/WEB-INF/jsp/
->         //      spring.mvc.view.suffix=.jsp
->         return "one_jsp"; //Spring Boot会用src/main/web-app/WEB-INF/jsp/one_jsp.jsp来生成返回页面
->     }
->     ...
+>    		// 如果使用JSP
+>    		// 1. 在pom.xml中不引入spring-boot-starter-thymeleaf，它会去templates下查找thymeleaf模板
+>    		// 2. 在pom.xml中引入jstl, tomcat-embed-jasper，开启对JSP的支持
+>    		// 3. 在application.properties中配置
+>    		//      spring.mvc.view.prefix=/WEB-INF/jsp/
+>    		//      spring.mvc.view.suffix=.jsp
+>    		return "one_jsp"; //Spring Boot会用src/main/web-app/WEB-INF/jsp/one_jsp.jsp来生成返回页面
+>    	}
+>    	...
 > }
 > ```
 
-## 05 Bootstrap
+## 05 Bootstrap, Thymeleaf, JPA定制查询
 
 > (1) 使用Thymeleaf + Boostrap生成Web页面
 >
 > (2) 为使用JPA生成的DAO添加定制查询
 
-代码位置：[../demos/07_spring_boot_mvc_thymeleaf_jpa_bootstrap/](../demos/07_spring_boot_mvc_thymeleaf_jpa_bootstrap/)
+代码位置：
 
-配置：[/src/main/resources/application.properties](../demos/07_spring_boot_mvc_thymeleaf_jpa_bootstrap/src/main/resources/application.properties)
+> [../demos/07_spring_boot_mvc_thymeleaf_jpa_bootstrap/](../demos/07_spring_boot_mvc_thymeleaf_jpa_bootstrap/)
 
+配置：
+
+> [/src/main/resources/application.properties](../demos/07_spring_boot_mvc_thymeleaf_jpa_bootstrap/src/main/resources/application.properties)
+>
 > ```properties
 > ...
 > 
@@ -188,14 +251,16 @@ Spring项目结构
 
 ### 5.1 使用Thymeleaf + Bootstrap生成Web页面
 
+#### (1) Demo
+
 > Bootstrap的css和js（下载存放到下面位置，或者在thymeleaf模板中直接使用cdn地址）
 >
 > ~~~xml
 > <!--
->     从 https://v3.bootcss.com/getting-started/#download 下载 "用于生产环境的 bootstrap"
->     解压后，
->     拷贝 bootstrap.min.css 到 src/main/resources/static/css/
->     拷贝 bootstrap.min.js  到 src/main/resources/static/js/
+> 	从 https://v3.bootcss.com/getting-started/#download 下载 "用于生产环境的 bootstrap"
+> 	解压后，
+> 	拷贝 bootstrap.min.css 到 src/main/resources/static/css/
+> 	拷贝 bootstrap.min.js  到 src/main/resources/static/js/
 > -->
 > ~~~
 >
@@ -203,64 +268,61 @@ Spring项目结构
 >
 > ~~~html
 > <!DOCTYPE html>
-> <html lang="en">
+> <html lang="en" xmlns:th="http://www.thymeleaf.org">
 > <head>
 > 	...
->     <!-- thymeleaf会自动给这些url加上Servlet Context前缀，在application.properties中的配置项为server.servlet.context-path -->
->     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+> 	<!-- thymeleaf会自动给这些url加上Servlet Context前缀，在application.properties中的配置项为server.servlet.context-path -->
+> 	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 >     <script th:src="@{/js/bootstrap.min.js}"></script>
->     ...
+> 	...
 > </head>
 > <body>
->     <!-- 用thymeleaf条件表达式，来让下面的标签仅在Controller设置的"stat"属性不为null时显示 -->
+> 	<!-- 用thymeleaf条件表达式，来让下面的标签仅在Controller设置的"stat"属性不为null时显示 -->
 > 	<!-- class="bg-danger" 来自 https://v3.bootcss.com/css/#helper-classes -->
 > 	<!-- <p class="bg-danger">...</p> -->
 > 	<p th:text="${stat == null ? '' : stat.message}" class="bg-danger">...</p>
 > 	<a th:href="@{/list}">用户列表</a>
 > 	<a th:href="@{/register}">用户注册</a>
 > 
->     <!-- 添加bootstrap组件 -->
->     <!-- 从 https://v3.bootcss.com/css/#forms-example 拷贝的form标签并粘贴到下方，根据需要进行修改 -->
->     <!-- 增加表单提交时，对应的路径和方法 -->
->     <form action="register" method="post">
->         <div class="form-group">
->             <label for="loginName">用户名</label>
->             <input type="text" name="loginName" class="form-control" id="loginName" placeholder="请输入用户名">
->         </div>
+> 	<!-- 添加bootstrap组件 -->
+> 	<!-- 从 https://v3.bootcss.com/css/#forms-example 拷贝的form标签并粘贴到下方，根据需要进行修改 -->
+> 	<!-- 增加表单提交时，对应的路径和方法 -->
+> 	<form action="register" method="post">
+> 		<div class="form-group">
+> 			<label for="loginName">用户名</label>
+> 			<input type="text" name="loginName" class="form-control" id="loginName" placeholder="请输入用户名">
+> 		</div>
 > 		...
->         <button type="submit" class="btn btn-default">提交</button>
->     </form>
+> 		<button type="submit" class="btn btn-default">提交</button>
+> 	</form>
 > </body>
 > ~~~
 >
-> 处理从上面的表单提交（`<form action="register" method="post">`）：[/src/main/java/.../controller/MainController.java](../demos/07_spring_boot_mvc_thymeleaf_jpa_bootstrap/src/main/java/com/javaref/springbootmvc/springbootmvc03/controller/MainController.java)
+> Controller：[/src/main/java/.../controller/MainController.java](../demos/07_spring_boot_mvc_thymeleaf_jpa_bootstrap/src/main/java/com/javaref/springbootmvc/springbootmvc03/controller/MainController.java)
 >
 > ```java
 > @Controller
 > public class MainController {
->     @Autowired
->     AccountService accSrv;
-> 	
->     ...
-> 	
->     // 测试url: http://localhost:8080/account/register
->     // 对应register.html中的表单提交：<form action="register" method="post">
->     @PostMapping("register")
->     public String registerPost(HttpServletRequest request, Account account) {
->         // 获取表单数据，可以通过HttpServletRequest，也可以通过注入@Entity对象account注入来获取
->         // 处于演示需要，这里两种方式一起使用
->         String loginName = (String)request.getAttribute("loginName");
->         System.out.println("============= Post ============");
->         System.out.println("loginName=" + loginName);
->         System.out.println("account: " + ToStringBuilder.reflectionToString(account));
+> 	@Autowired
+> 	AccountService accSrv;
 > 
->         // 注册用户，结果存入context
->         RespStat stat = accSrv.save(account);
->         request.setAttribute("stat", stat);
+> 	...
 > 
->         // 返回结果用"register.html"模板来渲染
->         return "register";
->     }
+> 	// 测试url: http://localhost:8080/account/register
+> 	@RequestMapping("register")
+> 	public String registerPost(HttpServletRequest request, Account account) {
+> 		// 获取表单数据，可以通过HttpServletRequest，也可以通过注入@Entity对象account注入来获取
+> 		// 处于演示需要，这里两种方式一起使用
+> 		String loginName = (String)request.getAttribute("loginName");
+> 
+> 		// 注册用户，结果存入context
+> 		RespStat stat = accSrv.save(account);
+> 		request.setAttribute("stat", stat);
+> 
+> 		// 返回结果用"register.html"模板来渲染
+> 		return "register";
+>  	}
+> 	
 >     ...
 > }
 > ```
@@ -272,7 +334,13 @@ Spring项目结构
 > * 在Thymeleaf模板中可以看到，`<p th:text="${stat == null ? '' : stat.message}" class="bg-danger">...</p>`，渲染html页面是使用了`RespStat stat`对象的数据
 > * `RespStat`是一个POJO，代码为[`/src/main/java/.../service/RespStat.java`](../demos/07_spring_boot_mvc_thymeleaf_jpa_bootstrap/src/main/java/com/javaref/springbootmvc/springbootmvc03/service/RespStat.java)
 
+#### (2) Thymeleaf
+
+> 参考 [./02_thymeleaf.md](./02_thymeleaf.md)
+
 ### 5.2 JPA定制查询
+
+#### (1) Demo
 
 > DAO：[/src/main/java/.../repository/AccountRepository.java](../demos/07_spring_boot_mvc_thymeleaf_jpa_bootstrap/src/main/java/com/javaref/springbootmvc/springbootmvc03/repository/AccountRepository.java)
 >
@@ -287,7 +355,7 @@ Spring项目结构
 >     // 面向对象的select，因此不是select * 而是select一个Account，放在变量acc中，存入返回列表
 >     @Query("select acc from Account acc where acc.id=1 ")
 >     List<Account> queryWithHQL1();
->     
+> 
 >     @Query("select acc from Account acc where acc.id=?1 ")
 >     List<Account> queryWithHQL2(int id);
 > 
@@ -313,30 +381,77 @@ Spring项目结构
 > ```java
 > @Service
 > public class AccountService {
->     @Autowired
->     AccountRepository accRep;
+> 	@Autowired
+> 	AccountRepository accRep;
+> 
+> 	// 使用上面编写的自定义方法
+> 	public List<Account> queryWithHQL1() {
+> 		return accRep.queryWithHQL1();
+> 	}
+> 
+> 	public List<Account> queryWithHQL2(int id) {
+> 		return accRep.queryWithHQL2(id);
+> 	}
+> 
+> 	// 使用JpaRepository<Account, Integer> 接口自带方法
+> 	public Optional<Account> findById(int id)  {
+> 		return accRep.findById(id);
+> 	}
+> 
+> 	public List<Account> findByIdBetween(int max, int min) {
+> 		return accRep.findByIdBetween(max, min);
+> 	}
 >     
->    	// 使用上面编写的自定义方法
->     public List<Account> queryWithHQL1() {
->         return accRep.queryWithHQL1();
->     }
-> 
->     public List<Account> queryWithHQL2(int id) {
->         return accRep.queryWithHQL2(id);
->     }
-> 
->     // 使用JpaRepository<Account, Integer> 接口自带方法
->     public Optional<Account> findById(int id)  {
->         return accRep.findById(id);
->     }
-> 
->     public List<Account> findByIdBetween(int max, int min) {
->         return accRep.findByIdBetween(max, min);
->     }
->     
->     ...
+> 	...
 > }
 > ```
+
+#### (2)  JPA自定义SQL注解`@Query`
+
+> 通过参数位置（占位符）来传递参数
+>
+> ~~~java
+> public interface UserDao extends Repository<AccountInfo, Long> { 
+> 	@Query("select a from AccountInfo a where a.accountId = ?1") 
+> 	public AccountInfo findByAccountId(Long accountId); 
+>  
+> 	@Query("select a from AccountInfo a where a.balance > ?1") 
+> 	public Page<AccountInfo> findByBalanceGreaterThan( 
+> 	Integer balance,Pageable pageable); 
+> }
+> ~~~
+>
+> 使用参数名来传递参数
+>
+> ~~~java
+> public interface UserDao extends Repository<AccountInfo, Long> { 
+> 	public AccountInfo save(AccountInfo accountInfo); 
+> 
+> 	@Query("from AccountInfo a where a.accountId = :id") 
+> 	public AccountInfo findByAccountId(@Param("id")Long accountId); 
+> 
+> 	@Query("from AccountInfo a where a.balance > :balance") 
+> 	public Page<AccountInfo> findByBalanceGreaterThan( 
+> 		@Param("balance")Integer balance,Pageable pageable); 
+> }
+> ~~~
+>
+> 更新
+>
+> ~~~java
+> @Modifying 
+> @Query("update AccountInfo a set a.salary = ?1 where a.salary < ?2") 
+> public int increaseSalary(int after, int before);
+> ~~~
+>
+> 直接使用Native SQL
+>
+> ~~~java
+> public interface UserRepository extends JpaRepository<User, Long> {
+> 	@Query(value = "SELECT * FROM USERS WHERE EMAIL_ADDRESS = ?1", nativeQuery = true)
+> 	User findByEmailAddress(String emailAddress);
+> }
+> ~~~
 
 ## 06  MyBatis
 
@@ -397,9 +512,9 @@ Spring项目结构
 > @SpringBootApplication
 > @MapperScan(value = "com.javaref.springboot.mapper")
 > public class SpringBootMvc04Application {
->    public static void main(String[] args) {
->       SpringApplication.run(SpringBootMvc04Application.class, args);
->    }
+>        public static void main(String[] args) {
+>           SpringApplication.run(SpringBootMvc04Application.class, args);
+>        }
 > }
 > ```
 
@@ -412,13 +527,13 @@ Spring项目结构
 > // Mapper扫描可以扫到这里，因此AccountMapper也可以不使用@Mapper注解
 > // @Mapper
 > public interface AccountMapper {
->    // SQL配置在AccountMapper.xml中
->    List<Account> findAllByXMLBinding();
->    void add(Account account);
+>        // SQL配置在AccountMapper.xml中
+>        List<Account> findAllByXMLBinding();
+>        void add(Account account);
 > 
->    // 不需要向AccountMapper.xml中添加配置
->    @Select("select * from account")
->    List<Account> findAllByAnnotation();
+>        // 不需要向AccountMapper.xml中添加配置
+>        @Select("select * from account")
+>        List<Account> findAllByAnnotation();
 > }
 > ```
 >
@@ -430,36 +545,36 @@ Spring项目结构
 > 
 > <!-- 将namespace命名为Mapper接口，就不需要实例化这个接口了 -->
 > <mapper namespace="com.javaref.springboot.mapper.AccountMapper">
->     <!-- 映射关系：POJO对象属性 - 表字段，如果不配置、将按照MyBatis默认的名称规则来映射 -->
->     <resultMap type="com.javaref.springboot.mapper.Account" id="AccountResultMap">
->         <!-- column   : 表字段        -->
->         <!-- property : 实体对象的属性 -->
->         <result column="login_name" property="loginName"/>
->         <result column="password" property="password"/>
->     </resultMap>
+>        <!-- 映射关系：POJO对象属性 - 表字段，如果不配置、将按照MyBatis默认的名称规则来映射 -->
+>        <resultMap type="com.javaref.springboot.mapper.Account" id="AccountResultMap">
+>            <!-- column   : 表字段        -->
+>            <!-- property : 实体对象的属性 -->
+>            <result column="login_name" property="loginName"/>
+>            <result column="password" property="password"/>
+>        </resultMap>
 > 
->     <!-- SQL与方法绑定：通过id="findAllByXMLBinding"、绑定到AccountMapper.findAllByXMLBinding()                -->
->     <!-- 返回的ResultSet与POJO绑定：通过resultMap="AccountResultMap"找到上面的id="AccountResultMap"的<resultMap>标签 -->
->     <select id="findAllByXMLBinding" resultMap="AccountResultMap">
->         select *
->         from account
->     </select>
+>        <!-- SQL与方法绑定：通过id="findAllByXMLBinding"、绑定到AccountMapper.findAllByXMLBinding()                -->
+>        <!-- 返回的ResultSet与POJO绑定：通过resultMap="AccountResultMap"找到上面的id="AccountResultMap"的<resultMap>标签 -->
+>        <select id="findAllByXMLBinding" resultMap="AccountResultMap">
+>            select *
+>            from account
+>        </select>
 > 
->     <!-- 向SQL中传参数 -->
->     <!-- #{}表达式中的内容是Account类的属性，框架通过动态代理+反射，找到Account的loginName、password属性的get方法拿到对应的值 -->
->     <insert id="add" parameterType="Account">
->         insert into account(login_name, password)
->         values (#{loginName}, #{password})
->     </insert>
+>        <!-- 向SQL中传参数 -->
+>        <!-- #{}表达式中的内容是Account类的属性，框架通过动态代理+反射，找到Account的loginName、password属性的get方法拿到对应的值 -->
+>        <insert id="add" parameterType="Account">
+>            insert into account(login_name, password)
+>            values (#{loginName}, #{password})
+>        </insert>
 > 
->     <!-- 另一种做法时，用@Select("select * from account")注解AccountMapper接口中的方法，而不用写xml配置 -->
->     <!-- 例如AccountMapper.findAllByAnnotation()方法 -->
+>        <!-- 另一种做法时，用@Select("select * from account")注解AccountMapper接口中的方法，而不用写xml配置 -->
+>        <!-- 例如AccountMapper.findAllByAnnotation()方法 -->
 > </mapper>
 > 
 > <!-- 想要自动生成上面的这些配置、以及Mapper的代码  -->
 > <!--
->    方法1：MyBatis Generator，基于XML配置，使用不方便
->     方法2：https://github.com/zouzg/mybatis-generator-gui, 使用GUI生成配置
+>    	方法1：MyBatis Generator，基于XML配置，使用不方便
+>    	方法2：https://github.com/zouzg/mybatis-generator-gui, 使用GUI生成配置
 > -->
 > ```
 
@@ -538,8 +653,8 @@ Spring项目结构
 >        @RequestParam(required = false) Integer pageNum,
 >        @RequestParam(required = false) Integer pageSize
 >  ) {
->     List<Menu> menus = menuSrv.findByPage(pageNum,pageSize);
->     return menus;
+>    	List<Menu> menus = menuSrv.findByPage(pageNum,pageSize);
+>    	return menus;
 >  }
 >  ```
 >
@@ -547,20 +662,83 @@ Spring项目结构
 >
 >  ```java
 >  public List<Menu> findByPage(Integer pageNum, Integer pageSize) {
->     // 引入
->     //     <groupId>com.github.pagehelper</groupId>
->     //     <artifactId>pagehelper-spring-boot-starter</artifactId>
->     // 之后
->     // 函数头部的 PageHelper.startPage(pageNum, pageSize) 代码
->     // 可以影响函数底部 menuMapper.selectByExample(example) 生成的SQL
->     // 这是pagehelper通过AOP来实现的
+>        // 引入
+>        //     <groupId>com.github.pagehelper</groupId>
+>        //     <artifactId>pagehelper-spring-boot-starter</artifactId>
+>        // 之后
+>        // 函数头部的 PageHelper.startPage(pageNum, pageSize) 代码
+>        // 可以影响函数底部 menuMapper.selectByExample(example) 生成的SQL
+>        // 这是pagehelper通过AOP来实现的
 >  
->     PageHelper.startPage(pageNum, pageSize);
->     MenuExample example = new MenuExample();
->     // AOP
->     return menuMapper.selectByExample(example);
+>        PageHelper.startPage(pageNum, pageSize);
+>        MenuExample example = new MenuExample();
+>        // AOP
+>        return menuMapper.selectByExample(example);
 >  }
 >  ```
 
+## 99 附录
 
+### 99.1 常用配置
+
+> ~~~properties
+> # JPA相关
+> # validate      加载hibernate时，验证创建数据库表结构
+> # create   	    每次加载hibernate，重新创建数据库表结构，这就是导致数据库表数据丢失的原因。
+> # create-drop   加载hibernate时创建，退出是删除表结构
+> # update        加载hibernate自动更新数据库结构
+> # validate      启动时验证表的结构，不会创建表
+> # none          启动时不做任何操作
+> spring.jpa.hibernate.ddl-auto=validate 
+> # 控制台打印sql
+> spring.jpa.show-sql=true
+> 
+> # 需要Spring Dev Tool依赖
+> spring.devtools.restart.enabled: true
+> 
+> # thymeleaf相关
+> spring.thymeleaf.cache=false
+> spring.thymeleaf.encoding=UTF-8
+> 
+> # encoding
+> spring.http.encoding.force=true
+> spring.http.encoding.charset=UTF-8
+> spring.http.encoding.enabled=true
+> server.tomcat.uri-encoding=UTF-8
+> 
+> spring.mvc.date-format=yyyy-MM-dd
+> ~~~
+
+### 99.2 文件上传
+
+> 指定大小
+>
+> ~~~properties
+> spring.http.multipart.maxFileSize=200MB
+> spring.http.multipart.maxRequestSize=200MB
+> 
+> spring.servlet.multipart.max-request-size = 200MB
+> spring.servlet.multipart.max-file-size = 200MB
+> ~~~
+>
+> 表单
+>
+> ~~~xml
+> <form action="fileUploadController" method="post" enctype="multipart/form-data">
+> 		上传文件：<input type="file" name="filename"/><br/>
+> 		<input type="submit"/>
+> </form>
+> ~~~
+>
+> Controller
+>
+> ~~~java
+> @RequestMapping("/fileUploadController")
+> public String fileUpload(MultipartFile filename) throws Exception{
+>     // 通常应当保存到分布式文件系统上
+> 	String orignalFileName = filename.getOriginalFilename());
+> 	filename.transferTo(new File(...));
+> 	return "ok";
+> }
+> ~~~
 
