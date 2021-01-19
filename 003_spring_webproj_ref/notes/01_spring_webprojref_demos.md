@@ -300,6 +300,8 @@
 
 ## 03 项目配置
 
+### 3.1 Demo
+
 内容
 
 > 使用`.yaml`编写项目配置
@@ -331,6 +333,151 @@
 > #   applicaiton-test.properties
 > spring.profiles.active=dev
 > ```
+
+### 3.2 YAML
+
+> YAML是“YAML Ain't Markup Language YAML（不是一种标记语言）”的缩写
+>
+> [/src/main/resources/application.yaml](../demos/03_yaml_projconf/src/main/resources/application.yaml)
+>
+> 语法规则如下
+>
+> 1. 大小写敏感 
+> 2. 使用缩进表示层级关系 
+> 3. 禁止使用tab缩进，只能使用空格键 
+> 4. 缩进长度没有限制，只要元素对齐就表示这些元素属于一个层级。 
+> 5. 使用#表示注释 
+> 6. 字符串可以不用引号标注
+
+### 3.3 Properties文件
+
+#### (1) 程序运行参数注入
+
+> 在配置文件中提供一些参数，供程序中使用，Spring使用`@Value`注解来获取参数值，例如下面的`${config.systemName}`可以从`.properties`配置文件中注入
+>
+> ~~~java
+> @Component
+> public class Config {
+> 	@Value(value = "${config.systemName}")
+> 	private String systemName;
+> 
+> 	public String getSystemName() {
+> 		return systemName;
+> 	}
+> 
+> 	public void setSystemName(String systemName) {
+> 		this.systemName = systemName;
+> 	}
+> }
+> ~~~
+>
+> [/src/main/resources/application.properties](../demos/03_yaml_projconf/src/main/resources/application.properties)
+>
+> [/src/main/resources/application-dev.properties](../demos/03_yaml_projconf/src/main/resources/application-dev.properties)
+>
+> [/src/main/resources/application-test.properties](../demos/03_yaml_projconf/src/main/resources/application-test.properties)
+>
+> [/src/main/resources/application-prod.properties](/src/main/resources/application-prod.properties)
+>
+> ~~~properties
+> # 如果是中文需要转成Unicode
+> config.systemName=xxx system
+> ~~~
+
+#### (2) 参数引用
+
+> ~~~properties
+> config.systemName=xxx system
+> config.systemProvider=xxx company
+> config.systemDesc=${config.systemName} developed by ${config.systemProvider}
+> ~~~
+
+#### (3) 随机数
+
+> ${random.int()} = 随机int
+>
+> ${random.long} = 随机long
+>
+> ${random.int(50)} = 50以内的随机数
+>
+> ${random.int(50,100)} = 50~100之间的int随机数
+>
+> ${random.value}= 随机字符串
+>
+> ~~~properties
+> config.randomNum=${random.int(50,100)}
+> ~~~
+
+## 3.4 配置文件优先级
+
+> 优先级最低：`application.yml`文件
+>
+> 其次：`application.properties`文件，会覆盖`yml`中的配置项
+>
+> 再次：`application-{dev|test|prod|...}.properties`文件，参考下面的多环境配置
+>
+> 最高：程序启动时的命令行参数，可以覆盖文件中的配置，例如
+>
+> ~~~bash
+> java -jar demo-0.0.1-SNAPSHOT.jar --server.port=60
+> ~~~
+>
+> 程序编译成jar包后，如果不想使用配置文件中的`server.port`可以在命令行进行替换
+
+## 3.5 多环境配置
+
+#### (1) 用多个properties文件配置（如本例）
+
+> 默认配置，需要用`spring.profiles.active`指定哪套环境生效
+>
+> * [/src/main/resources/application.properties](../demos/03_yaml_projconf/src/main/resources/application.properties)
+>
+> * [/src/main/resources/application.yaml](../demos/03_yaml_projconf/src/main/resources/application.yaml)
+>
+> 各个环境下的配置
+>
+> * [/src/main/resources/application-dev.properties](../demos/03_yaml_projconf/src/main/resources/application-dev.properties)
+>
+> * [/src/main/resources/application-test.properties](../demos/03_yaml_projconf/src/main/resources/application-test.properties)
+>
+> * [/src/main/resources/application-prod.properties](/src/main/resources/application-prod.properties)
+
+#### (2) 在一个yml文件中配置
+
+> 形式如下：
+>
+> ~~~yml
+> server:     
+>   port: 8881 
+> spring:
+>   profiles:
+>     active:
+>       - prod
+> 
+> ---
+> 
+> # 测试环境
+> spring:
+>   profiles: test
+> server:
+>   port: 8882
+> 
+> ---
+> 
+> # 开发环境
+> spring:
+>   profiles: dev 
+> server:     
+>   port: 8082
+> 
+> ---
+> 
+> # 生产环境
+> spring:
+>   profiles: prod 
+> server:     
+>   port: 8083
+> ~~~
 
 ## 04 MyBatis多表访问
 
@@ -408,8 +555,6 @@
 > ```
 
 ## 05 Restful Controller
-
-### 5.1 Restful Controller
 
 代码位置
 
