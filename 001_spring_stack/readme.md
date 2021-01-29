@@ -8,7 +8,7 @@
 
 ### CH01 Spring起步
 
-> 内容概要：Spring技术栈介绍，项目结构，针对Controller及Web模板测试用例的编写
+> 内容概要：（1）介绍（2）针对Controller及Web模板测试用例的编写
 >
 > 笔记链接：[https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch01_spring_intro.md](https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch01_spring_intro.md)
 
@@ -64,3 +64,8 @@
 >
 > 笔记链接：[https://github.com/fangkun119/spring-in-action-5-samples/blob/master/note/ch08_async_msg.md](https://github.com/fangkun119/spring-in-action-5-samples/blob/master/note/ch08_async_msg.md)
 
+### CH09 Spring Integration (对应第6版CH11)
+
+> 内容概要：（1）快速理解Spring Integration；（2）Integration框架各个组件的功能和使用；（3）Demo实例，用邮件触发Integration Flow产生订单并调用远端的REST API
+>
+> 笔记链接：[https://github.com/fangkun119/spring-in-action-5-samples/blob/master/note/ch09_spring_integ.md](
