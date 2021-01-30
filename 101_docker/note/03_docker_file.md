@@ -108,6 +108,10 @@
 
 ### (3) 例子：为tomcat增加index.html
 
+Demo目录：[../03_dockerfile/lab1/](/03_dockerfile/lab1/)
+
+步骤：
+
 > 步骤1：获取基准镜像、并启动基准镜像容器
 >
 > ~~~bash
@@ -134,7 +138,7 @@
 > LICENSE		 RELEASE-NOTES	conf	     native-jni-lib  webapps.dist
 > ~~~
 >
-> 步骤3：编写[`./docker-web/index.html`](lab1/docker-web/index.html)文件和[`lab1/Dockerfile`](lab1/Dockerfile) （具体代码点击链接可查看）
+> 步骤3：编写[`../03_dockerfile/docker-web/index.html`](../03_dockerfile/lab1/docker-web/index.html)文件和[`../03_dockerfile/lab1/Dockerfile`](../03_dockerfile/lab1/Dockerfile) 
 >
 > ~~~bash
 > $ mkdir -p /Users/fangkun/Dev/git/java_proj_ref/101_docker/03_docker_file/lab1/
@@ -146,6 +150,24 @@
 > $ find . -type f
 > ./Dockerfile
 > ./docker-web/index.html
+> ~~~
+>
+> ~~~dockerfile
+> # 基准镜像是tomcat:8.5.59-jdk11-openjdk
+> FROM tomcat:8.5.59-jdk11-openjdk
+> 
+> # 该镜像维护者
+> MAINTAINER fangkun119
+> 
+> # 工作目录，希望把web应用部署在基准镜像工作目录(/usr/local/tomcat/)下面的webapps内
+> # 用交互式(docker exec -lt ${container_id} /bin/bash)访问容器时、会自动跳转到该目录
+> # 创建容器时、如果不存在也会自动创建该目录
+> WORKDIR /usr/local/tomcat/webapps/
+> 
+> # 第一个docker-web是构建镜像时，与Dockerfile同级的名为docker-web的目录
+> # 第二个docker-web是${WORK_DIR}下名为docker-web的目录，如果不存在会创建
+> # ADD表示将第一个docker-web目录下所有内容都复制到第二个docker-web目录下
+> ADD docker-web ./docker-web
 > ~~~
 >
 > 步骤4：将上面的`lab1`目录远程拷贝到宿主机，执行`docker build -t ${tag} ${docker_file_dir}`来构建，注意`-t`指定的镜像tag有格式要求
@@ -365,9 +387,7 @@
 
 ### (4) `ENTRYPOINT`（当做命令）与`CMD`（当做默认参数）命令组合使用
 
-两个命令会被组合在一起执行，`CMD`部分用作`ENTRYPOINT`部分的默认参数 
-
-例如下面的Dockerfile
+两个命令会被组合在一起执行，`CMD`部分用作`ENTRYPOINT`部分的默认参数，例如下面的Dockerfile
 
 > ~~~dockerfile
 > FROM centos
@@ -421,41 +441,154 @@
 
 ## 6. 用`Dockerfile`构建`Redis`镜像
 
-Dockerfile:
+Demo位置：[../03_dockerfile/lab2_redis/](../03_dockerfile/lab2_redis)
 
+文件下载（redis源代码）：https://download.redis.io/releases/redis-4.0.14.tar.gz
+
+步骤
+
+(1) 文件准备
+
+> ~~~bash
+> [root@localhost ~]# mkdir -p /usr/image/docker-redis
+> [root@localhost ~]# cd /usr/image/docker-redis
+> [root@localhost docker-redis]# cp /home/share/redis-4.0.14.tar.gz .
+> [root@localhost docker-redis]# ls
+> redis-4.0.14.tar.gz
+> [root@localhost docker-redis]# vi Dockerfile      # 编写Dockerfile
+> [root@localhost docker-redis]# vi redis-7000.conf # 编写redis配置文件
+> [root@localhost docker-redis]# pwd
+> /usr/image/docker-redis
+> [root@localhost docker-redis]# ls
+> Dockerfile  redis-4.0.14.tar.gz  redis-7000.conf
+> ~~~
+>
+> Dockerfile内容
+>
 > ~~~dockerfile
+> # 基于cenntos镜像
 > FROM centos
-> RUM ["yum", "install", "-y", "gcc", "gcc-c++", "net-tools", "make"]
+> # 安装依赖
+> RUN ["yum", "install", "-y", "gcc", "gcc-c++", "net-tools", "make"]
+> # 切换工作目录
 > WORKDIR /usr/local
-> ADD redis-4.0.14.tar.gz . 	# redis源代码压缩包，会被ADD命令自动解压；.是当前目录、即WORKDIR
+> # 拷贝redis源代码压缩包到镜像内，会被ADD命令自动解压
+> ADD redis-4.0.14.tar.gz .
+> # 切换工作目录
 > WORKDIR /usr/local/redis-4.0.14/src
-> RUM make && make install 
+> # 编译和安装redis
+> RUN make && make install
+> # 切换工作目录
 > WORKDIR /usr/local/redis-4.0.14/
-> ADD redis-7000.conf .    	# 复制写好的redis配置文件、对外端口是7000
-> EXPOSE 7000					# 让容器对外暴露7000端口
+> # 拷贝redis配置文件到镜像内，redis对外端口是7000
+> ADD redis-7000.conf .
+> # 让容器对外暴露7000端口
+> EXPOSE 7000
+> # 设置容器启动时运行的默认命令
 > CMD ["redis-server", "redis-7000.conf"]
 > ~~~
+>
+> redis-7000.conf内容
+>
+> ~~~txt
+> port 7000
+> bind 0.0.0.0
+> ~~~
 
-
-构建
+(2) 确保Docker Service已经启动
 
 > ~~~bash
-> docker build -t fangkun119/dockerdemo-redis .
-> docker images
-> docker run -p 7000:7000 fangkun119/dockerdemo-redis
+> [root@localhost docker-redis]# service docker status
+> Redirecting to /bin/systemctl status docker.service
+> ● docker.service - Docker Application Container Engine
+>    Loaded: loaded (/usr/lib/systemd/system/docker.service; disabled; vendor preset: disabled)
+>    Active: inactive (dead)
+>      Docs: http://docs.docker.com
+> [root@localhost docker-redis]# service docker start
+> Redirecting to /bin/systemctl start docker.service
+> [root@localhost docker-redis]# service docker status
+> Redirecting to /bin/systemctl status docker.service
+> ● docker.service - Docker Application Container Engine
+>    Loaded: loaded (/usr/lib/systemd/system/docker.service; disabled; vendor preset: disabled)
+>    Active: active (running) since 六 2021-01-30 16:17:24 CST; 43s ago
+>    ...
+> ~~~
+
+(2) 构建镜像
+
+> ~~~bash
+> [root@localhost docker-redis]# docker build -t fangkun119/dockerdemo-redis .
+> Sending build context to Docker daemon 1.745 MB
+> Step 1/10 : FROM centos
+> ...
+> Step 10/10 : CMD redis-server redis-7000.conf
+> Successfully built b6f8137796d1
+> [root@localhost docker-redis]# docker images
+> REPOSITORY                    TAG                 IMAGE ID            CREATED             SIZE
+> fangkun119/dockerdemo-redis   latest              b6f8137796d1        About an hour ago   494 MB
+> docker.io/centos              latest              300e315adb2f        7 weeks ago         209 MB
+> ~~~
+
+(3) 创建容器
+
+> ~~~bash
+> [root@localhost docker-redis]# docker run -p 7000:7000 fangkun119/dockerdemo-redis
+> 1:C 30 Jan 10:38:49.223 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+> 1:C 30 Jan 10:38:49.224 # Redis version=4.0.14, bits=64, commit=00000000, modified=0, pid=1, just started
+> 1:C 30 Jan 10:38:49.224 # Configuration loaded
+> 1:M 30 Jan 10:38:49.233 * Running mode=standalone, port=7000.
+> 1:M 30 Jan 10:38:49.233 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+> 1:M 30 Jan 10:38:49.233 # Server initialized
+> 1:M 30 Jan 10:38:49.233 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+> 1:M 30 Jan 10:38:49.233 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+> 1:M 30 Jan 10:38:49.234 * Ready to accept connections
 > ~~~
 
 
-测试
+(4) 检查（另开一个窗口）
 
+> 确认端口7000被监听（CentOS 7）
+>
 > ~~~bash
-> netstat 									# 检查端口是否被监听
-> docker ps 									# 检查容器是否启动
-> docker exec -it ${container_id} /bin/bash 	# 登进容器内检查redis运行状况
+> [root@localhost ~]# netstat -lntp
+> Active Internet connections (only servers)
+> Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+> tcp        0      0 0.0.0.0:111             0.0.0.0:*               LISTEN      682/rpcbind
+> tcp        0      0 192.168.122.1:53        0.0.0.0:*               LISTEN      1394/dnsmasq
+> tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      1132/sshd
+> tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN      1129/cupsd
+> tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      1481/master
+> tcp6       0      0 :::111                  :::*                    LISTEN      682/rpcbind
+> tcp6       0      0 :::22                   :::*                    LISTEN      1132/sshd
+> tcp6       0      0 ::1:631                 :::*                    LISTEN      1129/cupsd
+> tcp6       0      0 :::7000                 :::*                    LISTEN      8383/docker-proxy-c
+> tcp6       0      0 ::1:25                  :::*                    LISTEN      1481/master
+> ~~~
+>
+> 检查运行中的docker容器，获取容器编号（CONTAINER ID）
+>
+> ~~~bash
+> [root@localhost ~]# docker ps
+> CONTAINER ID        IMAGE                         COMMAND                  CREATED             STATUS              PORTS                    NAMES
+> 6a8169d83b6e        fangkun119/dockerdemo-redis   "redis-server redi..."   15 minutes ago      Up 15 minutes       0.0.0.0:7000->7000/tcp   peaceful_hamilton
+> ~~~
+>
+> 使用容器编号登录到容器内部查看运行状况
+>
+> ~~~bash
+> [root@localhost ~]# docker exec -it 6a8169d83b6e /bin/bash
+> [root@6a8169d83b6e redis-4.0.14]# pwd
+> /usr/local/redis-4.0.14
+> [root@6a8169d83b6e redis-4.0.14]# ls
+> 00-RELEASENOTES  COPYING    Makefile   redis-7000.conf	runtest-cluster   src
+> BUGS		 INSTALL    README.md  redis.conf	runtest-sentinel  tests
+> CONTRIBUTING	 MANIFESTO  deps       runtest		sentinel.conf	  utils
+> [root@6a8169d83b6e redis-4.0.14]# cat redis-7000.conf
+> port 7000
+> bind 0.0.0.0
 > ~~~
 
-
-上面只是一个演示，实际工作中可以直接从docker hub上pull官方redis镜像
+说明：上面只是一个演示，实际工作中可以直接从docker hub上pull官方redis镜像
 
 > ~~~bash
 > docker pull redis
