@@ -439,7 +439,11 @@ Demo目录：[../03_dockerfile/lab1/](/03_dockerfile/lab1/)
 > root         1  3.0  0.1  47496  1800 ?        Rs   12:57   0:00 ps -aux
 > ~~~
 
-## 6. 用`Dockerfile`构建`Redis`镜像
+## 6. `Dockerfile`指令参考
+
+> [https://docs.docker.com/engine/reference/builder/#from](https://docs.docker.com/engine/reference/builder/#from)
+
+## 7. 用`Dockerfile`构建`Redis`镜像
 
 Demo位置：[../03_dockerfile/lab2_redis/](../03_dockerfile/lab2_redis)
 
