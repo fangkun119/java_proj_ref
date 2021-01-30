@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [Docker安装及配置](#docker%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE)
+  - [1.容器化技术介绍](#1%E5%AE%B9%E5%99%A8%E5%8C%96%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D)
+  - [2. Docker介绍](#2-docker%E4%BB%8B%E7%BB%8D)
+  - [3. 安装Docker](#3-%E5%AE%89%E8%A3%85docker)
+    - [(1) 在 CentOS 7 安装 Docker](#1-%E5%9C%A8-centos-7-%E5%AE%89%E8%A3%85-docker)
+  - [4. 阿里云加速代理](#4-%E9%98%BF%E9%87%8C%E4%BA%91%E5%8A%A0%E9%80%9F%E4%BB%A3%E7%90%86)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# Docker安装及配置
+
 ## 1.容器化技术介绍
 
 历史演化：
@@ -45,61 +60,62 @@ Docker
 
 ## 3. 安装Docker 
 
-> [https://docs.docker.com/get-docker/](https://docs.docker.com/get-docker/)  </br>
-> [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/) 
+> * [https://docs.docker.com/get-docker/](https://docs.docker.com/get-docker/) 
+>
+> * [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/) 
 
 ### (1) 在 CentOS 7 安装 Docker
 
 > 以[`https://docs.docker.com/engine/install/centos/`](https://docs.docker.com/engine/install/centos/)为准，下面是简要步骤及一些与官方文档不同、或额外增加的步骤
-
-~~~bash
-# 确保旧版的Docker已经删除
-[root@localhost ~]# sudo yum remove docker \
-                  docker-client \
-                  docker-client-latest \
-                  docker-common \
-                  docker-latest \
-                  docker-latest-logrotate \
-                  docker-logrotate \
-                  docker-engine
-
-# 安装yum工具集以便能够使用yum-config-manager，简化安装源配置
-[root@localhost ~]# sudo yum install -y yum-utils 
-
-# 安装数据存储驱动包、Docker容器进行内部数据存储时，需要这两个驱动包来完成存储 （额外增加步骤）
-[root@localhost ~]# sudo yum install -y device-mapper-persistent-data lvm2
-
-# 增加安装源，其中ce是community edition的意思，及免费的开源社区版（相对于企业版“ee”）
-# 相比官方文档、增加了aliyun的repo、加快国内访问速度，并设置makecache fast让yum自动选择最快的安装源
-[root@localhost ~]# sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-[root@localhost ~]# sudo yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
-sudo yum makecache fast
-
-# 安装docker
-[root@localhost ~]# sudo yum -y install docker-ce
-
-# 启动docker
-[root@localhost ~]# service docker start
-Redirecting to /bin/systemctl start docker.service
-
-# 验证，Docker是一个CS架构
-[root@localhost ~]# docker version
-Client: Docker Engine - Community
-Version:          19.03.13
-Server: Docker Engine - Community
-Version:          19.03.13
-
-[root@localhost ~]# docker pull hello-world
-Using default tag: latest
-latest: Pulling from library/hello-world
-0e03bdcc26d7: Pull complete
-Digest: sha256:8c5aeeb6a5f3ba4883347d3747a7249f491766ca1caa47e5da5dfcf6b9b717c0
-Status: Downloaded newer image for hello-world:latest
-docker.io/library/hello-world:latest
-
-[root@localhost ~]# docker run hello-world
-Hello from Docker!
-~~~
+>
+> ~~~bash
+> # 确保旧版的Docker已经删除
+> [root@localhost ~]# sudo yum remove docker \
+>                   docker-client \
+>                   docker-client-latest \
+>                   docker-common \
+>                   docker-latest \
+>                   docker-latest-logrotate \
+>                   docker-logrotate \
+>                   docker-engine
+> 
+> # 安装yum工具集以便能够使用yum-config-manager，简化安装源配置
+> [root@localhost ~]# sudo yum install -y yum-utils 
+> 
+> # 安装数据存储驱动包、Docker容器进行内部数据存储时，需要这两个驱动包来完成存储 （额外增加步骤）
+> [root@localhost ~]# sudo yum install -y device-mapper-persistent-data lvm2
+> 
+> # 增加安装源，其中ce是community edition的意思，及免费的开源社区版（相对于企业版“ee”）
+> # 相比官方文档、增加了aliyun的repo、加快国内访问速度，并设置makecache fast让yum自动选择最快的安装源
+> [root@localhost ~]# sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+> [root@localhost ~]# sudo yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+> sudo yum makecache fast
+> 
+> # 安装docker
+> [root@localhost ~]# sudo yum -y install docker-ce
+> 
+> # 启动docker
+> [root@localhost ~]# service docker start
+> Redirecting to /bin/systemctl start docker.service
+> 
+> # 验证，Docker是一个CS架构
+> [root@localhost ~]# docker version
+> Client: Docker Engine - Community
+> Version:          19.03.13
+> Server: Docker Engine - Community
+> Version:          19.03.13
+> 
+> [root@localhost ~]# docker pull hello-world
+> Using default tag: latest
+> latest: Pulling from library/hello-world
+> 0e03bdcc26d7: Pull complete
+> Digest: sha256:8c5aeeb6a5f3ba4883347d3747a7249f491766ca1caa47e5da5dfcf6b9b717c0
+> Status: Downloaded newer image for hello-world:latest
+> docker.io/library/hello-world:latest
+> 
+> [root@localhost ~]# docker run hello-world
+> Hello from Docker!
+> ~~~
 
 ## 4. 阿里云加速代理
 
