@@ -1,10 +1,12 @@
 [TOC]
 
-# Spring技术栈笔记链接及内容介绍
+# Spring笔记
 
 ## Spring In Action第6版
 
 > 在线阅读：[https://www.manning.com/books/spring-in-action-sixth-edition](https://www.manning.com/books/spring-in-action-sixth-edition) （编写至第8章）
+>
+> 代码fork：[https://github.com/fangkun119/spring-in-action-6-samples/](https://github.com/fangkun119/spring-in-action-6-samples/)
 
 ### CH01 Spring起步
 
@@ -57,6 +59,8 @@
 ## Spring In Action第5版
 
 > 在线阅读：https://www.manning.com/books/spring-in-action-fifth-edition （买第6版送第5版）
+>
+> 代码fork：[https://github.com/fangkun119/spring-in-action-5-samples/](https://github.com/fangkun119/spring-in-action-5-samples/)
 
 ### CH08 异步消息收发（对应第6版CH10）
 
