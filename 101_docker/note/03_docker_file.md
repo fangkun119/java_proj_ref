@@ -22,7 +22,8 @@
     - [(2) `ENTRYPOINT` - 容器创建（启动）时执行命令](#2-entrypoint---%E5%AE%B9%E5%99%A8%E5%88%9B%E5%BB%BA%E5%90%AF%E5%8A%A8%E6%97%B6%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4)
     - [(3) `CMD` - 默认命令](#3-cmd---%E9%BB%98%E8%AE%A4%E5%91%BD%E4%BB%A4)
     - [(4) `ENTRYPOINT`（当做命令）与`CMD`（当做默认参数）命令组合使用](#4-entrypoint%E5%BD%93%E5%81%9A%E5%91%BD%E4%BB%A4%E4%B8%8Ecmd%E5%BD%93%E5%81%9A%E9%BB%98%E8%AE%A4%E5%8F%82%E6%95%B0%E5%91%BD%E4%BB%A4%E7%BB%84%E5%90%88%E4%BD%BF%E7%94%A8)
-  - [6. 用`Dockerfile`构建`Redis`镜像](#6-%E7%94%A8dockerfile%E6%9E%84%E5%BB%BAredis%E9%95%9C%E5%83%8F)
+  - [6. `Dockerfile`指令参考](#6-dockerfile%E6%8C%87%E4%BB%A4%E5%8F%82%E8%80%83)
+  - [7. 用`Dockerfile`构建`Redis`镜像](#7-%E7%94%A8dockerfile%E6%9E%84%E5%BB%BAredis%E9%95%9C%E5%83%8F)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -590,6 +591,15 @@ Demo位置：[../03_dockerfile/lab2_redis/](../03_dockerfile/lab2_redis)
 > [root@6a8169d83b6e redis-4.0.14]# cat redis-7000.conf
 > port 7000
 > bind 0.0.0.0
+> ~~~
+
+(5) 关闭redis容器，关闭Docker Service
+
+> 在运行容器的窗口Ctrl+C，redis会收到信号退出，虽然后关闭Docker Service
+>
+> ~~~bash
+> [root@localhost docker-redis]# service docker stop
+> Redirecting to /bin/systemctl stop docker.service
 > ~~~
 
 说明：上面只是一个演示，实际工作中可以直接从docker hub上pull官方redis镜像
