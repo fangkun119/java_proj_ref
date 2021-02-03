@@ -1,0 +1,13 @@
+version: '3.3'
+services:
+  db:
+    build: ./bsbdj-db/
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+  app:
+    build: ./bsbdj-app/
+    depends_on:
+      - db
+    ports:
+      - "80:80"
