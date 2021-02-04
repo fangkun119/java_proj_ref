@@ -1,3 +1,37 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [3 Dockerfile](#3-dockerfile)
+  - [3.1 了解容器内部结构](#31-%E4%BA%86%E8%A7%A3%E5%AE%B9%E5%99%A8%E5%86%85%E9%83%A8%E7%BB%93%E6%9E%84)
+    - [3.1.1 通过`Dockerfile`查看容器内部结构](#311-%E9%80%9A%E8%BF%87dockerfile%E6%9F%A5%E7%9C%8B%E5%AE%B9%E5%99%A8%E5%86%85%E9%83%A8%E7%BB%93%E6%9E%84)
+    - [3.1.2 在容器中执行命令：`docker exec -it ${cmd}`](#312-%E5%9C%A8%E5%AE%B9%E5%99%A8%E4%B8%AD%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4docker-exec--it-cmd)
+    - [3.1.3 镜像和容器在宿主机的存储位置](#313-%E9%95%9C%E5%83%8F%E5%92%8C%E5%AE%B9%E5%99%A8%E5%9C%A8%E5%AE%BF%E4%B8%BB%E6%9C%BA%E7%9A%84%E5%AD%98%E5%82%A8%E4%BD%8D%E7%BD%AE)
+  - [3.2 用Dockerfile构建镜像](#32-%E7%94%A8dockerfile%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F)
+    - [3.2.1 构建镜像](#321-%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F)
+      - [(1) 构建命令`docker build`](#1-%E6%9E%84%E5%BB%BA%E5%91%BD%E4%BB%A4docker-build)
+      - [(3) 例子2：为tomcat增加index.html](#3-%E4%BE%8B%E5%AD%902%E4%B8%BAtomcat%E5%A2%9E%E5%8A%A0indexhtml)
+  - [3.4 编写Dockerfile](#34-%E7%BC%96%E5%86%99dockerfile)
+    - [3.4.1 Dockerfile指令](#341-dockerfile%E6%8C%87%E4%BB%A4)
+      - [(1) 基础指令](#1-%E5%9F%BA%E7%A1%80%E6%8C%87%E4%BB%A4)
+        - [`FROM` ： 指定基准镜像](#from--%E6%8C%87%E5%AE%9A%E5%9F%BA%E5%87%86%E9%95%9C%E5%83%8F)
+        - [`LABEL` & `MAINTAINER`： 描述信息](#label--maintainer-%E6%8F%8F%E8%BF%B0%E4%BF%A1%E6%81%AF)
+        - [`WORKDIR` ：设置工作目录](#workdir-%E8%AE%BE%E7%BD%AE%E5%B7%A5%E4%BD%9C%E7%9B%AE%E5%BD%95)
+        - [`ADD` & `COPY`：构建镜像时从本地复制文件到镜像中](#add--copy%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F%E6%97%B6%E4%BB%8E%E6%9C%AC%E5%9C%B0%E5%A4%8D%E5%88%B6%E6%96%87%E4%BB%B6%E5%88%B0%E9%95%9C%E5%83%8F%E4%B8%AD)
+        - [`ENV`： 设置环境变量](#env-%E8%AE%BE%E7%BD%AE%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F)
+        - [`EXPOSE` ：让容器暴露端口给外界](#expose-%E8%AE%A9%E5%AE%B9%E5%99%A8%E6%9A%B4%E9%9C%B2%E7%AB%AF%E5%8F%A3%E7%BB%99%E5%A4%96%E7%95%8C)
+        - [`ARG`： 定义变量](#arg-%E5%AE%9A%E4%B9%89%E5%8F%98%E9%87%8F)
+        - [`VOLUME`：创建挂载点](#volume%E5%88%9B%E5%BB%BA%E6%8C%82%E8%BD%BD%E7%82%B9)
+      - [(2) 执行指令](#2-%E6%89%A7%E8%A1%8C%E6%8C%87%E4%BB%A4)
+        - [`RUN` - 镜像构建时执行的命令](#run---%E9%95%9C%E5%83%8F%E6%9E%84%E5%BB%BA%E6%97%B6%E6%89%A7%E8%A1%8C%E7%9A%84%E5%91%BD%E4%BB%A4)
+        - [`ENTRYPOINT` - 容器创建（启动）时执行命令](#entrypoint---%E5%AE%B9%E5%99%A8%E5%88%9B%E5%BB%BA%E5%90%AF%E5%8A%A8%E6%97%B6%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4)
+        - [`CMD` - 默认命令](#cmd---%E9%BB%98%E8%AE%A4%E5%91%BD%E4%BB%A4)
+      - [(3) `ENTRYPOINT`（当做命令）与`CMD`（当做默认参数）命令组合使用](#3-entrypoint%E5%BD%93%E5%81%9A%E5%91%BD%E4%BB%A4%E4%B8%8Ecmd%E5%BD%93%E5%81%9A%E9%BB%98%E8%AE%A4%E5%8F%82%E6%95%B0%E5%91%BD%E4%BB%A4%E7%BB%84%E5%90%88%E4%BD%BF%E7%94%A8)
+      - [(4) `Dockerfile`指令参考](#4-dockerfile%E6%8C%87%E4%BB%A4%E5%8F%82%E8%80%83)
+  - [3.5 Demo：使用`Dockerfile`构建`Redis`镜像](#35-demo%E4%BD%BF%E7%94%A8dockerfile%E6%9E%84%E5%BB%BAredis%E9%95%9C%E5%83%8F)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 
 # 3 Dockerfile
