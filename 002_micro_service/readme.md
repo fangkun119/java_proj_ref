@@ -40,19 +40,31 @@
 
 内容概要：
 
-> (1) 设计：将业务问题拆解成微服务的分析方法和注意事项
->
-> (2) 开发：使用Spring Boot开发服务、国际化支持、以及使用HATEOAS返回相关API链接
->
-> (3) DevOPs：微服务部署的原则和步骤，使用Spring Actuator创建健康检查端点
+> 1. 设计：将业务问题拆解成微服务的分析方法和注意事项
+> 2. 开发：使用Spring Boot开发服务、国际化支持、以及使用HATEOAS返回相关API链接
+> 3. DevOPs：微服务部署的原则和步骤，使用Spring Actuator创建健康检查端点
 
-### CH04：Docker
+### CH04：Docker在微服务中的使用
 
-笔记链接：
+笔记链接：[https://github.com/fangkun119/manning-smia/blob/master/note/ch04_docker.md](https://github.com/fangkun119/manning-smia/blob/master/note/ch04_docker.md)
 
 内容概要：
 
-> 
+> 1. Docker介绍及Dockerfile编写
+>
+> 2. docker-compose：单宿主机容器编排工具
+>
+> 3. 在SpringBoot项目中使用Docker
+>
+>     (1) 普通构建（basic Dockerfile）与多级构建（Multi-stage Dockerfile）
+>
+>     (2) 使用Buildpacks工具优化Docker镜像分层
+>
+>     (3) 使用LAYERED_JAR优化Docker镜像分层
+
+相关笔记：
+
+> Docker：[https://github.com/fangkun119/java_proj_ref/tree/master/101_docker/note](https://github.com/fangkun119/java_proj_ref/tree/master/101_docker/note)
 
 ### CH05：Spring Cloud Configuration Server
 
