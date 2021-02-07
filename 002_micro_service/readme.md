@@ -68,11 +68,14 @@
 
 ### CH05：Spring Cloud Configuration Server
 
-笔记链接：
+笔记链接：[https://github.com/fangkun119/manning-smia/blob/master/note/ch05_spring_clound_configuration.md](https://github.com/fangkun119/manning-smia/blob/master/note/ch05_spring_clound_configuration.md)
 
 内容概要：
 
-> 
+> 1. 搭建Spring Cloud Config Server并与Spring Boot应用程序集成
+> 2. 使用本地文件、git、vault ui作为配置存储
+> 3. 实现配置文件多instance刷新
+> 4. 使用对称加密存储敏感配置
 
 ### CH06：服务发现
 
