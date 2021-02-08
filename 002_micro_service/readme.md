@@ -79,11 +79,25 @@
 
 ### CH06：服务发现
 
-笔记链接：
+笔记链接：[https://github.com/fangkun119/manning-smia/blob/master/note/ch06_service_discovery.md](https://github.com/fangkun119/manning-smia/blob/master/note/ch06_service_discovery.md)
 
 内容概要：
 
-> 
+> 1. 微服务服务发现 v.s 传统集中式服务发现
+>
+> 2. 客户端负载均衡
+>
+> 3. Spring Eureka Service搭建及配置
+>
+> 4. 向Eureka Service注册服务
+>
+> 5. 三种客户端通过Eureka Service和Spring Cloud Load Balancer调用服务的方法：
+>
+>     (1) 使用Service Discovery Client （没有负载均衡）
+>
+>     (2) 使用Load Balancer Awared RestTemplate
+>
+>     (3) 使用Netflix Feign Client
 
 ### CH07：容错模式及Resilience4j
 
