@@ -99,13 +99,17 @@
 >
 >     (3) 使用Netflix Feign Client
 
-### CH07：容错模式及Resilience4j
+### CH07：弹性模式及Resilience4j
 
-笔记链接：
+笔记链接：[https://github.com/fangkun119/manning-smia/blob/master/note/ch07_resilience4j_and_patterns.md](https://github.com/fangkun119/manning-smia/blob/master/note/ch07_resilience4j_and_patterns.md)
 
 内容概要：
 
-> 
+> (1) 断路器（Circuit Breaker）、隔离（Bulkhead）的工作原理
+>
+> (2) 使用Resilience4j（已处于维护模式的Hystrix的替代库）在Spring Cloud项目中实现`断路器`、`降级`、`隔离 `、`重试`、`Rate Limiter`等客户端弹性模式
+>
+> (3) 演示Resilience4j与ThreadLocal的兼容性
 
 ### CH08：服务路由及Spring Cloud Gateway
 
