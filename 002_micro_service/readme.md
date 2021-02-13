@@ -113,11 +113,17 @@
 
 ### CH08：服务路由及Spring Cloud Gateway
 
-笔记链接：
+笔记链接：[https://github.com/fangkun119/manning-smia/blob/master/note/ch08_spring_cloud_gateway.md](https://github.com/fangkun119/manning-smia/blob/master/note/ch08_spring_cloud_gateway.md)
 
 内容概要：
 
-> 
+> (1) Gateway的作用，Spring Cloud Gateway以及与Eureka通信的配置
+>
+> (2) 自动路由配置和手动路由配置 
+>
+> (3) 使用内置的Predicates和Filter工厂
+>
+> (4) 编写自定义Pre-filter和Post-filter，在请求/响应/日志中添加correlation  id，从而将同一个客户端请求触发的所有REST调用关联起来
 
 ### CH09：微服务安全
 
