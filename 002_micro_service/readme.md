@@ -145,7 +145,13 @@
 
 内容概要：
 
-> 
+> (1) 消息队列与、事件驱动框架的优点和注意事项
+>
+> (2) Spring Cloud Stream对事件驱动框架的抽象
+>
+> (3) 使用Kafka以及Spring Cloud Stream实现消息的收发（使用默认channel、以及使用自定义channel）
+>
+> (4) 使用Redis作为数据缓存
 
 ### CH11：分布式tracing及Sleuth和Zipkin
 
