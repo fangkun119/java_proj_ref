@@ -127,15 +127,21 @@
 
 ### CH09：微服务安全
 
-笔记链接：
+笔记链接：[https://github.com/fangkun119/manning-smia/blob/master/note/ch09_security.md](https://github.com/fangkun119/manning-smia/blob/master/note/ch09_security.md)
 
 内容概要：
 
-> 
+> (1) 使用KeyCloak搭建开源身份验证授权服务并配置用户权限
+>
+> (2) 修改代码以使用KeyCloak的OAuth2认证保护单个服务
+>
+> (3) 让OAuth2 Access Token在服务调用之间传播、以保护所有服务
+>
+> (4) 解析并使用Access  Token中的信息
 
 ### CH10：事件驱动框架及Spring Cloud Stream
 
-笔记链接：
+笔记链接：[https://github.com/fangkun119/manning-smia/blob/master/note/ch10_sprint_cloud_stream.md](https://github.com/fangkun119/manning-smia/blob/master/note/ch10_sprint_cloud_stream.md)
 
 内容概要：
 
