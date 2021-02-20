@@ -290,6 +290,11 @@ Demo目录：[../03_dockerfile/lab1/](/03_dockerfile/lab1/)
 > ~~~
 >
 > `ADD`除了复制、还可以将远程url的资源下载到镜像内的指定目录中（类似wget和curl），但在实践中不鼓励这么做
+>
+> ~~~dockerfile
+> ARG JAR_FILE
+> COPY ${JAR_FILE} app.jar
+> ~~~
 
 #####  `ENV`： 设置环境变量
 

@@ -539,13 +539,16 @@ Mac版Docker内置了Docker Compose：[https://docs.docker.com/compose/install/]
 
 #### (2) 创建并编排容器
 
-> 执行`docker-compose -up`命令后，会先编译镜像，再创建容器
+> 执行`docker-compose config`命令：会检查docker文件
+>
+> 执行`docker-compose -up`命令：会先编译镜像，再创建容器
 >
 > ~~~bash
 > __________________________________________________________________
 > $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/101_docker/05_dockercompose/lab_bsbdj/bsbdj/
-> $ # docker-compose up	 # 前台运行，键入Ctrl+C时会停止并删除容器
-> $ docker-compose up -d	 # 后台运行
+> $ # docker-compose config  # 检查docker文件
+> $ # docker-compose up	   # 前台运行，键入Ctrl+C时会停止容器
+> $ docker-compose up -d	   # 后台运行
 > Starting bsbdj_db_1  ... done
 > Starting bsbdj_app_1 ... done
 > __________________________________________________________________
