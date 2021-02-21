@@ -1,3 +1,28 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents** generated with [DocToc](https://github.com/thlorenz/doctoc)-->
+
+- [JVM调优理论知识和GC算法概要](#jvm%E8%B0%83%E4%BC%98%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86%E5%92%8Cgc%E7%AE%97%E6%B3%95%E6%A6%82%E8%A6%81)
+  - [1 JVM如何找到垃圾对象](#1-jvm%E5%A6%82%E4%BD%95%E6%89%BE%E5%88%B0%E5%9E%83%E5%9C%BE%E5%AF%B9%E8%B1%A1)
+  - [2 GC算法](#2-gc%E7%AE%97%E6%B3%95)
+    - [(1) `Mark-Sweep` （标记清除）：标记垃圾对象、然后清除](#1-mark-sweep-%E6%A0%87%E8%AE%B0%E6%B8%85%E9%99%A4%E6%A0%87%E8%AE%B0%E5%9E%83%E5%9C%BE%E5%AF%B9%E8%B1%A1%E7%84%B6%E5%90%8E%E6%B8%85%E9%99%A4)
+    - [(2) `Copying` （拷贝）：拷贝非垃圾对象、然后清理整块内存](#2-copying-%E6%8B%B7%E8%B4%9D%E6%8B%B7%E8%B4%9D%E9%9D%9E%E5%9E%83%E5%9C%BE%E5%AF%B9%E8%B1%A1%E7%84%B6%E5%90%8E%E6%B8%85%E7%90%86%E6%95%B4%E5%9D%97%E5%86%85%E5%AD%98)
+    - [(3) `Mark-Compact`（标记压缩）：清理垃圾对象、并将非垃圾对象移动到一起](#3-mark-compact%E6%A0%87%E8%AE%B0%E5%8E%8B%E7%BC%A9%E6%B8%85%E7%90%86%E5%9E%83%E5%9C%BE%E5%AF%B9%E8%B1%A1%E5%B9%B6%E5%B0%86%E9%9D%9E%E5%9E%83%E5%9C%BE%E5%AF%B9%E8%B1%A1%E7%A7%BB%E5%8A%A8%E5%88%B0%E4%B8%80%E8%B5%B7)
+  - [3 JVM内存分代模型](#3-jvm%E5%86%85%E5%AD%98%E5%88%86%E4%BB%A3%E6%A8%A1%E5%9E%8B)
+    - [3.1 使用分代模型的JVM](#31-%E4%BD%BF%E7%94%A8%E5%88%86%E4%BB%A3%E6%A8%A1%E5%9E%8B%E7%9A%84jvm)
+    - [3.2 分代模型，及对象从创建到消亡过程](#32-%E5%88%86%E4%BB%A3%E6%A8%A1%E5%9E%8B%E5%8F%8A%E5%AF%B9%E8%B1%A1%E4%BB%8E%E5%88%9B%E5%BB%BA%E5%88%B0%E6%B6%88%E4%BA%A1%E8%BF%87%E7%A8%8B)
+    - [3.3 GC触发](#33-gc%E8%A7%A6%E5%8F%91)
+    - [3.4 栈上分配以及`TLAB`](#34-%E6%A0%88%E4%B8%8A%E5%88%86%E9%85%8D%E4%BB%A5%E5%8F%8Atlab)
+    - [3.5 对象何时进入老年代](#35-%E5%AF%B9%E8%B1%A1%E4%BD%95%E6%97%B6%E8%BF%9B%E5%85%A5%E8%80%81%E5%B9%B4%E4%BB%A3)
+  - [4 常见垃圾回收器](#4-%E5%B8%B8%E8%A7%81%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8)
+    - [4.1 概要](#41-%E6%A6%82%E8%A6%81)
+    - [4.2 物理分代模型中常用的垃圾回收器](#42-%E7%89%A9%E7%90%86%E5%88%86%E4%BB%A3%E6%A8%A1%E5%9E%8B%E4%B8%AD%E5%B8%B8%E7%94%A8%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8)
+    - [4.3 CMS（`ConcurrentMarkSweep`)垃圾回收器](#43-cmsconcurrentmarksweep%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8)
+    - [4.4 `G1`垃圾回收器（逻辑上的分代回收器）](#44-g1%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8%E9%80%BB%E8%BE%91%E4%B8%8A%E7%9A%84%E5%88%86%E4%BB%A3%E5%9B%9E%E6%94%B6%E5%99%A8)
+  - [5  参考](#5--%E5%8F%82%E8%80%83)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # JVM调优理论知识和GC算法概要
 
 > 概括GC算法相关的内容，为JVM调优准备知识，更详细的GC算法介绍参考[../08_gc_algorithm/readme.md](../08_gc_algorithm/readme.md)
@@ -6,7 +31,7 @@
 
 <b>引用计数</b>为0的是垃圾对象；但引用计数不能解决循环引用问题，还需要<b>`Root  Searching`</b>，把那些不能从`root instances`抵达的对象也标记为垃圾对象
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_root_searching.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_root_searching.jpg" width="800" /></div>
 
 ## 2 GC算法
 
@@ -39,7 +64,7 @@
 
 > 下图是内存分代模型（未包含`方法区`）部分，其中的数字是内存大小的默认比例（Java 1.8，不适用于`G1`/`Shenandoah`/...等新的JVM，可以通过JVM参数修改）
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_mem_generation.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_mem_generation.jpg" width="800" /></div>
 >
 > * 新生代（`new`、也叫做`young`）：存活对象少、适合`Mark-Sweep`算法
 > 	* 刚创建的对象，如果不能在栈上分配，就分配在`eden`
@@ -55,7 +80,7 @@
 
 ### 3.3 GC触发
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_gc_triggering.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_gc_triggering.jpg" width="800" /></div>
 > 
 > * `MinorGC`（也叫`YGC`、`YongGC`）：新生代空间耗尽时触发
 > * `MajorGC/FullGC`：老年代无法继续分配空间时触发、新生代老年代同时进行回收
@@ -101,7 +126,7 @@ TLAB：`Thread Local Allocation Buffer`
 
 ### 4.1 概要
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_garbage_collectors.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_garbage_collectors.jpg" width="800" /></div>
 > 
 > 备注：`Serial`指单线程，`Parallel`指多线程，带`Old`后缀的会使用适合老年代的算法
 
@@ -150,7 +175,7 @@ TLAB：`Thread Local Allocation Buffer`
 
 列出四阶段的[CMS垃圾回收过程](https://www.cnblogs.com/zhangxiaoguang/p/5792468.html)、同时也有助于理解并发回收器
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_gc_cms.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_gc_cms.jpg" width="800" /></div>
 > 
 > * 初始标记：标记根对象`root object`（会**STW**，但时间非常短，因为根对象数量少）
 > * 并发标记：遍历整个老年代并且标记所有存活的对象，该阶段耗时最高，因此与应用程序同时运行
@@ -191,7 +216,7 @@ G1同样使用四阶段回收过程
 
 区别主要在于阶段2、即<b>并发标记</b>阶段
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_g1_3color_mark.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_g1_3color_mark.jpg" width="600" /></div>
 >
 > * `CMS` ：使用`三色标记` + `Incremental Update`算法
 > * `G1`(10ms) ：使用`三色标记` + `SATB`（Snapshop at the beginning）算法，配合`RSet`进行

@@ -1,3 +1,22 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [JVM：介绍及`class file`格式](#jvm%E4%BB%8B%E7%BB%8D%E5%8F%8Aclass-file%E6%A0%BC%E5%BC%8F)
+  - [1：JVM介绍](#1jvm%E4%BB%8B%E7%BB%8D)
+    - [(1) 代码编译和执行过程](#1-%E4%BB%A3%E7%A0%81%E7%BC%96%E8%AF%91%E5%92%8C%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B)
+    - [(2) 跨语言跨平台](#2-%E8%B7%A8%E8%AF%AD%E8%A8%80%E8%B7%A8%E5%B9%B3%E5%8F%B0)
+    - [(3) JVM规范](#3-jvm%E8%A7%84%E8%8C%83)
+    - [(4) 常见JVM实现](#4-%E5%B8%B8%E8%A7%81jvm%E5%AE%9E%E7%8E%B0)
+  - [2：Class文件结构](#2class%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84)
+    - [(1) Demo代码：`Grp01Demo01ByteCode.java`](#1-demo%E4%BB%A3%E7%A0%81grp01demo01bytecodejava)
+    - [(2) 查看`.class`文件的方法](#2-%E6%9F%A5%E7%9C%8Bclass%E6%96%87%E4%BB%B6%E7%9A%84%E6%96%B9%E6%B3%95)
+    - [(3) `.class`文件结构](#3-class%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84)
+    - [(4) 用`javap -v`命令查看`Grp01Demo01ByteCode.class`](#4-%E7%94%A8javap--v%E5%91%BD%E4%BB%A4%E6%9F%A5%E7%9C%8Bgrp01demo01bytecodeclass)
+    - [(5) 用`jClassLib`插件查看.class文件](#5-%E7%94%A8jclasslib%E6%8F%92%E4%BB%B6%E6%9F%A5%E7%9C%8Bclass%E6%96%87%E4%BB%B6)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # JVM：介绍及`class file`格式
 
 ## 1：JVM介绍
@@ -28,8 +47,10 @@ java  virtual machine specifications
 > * [https://docs.oracle.com/javase/specs/index.html](https://docs.oracle.com/javase/specs/index.html)
 
 > `Java 13`为例，下图所示的内容，可以看到`java 13`的语言特性以及对应JVM的`虚拟机`特性（比较晦涩庞大，不适合读，但是可以用来查问题；内容只涉及规范和命令等、不包含调优）
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/javase_13.jpg" width="600" /></div>
+>
 > 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/javase_13.jpg)
 
 ### (4) 常见JVM实现
 
@@ -68,13 +89,13 @@ java  virtual machine specifications
 > 3. `access_flags`：整个class的修饰符
 > 
 >  	* `ACC_PUBLIC` `Ox0001`：是否为public
-> 	* `ACC_FINAL` `Ox0010`：是否为final
-> 	* `ACC_SUPER` `Ox0020`：该flag在JDK1.0.2之后要求必须设置、用来指明invokespectial指令使用新语义
-> 	* `ACC_INTERFACE` `Ox0200`：是否为接口
-> 	* `ACC_ABSTRACT` `Ox0400`：接口或者抽象类
-> 	* `ACC_SYNTHETIC` `Ox1000`：编译期自动生成、并非用户代码产生
-> 	* `ACC_ANNOTATION` `Ox2000`：是否是注解
-> 	* `ACC_ENUM`：`Ox4000`：是否是enum 
+>  	* `ACC_FINAL` `Ox0010`：是否为final
+>  	* `ACC_SUPER` `Ox0020`：该flag在JDK1.0.2之后要求必须设置、用来指明invokespectial指令使用新语义
+>  	* `ACC_INTERFACE` `Ox0200`：是否为接口
+>  	* `ACC_ABSTRACT` `Ox0400`：接口或者抽象类
+>  	* `ACC_SYNTHETIC` `Ox1000`：编译期自动生成、并非用户代码产生
+>  	* `ACC_ANNOTATION` `Ox2000`：是否是注解
+>  	* `ACC_ENUM`：`Ox4000`：是否是enum 
 > 
 > 4. `this_class`，`super_class`，`interfaces_count`，`interfaces`：当前类名、父类名、实现的接口，会指向常量池中对应的内容
 > 5. `fields_count`，`fields`，`methods_count`，`methods`：属性、方法
@@ -135,20 +156,20 @@ java  virtual machine specifications
 
 ### (5) 用`jClassLib`插件查看.class文件
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jclasslib.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jclasslib.jpg" width="800" /></div>
 > 
 > * `一般信息`：参考前面的内容
 > * `常量池`：每一种常量类型（例如：CONSTANT_Methodref_Info）对应一种不同的二进制数据结构
 > 	* `二进制结构`中各个字段的含义可以参考 [https://docs.oracle.com/javase/specs/jvms/se12/html/jvms-4.html#jvms-4.4](https://docs.oracle.com/javase/specs/jvms/se12/html/jvms-4.html#jvms-4.4) 
 > 	* `jClassLib`根据`二进制结构`解析.class并显示解析后的内容
 > 	* 数据结构中的项有可能指向常量池中的其他项目（例如`cp_info#1`表示常量池第1项) ，如下图所示
-> 	![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/constant_pool_item.jpg)
+> 	<div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/constant_pool_item.jpg" width="800" /></div>
 > 	* 遇到`Fieldm描述符`和`方法描述符`，例如`V`（void），可参考下面链接：
 > 		* [https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3.2](https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3.2)
 > 		* [https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3.3](https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3.3)
 > * `接口`，`Fields`：接口和成员变量
 > * `Methods`：方法，点击其中的`Code`项可以看到JVM字节码指令（每个指令解析自.class中的一个指令码）
 > 	* `jClassLIb`为这些指令增加了链接，可以跳转到Oracle的页面上查看指令的用途，例如下面的`aload`
-> 	![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/class_file_method.jpg)
+> 	<div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/class_file_method.jpg" width="800" /></div>
 > 	* 也可以在 [https://docs.oracle.com/javase/specs/index.html](https://docs.oracle.com/javase/specs/index.html)中找到参考
 

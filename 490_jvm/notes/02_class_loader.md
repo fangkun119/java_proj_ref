@@ -1,3 +1,29 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [Class加载和初始化](#class%E5%8A%A0%E8%BD%BD%E5%92%8C%E5%88%9D%E5%A7%8B%E5%8C%96)
+  - [1. 步骤](#1-%E6%AD%A5%E9%AA%A4)
+  - [2. 加载](#2-%E5%8A%A0%E8%BD%BD)
+    - [2.1 理解类加载器（`ClassLoader`）](#21-%E7%90%86%E8%A7%A3%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8classloader)
+    - [2.2. 双亲委派加载过程](#22-%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B)
+      - [(1) 如何通过`ClassLoader`加载一个类](#1-%E5%A6%82%E4%BD%95%E9%80%9A%E8%BF%87classloader%E5%8A%A0%E8%BD%BD%E4%B8%80%E4%B8%AA%E7%B1%BB)
+      - [(2) 类加载（`loadClass方法`）执行过程](#2-%E7%B1%BB%E5%8A%A0%E8%BD%BDloadclass%E6%96%B9%E6%B3%95%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B)
+      - [(3) 双亲委派机制有可能被打破吗？](#3-%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%9C%BA%E5%88%B6%E6%9C%89%E5%8F%AF%E8%83%BD%E8%A2%AB%E6%89%93%E7%A0%B4%E5%90%97)
+    - [2.3. 自定义类加载器](#23-%E8%87%AA%E5%AE%9A%E4%B9%89%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8)
+      - [(1) 继承`ClassLoader`实现自定义加载器](#1-%E7%BB%A7%E6%89%BFclassloader%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8A%A0%E8%BD%BD%E5%99%A8)
+      - [(2) 为自定义加载器指定非默认的父加载器](#2-%E4%B8%BA%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8A%A0%E8%BD%BD%E5%99%A8%E6%8C%87%E5%AE%9A%E9%9D%9E%E9%BB%98%E8%AE%A4%E7%9A%84%E7%88%B6%E5%8A%A0%E8%BD%BD%E5%99%A8)
+    - [2.4. JVM的Lazy Loading](#24-jvm%E7%9A%84lazy-loading)
+    - [2.5. 解释器和即时编译器（`JIT）](#25-%E8%A7%A3%E9%87%8A%E5%99%A8%E5%92%8C%E5%8D%B3%E6%97%B6%E7%BC%96%E8%AF%91%E5%99%A8jit)
+  - [3. Linking以及Initializtion](#3-linking%E4%BB%A5%E5%8F%8Ainitializtion)
+    - [3.1 Linking的步骤](#31-linking%E7%9A%84%E6%AD%A5%E9%AA%A4)
+    - [3.2 Initialization的步骤](#32-initialization%E7%9A%84%E6%AD%A5%E9%AA%A4)
+    - [3.3 代码演示](#33-%E4%BB%A3%E7%A0%81%E6%BC%94%E7%A4%BA)
+    - [3.4 对于非静态成员变量](#34-%E5%AF%B9%E4%BA%8E%E9%9D%9E%E9%9D%99%E6%80%81%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F)
+    - [3.5 半初始化问题](#35-%E5%8D%8A%E5%88%9D%E5%A7%8B%E5%8C%96%E9%97%AE%E9%A2%98)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Class加载和初始化
 
 ## 1. 步骤 
@@ -68,7 +94,7 @@ Launch：
 > * `sun.misc.Launcher$ExtClassLoader`表示`sun.misc.Launcher`类下面的一个内部类`ExtClassLoader`
 > * `Launcher`是`class loader的启动类`，如下图所示，从`Launcher`的代码中可以看出它内置的3个ClassLoader，以及这三个ClassLoader所负责的加载范围
 > 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_classloader_launcher.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_classloader_launcher.jpg" width="800" /></div>
 
 通过ClassLoader来加载一个类：
 

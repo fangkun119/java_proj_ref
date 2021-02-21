@@ -1,10 +1,26 @@
-[TOC]
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [GC算法](#gc%E7%AE%97%E6%B3%95)
+  - [1 垃圾回收算法回顾](#1-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95%E5%9B%9E%E9%A1%BE)
+  - [2 CMS垃圾回收算法](#2-cms%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95)
+  - [3 G1垃圾回收算法](#3-g1%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95)
+    - [3.1 G1的内存布局](#31-g1%E7%9A%84%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80)
+    - [3.2 G1的特点](#32-g1%E7%9A%84%E7%89%B9%E7%82%B9)
+    - [3.2 `Card`、`Card Table`：读GC文档时会遇到的概念](#32-cardcard-table%E8%AF%BBgc%E6%96%87%E6%A1%A3%E6%97%B6%E4%BC%9A%E9%81%87%E5%88%B0%E7%9A%84%E6%A6%82%E5%BF%B5)
+    - [3.3 `RSet`、`CSet`：G1特有的概念](#33-rsetcsetg1%E7%89%B9%E6%9C%89%E7%9A%84%E6%A6%82%E5%BF%B5)
+    - [3.4 G1的GC](#34-g1%E7%9A%84gc)
+    - [3.5 并发标记算法 (CMS，G1中使用)](#35-%E5%B9%B6%E5%8F%91%E6%A0%87%E8%AE%B0%E7%AE%97%E6%B3%95-cmsg1%E4%B8%AD%E4%BD%BF%E7%94%A8)
+  - [4. 参考资料](#4-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # GC算法
 
 ## 1 垃圾回收算法回顾
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_garbage_collectors.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_garbage_collectors.jpg" width="800" /></div>
 >
 > * 左边的6个垃圾回收算法为分代垃圾回收器，G1为逻辑上的分代垃圾回收器，其他的不分代
 > * `<Serial，SerialOld>（几十兆内存）`→`<Parallel Scavenge, Parallel Old>（百兆至几个G的内存）`→`<ParNew, CMS>（20G内存）`→`G1（上百G内存）`的发展历程，是逐渐适应越来越大的内存的过程
@@ -24,7 +40,7 @@
 
 `CMS`的四（六）阶段回收过程：[https://www.cnblogs.com/zhangxiaoguang/p/5792468.html](https://www.cnblogs.com/zhangxiaoguang/p/5792468.html)
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_gc_cms.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_gc_cms.jpg" width="800" /></div>
 >
 > * 初始标记：标记根对象`root objects`（会**STW**，但时间非常短，因为根对象数量少）
 > * 并发标记：遍历整个老年代并且标记所有存活的对象，该阶段耗时最高，因此与应用程序同时运行
@@ -54,11 +70,11 @@
 
 > 传统GC的内存布局
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_mem_layout_traditional.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_mem_layout_traditional.jpg" width="800" /></div>
 >
 > G1的内存布局，物理上是分成小块（`region`），逻辑上每个小块依然属于某一代（但属于哪一代并不固定）
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_mem_layout_g1.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_mem_layout_g1.jpg" width="800" /></div>
 >
 > `Eden`（新生代）、`Survivor`（幸存区）、 `Old`（老年代）与传统GC的含义相同
 >
@@ -148,7 +164,7 @@ FGC：Old空间不足、或者调用`System.gc()`时
 
 在下面的条件下、三色标记会发生对象漏标
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_3color_miss_mark.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_3color_miss_mark.jpg" width="500" /></div>
 >
 > 原本B指向D（灰色指向白色），但是在GC线程执行并发标记过程中，程序线程将对象引用变为A指向D（黑色指向白色），使得D在并发标记阶段没有机会被标记到、产生漏标
 

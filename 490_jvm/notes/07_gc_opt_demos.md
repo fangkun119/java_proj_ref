@@ -1,3 +1,53 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [GC日志、调优案例及工具](#gc%E6%97%A5%E5%BF%97%E8%B0%83%E4%BC%98%E6%A1%88%E4%BE%8B%E5%8F%8A%E5%B7%A5%E5%85%B7)
+  - [1 准备](#1-%E5%87%86%E5%A4%87)
+  - [2 PS(`Parallel Scavenge`) PO（`Parallel Old`) GC日志](#2-psparallel-scavenge-poparallel-old-gc%E6%97%A5%E5%BF%97)
+  - [3 调优案例及工具](#3-%E8%B0%83%E4%BC%98%E6%A1%88%E4%BE%8B%E5%8F%8A%E5%B7%A5%E5%85%B7)
+    - [3.1 总体步骤](#31-%E6%80%BB%E4%BD%93%E6%AD%A5%E9%AA%A4)
+    - [3.2 Demo代码](#32-demo%E4%BB%A3%E7%A0%81)
+    - [3.3 定位问题](#33-%E5%AE%9A%E4%BD%8D%E9%97%AE%E9%A2%98)
+      - [(1) 找到CPU消耗量高的进程](#1-%E6%89%BE%E5%88%B0cpu%E6%B6%88%E8%80%97%E9%87%8F%E9%AB%98%E7%9A%84%E8%BF%9B%E7%A8%8B)
+      - [(2) 查看消耗CPU的线程：](#2-%E6%9F%A5%E7%9C%8B%E6%B6%88%E8%80%97cpu%E7%9A%84%E7%BA%BF%E7%A8%8B)
+      - [(3) 用`jstack`查看线程状态](#3-%E7%94%A8jstack%E6%9F%A5%E7%9C%8B%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81)
+      - [(4) 根据`jstack`输出来debug](#4-%E6%A0%B9%E6%8D%AEjstack%E8%BE%93%E5%87%BA%E6%9D%A5debug)
+    - [3.3 其他`jvm`自带的工具](#33-%E5%85%B6%E4%BB%96jvm%E8%87%AA%E5%B8%A6%E7%9A%84%E5%B7%A5%E5%85%B7)
+      - [(1) 用`jinfo`查看进程虚拟机的详细信息](#1-%E7%94%A8jinfo%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9A%84%E8%AF%A6%E7%BB%86%E4%BF%A1%E6%81%AF)
+      - [(2) 用`jstat -gc ${pid} ${interval}` 查看进程的GC信息](#2-%E7%94%A8jstat--gc-pid-interval-%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8B%E7%9A%84gc%E4%BF%A1%E6%81%AF)
+      - [(3) 使用`jconsole`图形化界面查看进程GC的信息（会影响服务器性能、用于压力测试而非线上监控）](#3-%E4%BD%BF%E7%94%A8jconsole%E5%9B%BE%E5%BD%A2%E5%8C%96%E7%95%8C%E9%9D%A2%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8Bgc%E7%9A%84%E4%BF%A1%E6%81%AF%E4%BC%9A%E5%BD%B1%E5%93%8D%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%80%A7%E8%83%BD%E7%94%A8%E4%BA%8E%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95%E8%80%8C%E9%9D%9E%E7%BA%BF%E4%B8%8A%E7%9B%91%E6%8E%A7)
+      - [(4) 使用`jvisualvm`图形化界面查看进程GC的信息（会影响服务器性能、用于压力测试而非线上监控）](#4-%E4%BD%BF%E7%94%A8jvisualvm%E5%9B%BE%E5%BD%A2%E5%8C%96%E7%95%8C%E9%9D%A2%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8Bgc%E7%9A%84%E4%BF%A1%E6%81%AF%E4%BC%9A%E5%BD%B1%E5%93%8D%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%80%A7%E8%83%BD%E7%94%A8%E4%BA%8E%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95%E8%80%8C%E9%9D%9E%E7%BA%BF%E4%B8%8A%E7%9B%91%E6%8E%A7)
+      - [（5）使用`jmap -histo ${pid} | head -n ${top_line_num}`查看有多少对象产生](#5%E4%BD%BF%E7%94%A8jmap--histo-pid--head--n-top_line_num%E6%9F%A5%E7%9C%8B%E6%9C%89%E5%A4%9A%E5%B0%91%E5%AF%B9%E8%B1%A1%E4%BA%A7%E7%94%9F)
+      - [（6） Dump Heap内存（注意有可能对系统性能产生较大的影响）](#6-dump-heap%E5%86%85%E5%AD%98%E6%B3%A8%E6%84%8F%E6%9C%89%E5%8F%AF%E8%83%BD%E5%AF%B9%E7%B3%BB%E7%BB%9F%E6%80%A7%E8%83%BD%E4%BA%A7%E7%94%9F%E8%BE%83%E5%A4%A7%E7%9A%84%E5%BD%B1%E5%93%8D)
+    - [3.4 `Arthas`在线排查工具](#34-arthas%E5%9C%A8%E7%BA%BF%E6%8E%92%E6%9F%A5%E5%B7%A5%E5%85%B7)
+      - [(1) 资料](#1-%E8%B5%84%E6%96%99)
+      - [(2) 快速开始](#2-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B)
+    - [(3) 将`Arthas` attach到运行中的java程序上](#3-%E5%B0%86arthas-attach%E5%88%B0%E8%BF%90%E8%A1%8C%E4%B8%AD%E7%9A%84java%E7%A8%8B%E5%BA%8F%E4%B8%8A)
+      - [(4) `Arthas`常用命令](#4-arthas%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4)
+        - [`jvm`：相当于之前的`jinfo`命令、查看jvm的详细配置情况](#jvm%E7%9B%B8%E5%BD%93%E4%BA%8E%E4%B9%8B%E5%89%8D%E7%9A%84jinfo%E5%91%BD%E4%BB%A4%E6%9F%A5%E7%9C%8Bjvm%E7%9A%84%E8%AF%A6%E7%BB%86%E9%85%8D%E7%BD%AE%E6%83%85%E5%86%B5)
+        - [`thread`：各个线程的阻塞情况和CPU使用情况](#thread%E5%90%84%E4%B8%AA%E7%BA%BF%E7%A8%8B%E7%9A%84%E9%98%BB%E5%A1%9E%E6%83%85%E5%86%B5%E5%92%8Ccpu%E4%BD%BF%E7%94%A8%E6%83%85%E5%86%B5)
+        - [`thread ${ARTHAS_THREAD_ID}`：查看线程调用栈](#thread-arthas_thread_id%E6%9F%A5%E7%9C%8B%E7%BA%BF%E7%A8%8B%E8%B0%83%E7%94%A8%E6%A0%88)
+        - [`dashboard`：查看整体线程情况（类似之前的`top -Hp ${pid}`但功能会更丰富)，有哪些线程，内存情况怎么，哪些线程在消耗CPU](#dashboard%E6%9F%A5%E7%9C%8B%E6%95%B4%E4%BD%93%E7%BA%BF%E7%A8%8B%E6%83%85%E5%86%B5%E7%B1%BB%E4%BC%BC%E4%B9%8B%E5%89%8D%E7%9A%84top--hp-pid%E4%BD%86%E5%8A%9F%E8%83%BD%E4%BC%9A%E6%9B%B4%E4%B8%B0%E5%AF%8C%E6%9C%89%E5%93%AA%E4%BA%9B%E7%BA%BF%E7%A8%8B%E5%86%85%E5%AD%98%E6%83%85%E5%86%B5%E6%80%8E%E4%B9%88%E5%93%AA%E4%BA%9B%E7%BA%BF%E7%A8%8B%E5%9C%A8%E6%B6%88%E8%80%97cpu)
+        - [`heapdump`：导出堆文件，相当于`jmap -dump:format=b,file=${file_path} ${pid}`](#heapdump%E5%AF%BC%E5%87%BA%E5%A0%86%E6%96%87%E4%BB%B6%E7%9B%B8%E5%BD%93%E4%BA%8Ejmap--dumpformatbfilefile_path-pid)
+      - [(5) Arthas特有的功能](#5-arthas%E7%89%B9%E6%9C%89%E7%9A%84%E5%8A%9F%E8%83%BD)
+        - [`jad`：反编译](#jad%E5%8F%8D%E7%BC%96%E8%AF%91)
+        - [`redefine`：热替换](#redefine%E7%83%AD%E6%9B%BF%E6%8D%A2)
+        - [`sc`：search class](#scsearch-class)
+        - [`watch`：观察方法执行](#watch%E8%A7%82%E5%AF%9F%E6%96%B9%E6%B3%95%E6%89%A7%E8%A1%8C)
+      - [(6) `Arthas`没有包含的功能](#6-arthas%E6%B2%A1%E6%9C%89%E5%8C%85%E5%90%AB%E7%9A%84%E5%8A%9F%E8%83%BD)
+  - [4 其他场景](#4-%E5%85%B6%E4%BB%96%E5%9C%BA%E6%99%AF)
+    - [4.1 宕机程序](#41-%E5%AE%95%E6%9C%BA%E7%A8%8B%E5%BA%8F)
+    - [4.2 系统内存飙高调优](#42-%E7%B3%BB%E7%BB%9F%E5%86%85%E5%AD%98%E9%A3%99%E9%AB%98%E8%B0%83%E4%BC%98)
+    - [4.3 `Lambda`表达式导致方法区溢出](#43-lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AF%BC%E8%87%B4%E6%96%B9%E6%B3%95%E5%8C%BA%E6%BA%A2%E5%87%BA)
+    - [4.4 栈溢出](#44-%E6%A0%88%E6%BA%A2%E5%87%BA)
+    - [4.5 监控JVM](#45-%E7%9B%91%E6%8E%A7jvm)
+  - [其他](#%E5%85%B6%E4%BB%96)
+    - [(1) 代码优化](#1-%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96)
+    - [(2) 安装`htop`](#2-%E5%AE%89%E8%A3%85htop)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # GC日志、调优案例及工具
 
 ## 1 准备
@@ -121,7 +171,7 @@
 
 > `Parallel Scavenge`（Miner GC）日志：
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_ps_gc_log.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_ps_gc_log.jpg" width="800" /></div>
 >
 > `[GC类型(GC原因)[内存代:回收前该代使用量->回收后该代使用量(该代总大小),该代回收花费时间] 回收前堆的使用量->回收后堆的使用量(堆的总大小), 堆回收花费时间][Times:Linux用户态、内核态、总共时间消耗]`
 >
@@ -417,11 +467,11 @@
 >
 > 在Mac上，用`Finder`进入JDK存放java bin文件的目录，双击jconsole，启动图形化界面
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jconsole_conn.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jconsole_conn.jpg" width="800" /></div>
 >
 > 填入Linux机器上JMX服务的地址和端口后，可以看到图形化的GC信息
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jconsole_monitor.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jconsole_monitor.jpg" width="800" /></div>
 
 #### (4) 使用`jvisualvm`图形化界面查看进程GC的信息（会影响服务器性能、用于压力测试而非线上监控）
 
@@ -435,15 +485,15 @@
 >
 > 添加JMX连接
 >
-> ![jvm_jvisualvm_conn](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jvisualvm_conn.jpg)
+> ![jvm_jvisualvm_conn](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jvisualvm_conn.jpg" width="800" /></div>
 >
 > 连接JMX可以看到相关的信息
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jvisualvm_monitor.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jvisualvm_monitor.jpg" width="800" /></div>
 >
 > 用`堆抽样器`可以看出来是哪个类占用的内存导致了堆被占满，还可以看来是哪个线程分配了大量的内存
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jvisualvm_heapsampler.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_jvisualvm_heapsampler.jpg" width="800" /></div>
 
 #### （5）使用`jmap -histo ${pid} | head -n ${top_line_num}`查看有多少对象产生
 
@@ -792,7 +842,7 @@
 
 ##### `thread`：各个线程的阻塞情况和CPU使用情况
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_arthas_thread.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_arthas_thread.jpg" width="800" /></div>
 
 ##### `thread ${ARTHAS_THREAD_ID}`：查看线程调用栈
 
@@ -813,7 +863,7 @@
 
 ##### `dashboard`：查看整体线程情况（类似之前的`top -Hp ${pid}`但功能会更丰富)，有哪些线程，内存情况怎么，哪些线程在消耗CPU
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_arthas_dashboard.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_arthas_dashboard.jpg" width="800" /></div>
 
 ##### `heapdump`：导出堆文件，相当于`jmap -dump:format=b,file=${file_path} ${pid}`
 
@@ -846,15 +896,15 @@
 >
 > 用浏览器访问dump结果
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_arthas_jhat.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_arthas_jhat.jpg" width="800" /></div>
 >
 > 使用`Show heap histogram`或者`Show instances counts for all classes`查询可以找到哪个类分配了大量对象占用了内存
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_arthas_jhat_histo.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_arthas_jhat_histo.jpg" width="800" /></div>
 >
 > 使用`Execute Object Query Language (OQL) query`可以查看某个类new了多少个对象、占用多少字节，每个对象有多少个引用等。在某些特别复杂的case中可以用来看是怎样的对象出了问题
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_athas_jhat_oql.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_athas_jhat_oql.jpg" width="800" /></div>
 >
 >  出了`jhat`，使用`MAT`,`jvisualvm`也都可以分析heap dump文件（需要jvm版本一致） 
 

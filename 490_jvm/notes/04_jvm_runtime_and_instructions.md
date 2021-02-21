@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [JVM运行时数据区及常用指令](#jvm%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%8F%8A%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4)
+  - [1. Java运行时数据区](#1-java%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA)
+    - [1.1 运行时数据区](#11-%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA)
+    - [1.2 JVM Stack](#12-jvm-stack)
+    - [1.3 局部变量表](#13-%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F%E8%A1%A8)
+  - [2 常用指令](#2-%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # JVM运行时数据区及常用指令
 
 > 之前的笔记是关于：(1) `class -> JVM`：class load、link、initialize；（2）JVM：run engine。这篇关于接下来的一部分，JVM运行时的`run-time data area`是什么样的 
@@ -8,8 +21,8 @@
 
 ### 1.1 运行时数据区
 
- ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_runtime_data_areas.jpg)
- 
+ <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_runtime_data_areas.jpg" width="600" /></div>
+
 > * `Program Counter`(简称`PC`)：存放下一条指令的位置，每个Java线程都有自己的`PC`
 > * `JVM stacks`:  用来运行Java方法，每个线程有一个栈
 > * `Native Method Stacks`：用来运行JVM本地方法（JVM内部用C/C++编写的方法 ）
@@ -58,14 +71,14 @@
 
 局部变量表：
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_local_variable_table.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_local_variable_table.jpg" width="800" /></div>
 > 
 > * `Nr. 0`：对应方法参数`String[] args` （因为是`static`方法没有`this`，所以Nr.0是方法参数；否则Nr.0要用来表示`this`）
 > * `Nr. 1`：对应局部变量`i`
 
 代码块对应的字节码：
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_method_byte_code.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_method_byte_code.jpg" width="600" /></div>
 > 
 > * `bipush 8`：把`8`对应的byte扩展成int value、随后入栈（因为byte可以容纳8、所以用了bipush；如果是129用short才能容纳、字节码会变成sipush 129）
 > * `istore_1`：将`int`存储到局部变量表下标为`1`的表项中（对应变量`i`，值为8）

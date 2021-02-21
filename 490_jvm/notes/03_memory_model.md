@@ -1,3 +1,32 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [内存屏障、Java内存布局](#%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9Cjava%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80)
+  - [1 硬件层的并发优化基础知识](#1-%E7%A1%AC%E4%BB%B6%E5%B1%82%E7%9A%84%E5%B9%B6%E5%8F%91%E4%BC%98%E5%8C%96%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86)
+    - [1.1 存储器层次结构（《深入理解计算机系统》，第三版，P421 ）](#11-%E5%AD%98%E5%82%A8%E5%99%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E7%AC%AC%E4%B8%89%E7%89%88p421-)
+    - [1.2 总线锁、缓存锁](#12-%E6%80%BB%E7%BA%BF%E9%94%81%E7%BC%93%E5%AD%98%E9%94%81)
+    - [1.3 缓存行（`Cache Line`）](#13-%E7%BC%93%E5%AD%98%E8%A1%8Ccache-line)
+    - [1.4 伪共享](#14-%E4%BC%AA%E5%85%B1%E4%BA%AB)
+  - [2. CPU指令重排、内存屏障、`volatile`及`synchronized`](#2-cpu%E6%8C%87%E4%BB%A4%E9%87%8D%E6%8E%92%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9Cvolatile%E5%8F%8Asynchronized)
+    - [2.1 CPU指令重排](#21-cpu%E6%8C%87%E4%BB%A4%E9%87%8D%E6%8E%92)
+    - [2.2 如何保证特定情况下不发生指令重排](#22-%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E7%89%B9%E5%AE%9A%E6%83%85%E5%86%B5%E4%B8%8B%E4%B8%8D%E5%8F%91%E7%94%9F%E6%8C%87%E4%BB%A4%E9%87%8D%E6%8E%92)
+      - [(1) CPU内存屏障](#1-cpu%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C)
+      - [(2) JVM级别的内存屏障（`JSR133`）](#2-jvm%E7%BA%A7%E5%88%AB%E7%9A%84%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9Cjsr133)
+      - [(3) `Volatile`的实现细节](#3-volatile%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82)
+      - [`synchronized`实现细节](#synchronized%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82)
+  - [3 Java对象内存布局](#3-java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80)
+    - [3.1 对象创建过程](#31-%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B)
+    - [3.2 对象在内存中的布局](#32-%E5%AF%B9%E8%B1%A1%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%B8%83%E5%B1%80)
+      - [(1) 虚拟机设置](#1-%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%AE%BE%E7%BD%AE)
+      - [(2) 普通对象布局](#2-%E6%99%AE%E9%80%9A%E5%AF%B9%E8%B1%A1%E5%B8%83%E5%B1%80)
+      - [(3) 数组对象布局](#3-%E6%95%B0%E7%BB%84%E5%AF%B9%E8%B1%A1%E5%B8%83%E5%B1%80)
+      - [(4) 对象头包含的内容](#4-%E5%AF%B9%E8%B1%A1%E5%A4%B4%E5%8C%85%E5%90%AB%E7%9A%84%E5%86%85%E5%AE%B9)
+      - [(5) 对象怎么定位](#5-%E5%AF%B9%E8%B1%A1%E6%80%8E%E4%B9%88%E5%AE%9A%E4%BD%8D)
+  - [4 其他](#4-%E5%85%B6%E4%BB%96)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 内存屏障、Java内存布局
 
 > * 高并发情况下Java内存怎么支持
@@ -85,7 +114,7 @@ Java代码
 
 字节码层面
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jclasslib_volatile.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jclasslib_volatile.jpg" width="800" /></div>
 > 
 > 只是为变量`j`增加了`ACC_VOLATILE`标记
 
@@ -123,13 +152,13 @@ java代码
 
 `synchronized void m() { }`
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_synchronized_method.jpg) 
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_synchronized_method.jpg" width="800" /></div> 
 > 
 > 使用`ACC_SYNCHRONIZED`来标记函数
 
 `void n() { synchronized(this) {} }`
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_synchronized_code_block.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_synchronized_code_block.jpg" width="800" /></div>
 > 
 > 使用monitorenter来告知JVM需要加锁、使用monitorexit来解锁（共2个：1个用于正常退出；1个用于异常退出）
 
@@ -206,9 +235,9 @@ OS和硬件层面
 #### (4) 对象头包含的内容
 
 每个JVM版本实现都不一样，以下图某个`markword 32 bit`的JVM为例：
- 
-![](https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_object_markword.jpg)
- 
+
+<div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_object_markword.jpg" width="800" /></div>
+
 > *	`锁标志位`（2 bit）表示对象加锁状态
 > 	* `无锁态`
 > 	* `轻量级锁`：仅在JVM虚拟机层面的锁、不会调用内核

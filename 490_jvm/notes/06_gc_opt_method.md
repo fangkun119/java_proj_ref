@@ -1,3 +1,29 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [GC调优方法概述](#gc%E8%B0%83%E4%BC%98%E6%96%B9%E6%B3%95%E6%A6%82%E8%BF%B0)
+  - [1 GC调优相关的概念](#1-gc%E8%B0%83%E4%BC%98%E7%9B%B8%E5%85%B3%E7%9A%84%E6%A6%82%E5%BF%B5)
+    - [1.1 调优目标](#11-%E8%B0%83%E4%BC%98%E7%9B%AE%E6%A0%87)
+    - [1.2 什么是调优](#12-%E4%BB%80%E4%B9%88%E6%98%AF%E8%B0%83%E4%BC%98)
+    - [1.3 调优规划](#13-%E8%B0%83%E4%BC%98%E8%A7%84%E5%88%92)
+  - [2 调优规划和预调优](#2-%E8%B0%83%E4%BC%98%E8%A7%84%E5%88%92%E5%92%8C%E9%A2%84%E8%B0%83%E4%BC%98)
+    - [例子1：订单系统用什么样配置的机器做压测](#%E4%BE%8B%E5%AD%901%E8%AE%A2%E5%8D%95%E7%B3%BB%E7%BB%9F%E7%94%A8%E4%BB%80%E4%B9%88%E6%A0%B7%E9%85%8D%E7%BD%AE%E7%9A%84%E6%9C%BA%E5%99%A8%E5%81%9A%E5%8E%8B%E6%B5%8B)
+    - [例子2：如何支撑大并发流量系统（100万并发）的抢票功能](#%E4%BE%8B%E5%AD%902%E5%A6%82%E4%BD%95%E6%94%AF%E6%92%91%E5%A4%A7%E5%B9%B6%E5%8F%91%E6%B5%81%E9%87%8F%E7%B3%BB%E7%BB%9F100%E4%B8%87%E5%B9%B6%E5%8F%91%E7%9A%84%E6%8A%A2%E7%A5%A8%E5%8A%9F%E8%83%BD)
+  - [3 优化JVM运行环境](#3-%E4%BC%98%E5%8C%96jvm%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83)
+    - [例子1：50万PV资料类网站，服务器从32位1.5G堆升级到64位16G堆时发生严重卡顿](#%E4%BE%8B%E5%AD%90150%E4%B8%87pv%E8%B5%84%E6%96%99%E7%B1%BB%E7%BD%91%E7%AB%99%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%BB%8E32%E4%BD%8D15g%E5%A0%86%E5%8D%87%E7%BA%A7%E5%88%B064%E4%BD%8D16g%E5%A0%86%E6%97%B6%E5%8F%91%E7%94%9F%E4%B8%A5%E9%87%8D%E5%8D%A1%E9%A1%BF)
+    - [例子2：系统CPU经常100%、如何调优](#%E4%BE%8B%E5%AD%902%E7%B3%BB%E7%BB%9Fcpu%E7%BB%8F%E5%B8%B8100%25%E5%A6%82%E4%BD%95%E8%B0%83%E4%BC%98)
+    - [例子3：系统内存飙高、如何调优](#%E4%BE%8B%E5%AD%903%E7%B3%BB%E7%BB%9F%E5%86%85%E5%AD%98%E9%A3%99%E9%AB%98%E5%A6%82%E4%BD%95%E8%B0%83%E4%BC%98)
+    - [例子4：如何监控JVM](#%E4%BE%8B%E5%AD%904%E5%A6%82%E4%BD%95%E7%9B%91%E6%8E%A7jvm)
+  - [4 JVM命令行参数](#4-jvm%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0)
+    - [4.1 JVM命令行参数参考](#41-jvm%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0%E5%8F%82%E8%80%83)
+    - [4.2 HotSpot参数分类](#42-hotspot%E5%8F%82%E6%95%B0%E5%88%86%E7%B1%BB)
+  - [5 常见垃圾回收器组合参数设定（1.8）](#5-%E5%B8%B8%E8%A7%81%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8%E7%BB%84%E5%90%88%E5%8F%82%E6%95%B0%E8%AE%BE%E5%AE%9A18)
+  - [6 查看GC类型](#6-%E6%9F%A5%E7%9C%8Bgc%E7%B1%BB%E5%9E%8B)
+  - [7 常用JVM参数](#7-%E5%B8%B8%E7%94%A8jvm%E5%8F%82%E6%95%B0)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # GC调优方法概述
 
 
