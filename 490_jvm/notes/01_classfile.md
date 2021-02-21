@@ -157,16 +157,18 @@ java  virtual machine specifications
 ### (5) 用`jClassLib`插件查看.class文件
 
 > <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jclasslib.jpg" width="800" /></div>
-> 
+>
 > * `一般信息`：参考前面的内容
 > * `常量池`：每一种常量类型（例如：CONSTANT_Methodref_Info）对应一种不同的二进制数据结构
-> 	* `二进制结构`中各个字段的含义可以参考 [https://docs.oracle.com/javase/specs/jvms/se12/html/jvms-4.html#jvms-4.4](https://docs.oracle.com/javase/specs/jvms/se12/html/jvms-4.html#jvms-4.4) 
-> 	* `jClassLib`根据`二进制结构`解析.class并显示解析后的内容
-> 	* 数据结构中的项有可能指向常量池中的其他项目（例如`cp_info#1`表示常量池第1项) ，如下图所示
-> 	<div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/constant_pool_item.jpg" width="800" /></div>
-> 	* 遇到`Fieldm描述符`和`方法描述符`，例如`V`（void），可参考下面链接：
-> 		* [https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3.2](https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3.2)
-> 		* [https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3.3](https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3.3)
+>   * `二进制结构`中各个字段的含义可以参考 [https://docs.oracle.com/javase/specs/jvms/se12/html/jvms-4.html#jvms-4.4](https://docs.oracle.com/javase/specs/jvms/se12/html/jvms-4.html#jvms-4.4) 
+>   * `jClassLib`根据`二进制结构`解析.class并显示解析后的内容
+>   * 数据结构中的项有可能指向常量池中的其他项目（例如`cp_info#1`表示常量池第1项) ，如下图所示
+>   <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/constant_pool_item.jpg" width="800" /></div>
+>   * 遇到`Fieldm描述符`和`方法描述符`，例如`V`（void），可参考下面链接：
+>
+>     https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3.2
+>
+>     https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3.3
 > * `接口`，`Fields`：接口和成员变量
 > * `Methods`：方法，点击其中的`Code`项可以看到JVM字节码指令（每个指令解析自.class中的一个指令码）
 > 	* `jClassLIb`为这些指令增加了链接，可以跳转到Oracle的页面上查看指令的用途，例如下面的`aload`
