@@ -1,4 +1,26 @@
-[TOC]
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [笔记及代码阅读](#%E7%AC%94%E8%AE%B0%E5%8F%8A%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB)
+  - [Spring Microservices in Action, 2nd Edition](#spring-microservices-in-action-2nd-edition)
+    - [CH01：微服务及构建模式](#ch01%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%8F%8A%E6%9E%84%E5%BB%BA%E6%A8%A1%E5%BC%8F)
+    - [CH02：Spring Cloud及云原生应用实践指南](#ch02spring-cloud%E5%8F%8A%E4%BA%91%E5%8E%9F%E7%94%9F%E5%BA%94%E7%94%A8%E5%AE%9E%E8%B7%B5%E6%8C%87%E5%8D%97)
+    - [CH03：Spring Boot在微服务中的使用](#ch03spring-boot%E5%9C%A8%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8)
+    - [CH04：Docker在微服务中的使用](#ch04docker%E5%9C%A8%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8)
+    - [CH05：Spring Cloud Configuration Server](#ch05spring-cloud-configuration-server)
+    - [CH06：服务发现](#ch06%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0)
+    - [CH07：弹性模式及Resilience4j](#ch07%E5%BC%B9%E6%80%A7%E6%A8%A1%E5%BC%8F%E5%8F%8Aresilience4j)
+    - [CH08：服务路由及Spring Cloud Gateway](#ch08%E6%9C%8D%E5%8A%A1%E8%B7%AF%E7%94%B1%E5%8F%8Aspring-cloud-gateway)
+    - [CH09：微服务安全](#ch09%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%AE%89%E5%85%A8)
+    - [CH10：事件驱动框架及Spring Cloud Stream](#ch10%E4%BA%8B%E4%BB%B6%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6%E5%8F%8Aspring-cloud-stream)
+    - [CH11：分布式tracing及Sleuth和Zipkin](#ch11%E5%88%86%E5%B8%83%E5%BC%8Ftracing%E5%8F%8Asleuth%E5%92%8Czipkin)
+    - [CH12：微服务部署](#ch12%E5%BE%AE%E6%9C%8D%E5%8A%A1%E9%83%A8%E7%BD%B2)
+    - [附录1：微服务架构最佳实践](#%E9%99%84%E5%BD%951%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5)
+    - [附录2：OAuth2授权类型](#%E9%99%84%E5%BD%952oauth2%E6%8E%88%E6%9D%83%E7%B1%BB%E5%9E%8B)
+    - [附录3：微服务监控](#%E9%99%84%E5%BD%953%E5%BE%AE%E6%9C%8D%E5%8A%A1%E7%9B%91%E6%8E%A7)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # 笔记及代码阅读
 
