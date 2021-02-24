@@ -1,53 +1,117 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [React Note 01](#react-note-01)
+  - [1. 前端框架比较：Angular、React、VUE](#1-%E5%89%8D%E7%AB%AF%E6%A1%86%E6%9E%B6%E6%AF%94%E8%BE%83angularreactvue)
+    - [(1) 特点比较](#1-%E7%89%B9%E7%82%B9%E6%AF%94%E8%BE%83)
+    - [(2) 语法比较](#2-%E8%AF%AD%E6%B3%95%E6%AF%94%E8%BE%83)
+    - [(3) 框架学习曲线](#3-%E6%A1%86%E6%9E%B6%E5%AD%A6%E4%B9%A0%E6%9B%B2%E7%BA%BF)
+    - [(4) 框架功能/性能差别](#4-%E6%A1%86%E6%9E%B6%E5%8A%9F%E8%83%BD%E6%80%A7%E8%83%BD%E5%B7%AE%E5%88%AB)
+    - [(5) 框架流行度](#5-%E6%A1%86%E6%9E%B6%E6%B5%81%E8%A1%8C%E5%BA%A6)
+  - [2. create-react-app](#2-create-react-app)
+  - [3.组件化思想](#3%E7%BB%84%E4%BB%B6%E5%8C%96%E6%80%9D%E6%83%B3)
+  - [4. 用于快速上手的项目](#4-%E7%94%A8%E4%BA%8E%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B%E7%9A%84%E9%A1%B9%E7%9B%AE)
+    - [(1) 文档](#1-%E6%96%87%E6%A1%A3)
+    - [(2) 代码及注释链接](#2-%E4%BB%A3%E7%A0%81%E5%8F%8A%E6%B3%A8%E9%87%8A%E9%93%BE%E6%8E%A5)
+  - [5. 项目知识点](#5-%E9%A1%B9%E7%9B%AE%E7%9F%A5%E8%AF%86%E7%82%B9)
+    - [(1) 什么是钩子（Hook）](#1-%E4%BB%80%E4%B9%88%E6%98%AF%E9%92%A9%E5%AD%90hook)
+    - [(2) `useState`钩子](#2-usestate%E9%92%A9%E5%AD%90)
+    - [(3) `useEffect`钩子](#3-useeffect%E9%92%A9%E5%AD%90)
+    - [(4) 屏蔽表单提交时的默认操作及屏蔽方法](#4-%E5%B1%8F%E8%94%BD%E8%A1%A8%E5%8D%95%E6%8F%90%E4%BA%A4%E6%97%B6%E7%9A%84%E9%BB%98%E8%AE%A4%E6%93%8D%E4%BD%9C%E5%8F%8A%E5%B1%8F%E8%94%BD%E6%96%B9%E6%B3%95)
+    - [(5) 屏蔽点击事件向上传递](#5-%E5%B1%8F%E8%94%BD%E7%82%B9%E5%87%BB%E4%BA%8B%E4%BB%B6%E5%90%91%E4%B8%8A%E4%BC%A0%E9%80%92)
+    - [(6) 插入icon并绑定事件处理](#6-%E6%8F%92%E5%85%A5icon%E5%B9%B6%E7%BB%91%E5%AE%9A%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86)
+    - [(7) 列表元素key](#7-%E5%88%97%E8%A1%A8%E5%85%83%E7%B4%A0key)
+    - [(8) Local Storage](#8-local-storage)
+    - [(7) 解构赋值](#7-%E8%A7%A3%E6%9E%84%E8%B5%8B%E5%80%BC)
+    - [(8) ES6 Spread语法](#8-es6-spread%E8%AF%AD%E6%B3%95)
+    - [(9) 用style属性来定义样式](#9-%E7%94%A8style%E5%B1%9E%E6%80%A7%E6%9D%A5%E5%AE%9A%E4%B9%89%E6%A0%B7%E5%BC%8F)
+    - [(10) 根据index删除列表元素](#10-%E6%A0%B9%E6%8D%AEindex%E5%88%A0%E9%99%A4%E5%88%97%E8%A1%A8%E5%85%83%E7%B4%A0)
+  - [6. Hooks背后的理念：可复用性](#6-hooks%E8%83%8C%E5%90%8E%E7%9A%84%E7%90%86%E5%BF%B5%E5%8F%AF%E5%A4%8D%E7%94%A8%E6%80%A7)
+  - [7. CSS 布局](#7-css-%E5%B8%83%E5%B1%80)
+    - [(1) CSS盒模型](#1-css%E7%9B%92%E6%A8%A1%E5%9E%8B)
+    - [(2) 弹性布局](#2-%E5%BC%B9%E6%80%A7%E5%B8%83%E5%B1%80)
+      - [flex-direction](#flex-direction)
+      - [flex-wrap](#flex-wrap)
+      - [justify-content](#justify-content)
+      - [align-items](#align-items)
+      - [align-content](#align-content)
+  - [附录：参考文档](#%E9%99%84%E5%BD%95%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # React Note 01
 
-## 1. 三个前端框架
+> 对应Projcet  1：Todo List项目
+
+## 1. 前端框架比较：Angular、React、VUE
+
+### (1) 特点比较
 
 > * `Angular`: Google，特点是提供丰富的内置组件（`build-in`）
 > * `React`: Facebook，开源出来的内容非常少、最小化专注于界面（`UI-building`）
 > * `Vue`：独立开发者（前谷歌员工），特点介于两者之间
+>
+> | 特点            | Angular | React | Vue  |
+> | --------------- | ------- | ----- | ---- |
+> | UI/DOM操作      | 支持    | 支持  | 支持 |
+> | 状态管理        | 支持    | 较弱  | 支持 |
+> | Routing         | 支持    |       | 支持 |
+> | 表单验证 、处理 | 支持    |       |      |
+> | HTTP客户端      | 支持    |       |      |
 
-| Feature         	| Angular	| React 	| Vue    	|
-| -----------	| ------	| ---- 	| ----- 	|
-| UI/DOM操作 	| 支持		| 支持 	| 支持 	|
-| 状态管理     	| 支持	 	| 较弱	| 支持    	|
-| Routing      	| 支持	 	| 		| 支持    	|
-| 表单验证/处理  	| 支持	 	| 		|           	|
-| Http客户端  	| 支持	 	| 		|           	|
+### (2) 语法比较
 
-语法比较：
+`Angular`
 
-> * `Angular`：类Html静态模板形式，代码只要关注动态部分即可
-> * `React`：JSX组件形式，动态模板。代码较少，但状态变化触发重新渲染，为此`React`引入`Virtual Dom`、通过以下方法来降低渲染开销 (`Angular`,`Vue`后续也引入了`Virtual Dom`)
-> 	* 比较、选择性渲染
-> 	* 批量Dom操作、在event loop的结尾（一组短时间内连续发生的Dom操作）统一渲染
-> * `Vue`：Html静态模板部分类似`Angular`
+>  类Html静态模板形式，代码只要关注动态部分即可
 
-框架学习曲线：
+`React`
 
-> * `Vue`：平滑、上手快、中小型公司经常使用
-> * `React`：初期JSX语法有一定难度
-> * `Angular`：三个框架学习成本最高
+> JSX组件形式，动态模板。
+>
+> 代码较少，但状态变化触发重新渲染，为此`React`引入`Virtual Dom`、通过以下方法来降低渲染开销
+>
+> * 比较、选择性渲染
+> * 批量Dom操作、在event loop的结尾（一组短时间内连续发生的Dom操作）统一渲染
+>
+> `Angular`、`Vue`后续也引入了`Virtual Dom`
 
-框架功能/性能差别：
+`Vue`
+
+> Html静态模板部分类似`Angular`
+
+### (3) 框架学习曲线
+
+> `Vue`：平滑、上手快、中小型公司经常使用
+>
+> `React`：初期JSX语法有一定难度
+>
+> `Angular`：三个框架学习成本最高
+
+### (4) 框架功能/性能差别
 
 > 功能差别已经不大了（生态都已经建立起来）；性能也很难比较（三足鼎立状态、没有哪一款可以绝对优于其他2款，一些特定操作的测评与实际应用差别较大也不具备代表性）
 
-框架流行度：
+### (5) 框架流行度
 
 > `React`占明显优势，国外`React`和`Angular`，国内`React`和`Vue`
 
 ## 2. create-react-app
 
-官方提供的脚手架、创建单页应用程序、零配置构建。使用下面4种方法之一（取决于使用哪种包管理工具）：
+`create-react-app`是官方提供的脚手架、创建单页应用程序、零配置构建。
+
+用下面4种方法之一（取决于使用哪种包管理工具）即可创建
 
 > ~~~bash
-> create-react-app my-app 		# 全局安装create-react-app的情况
-> npx create-react-app my-app  	# npx来自npm 5.2+或更高版本
-> npm init react-app my-app  		# npm init <initializer> 在 npm 6+可用
-> yarn create react-app my-app 	# yarn create在Yarn 0.25+中可用
+> $ # 替换<app-anem>为项目名称
+> $ create-react-app <app-name>		# 全局安装create-react-app的情况
+> $ npx create-react-app <app-name>	# npx来自npm 5.2+或更高版本
+> $ npm init react-app <app-name>  	# npm init <initializer> 在 npm 6+可用
+> $ yarn create react-app <app-name> 	# yarn create在Yarn 0.25+中可用
 > ~~~
 
-项目创建之后（以使用npm包管理工具为例，yarn差别也不大），有四条命令可以用
+启动创建好之后的app（以使用npm包管理工具为例，yarn差别也不大）
 
 > `npm start`：启动项目、可以在浏览器中查看
 > `npm run build`:  构建，把JSX语法、高阶ES语法等转义成浏览器能用的格式，压缩JS等
@@ -56,8 +120,9 @@
 
 ## 3.组件化思想
 
-> * 小组件组装成大组件、大组件组装成更大的组件、……，提高代码复用
-> * Trade Off：组件化缺乏 v.s 过度组件化
+> 小组件组装成大组件、大组件组装成更大的组件、……，提高代码复用
+>
+> Trade Off：组件化缺乏 v.s 过度组件化
 
 ## 4. 用于快速上手的项目
 
@@ -70,17 +135,18 @@
 [todo-list/public/index.html](todo-list/public/index.html)
 
 > 载入CSS Lib，使用定义在`to-dolist/src/App.js`中的`App Component`作为该应用的主Component
+>
+> ~~~html
+> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.1/css/bulma.min.css" />
+> ~~~
 
-~~~html
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.1/css/bulma.min.css" />
-~~~
 [todo-list/src/App.js](todo-list/src/App.js)及[todo-list/src/App.css](todo-list/src/App.css)
 
 > 主Component：实现方法及相关React使用要点，见代码注释
 
 ## 5. 项目知识点
 
-### (1)  什么是钩子（Hook）
+### (1) 什么是钩子（Hook）
 >
 > 先看的`class component`写法  
 >
@@ -244,7 +310,7 @@
 > ~~~
 
 
-### (7) 列表元素key：
+### (7) 列表元素key
 
 > `React`要求列表元素提供key属性、避免不必要的重新渲染以及渲染元素的唯一性。同时不推荐用index当做key，会导致诸如“表格插入行时重新渲染所有行”的情况。
 > 
@@ -306,7 +372,7 @@
 Storage {length: 0}
 > ~~~
 
-### (7) 解构赋值：
+### (7) 解构赋值
 
 > 用途：1. 将对象属性赋给一组变量；2. 将数组元素赋给一组变量
 > 
@@ -354,7 +420,7 @@ Storage {length: 0}
 > newTodos.splice(index, 1);    //根据index删除列表元素
 > ~~~
 
-## 6. Hooks背后的理念：可复用性 
+## 6. Hooks背后的理念：可复用性
 
 > `React`改进可复用性的历史：`Mixin` -> `HOC` -> `Render Props` -> `Hooks`
 
@@ -487,7 +553,7 @@ HOC: 高阶组件
 > const BlogPostWithSubscription = withSubscription(BlogPost, (DataSource, props) => DataSource.getBlogPost(props.id);
 > ~~~
 
-Render Props： 		
+Render Props
 
 > 要定制化的部分`{this.props.render(this.state);}`空出来由外部代码传入
 > 
@@ -539,7 +605,7 @@ Render Props：
 **Hooks** 
 
 把公共部分抽出来变成一个方法，就可以了。不再需要以组件为粒度来写公共代码。例子如下：
- 
+
 > 公用部分写在`自定义hook`（使用官方hook的函数）中：`useFriendStatus`
 > 
 > ~~~javascript
