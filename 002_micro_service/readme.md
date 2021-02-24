@@ -4,9 +4,13 @@
 
 ## Spring Microservices in Action, 第二版
 
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/microservice/smia2_cover.jpg" width="250" /></div>
+
 在线阅读：[https://livebook.manning.com/book/spring-microservices-in-action-second-edition/](https://livebook.manning.com/book/spring-microservices-in-action-second-edition/)
 
 代码fork：[https://github.com/fangkun119/manning-smia](https://github.com/fangkun119/manning-smia)
+
+笔记链接：[https://github.com/fangkun119/manning-smia/blob/master/note/](https://github.com/fangkun119/manning-smia/blob/master/note/)
 
 ### CH01：微服务及构建模式
 
@@ -155,11 +159,17 @@
 
 ### CH11：分布式tracing及Sleuth和Zipkin
 
-笔记链接：
+笔记链接：https://github.com/fangkun119/manning-smia/blob/master/note/ch11_distributed_tracing.md
 
 内容概要：
 
-> 
+> (1) 使用Spring Cloud Sleuth为各个服务日志统一添加`trace id`、`span id`等；配置logstash-logback，将服务日志发送给LogStash
+>
+> (2) 使用ELK（ElasticSearch、LogStash、Kibana）以收集日志，配置并使用Kibana来根据`trace id`搜索属于同一transaction的日志
+>
+> (3) 将trace id添加到HTTP Response中以便日常oncall和debug
+>
+> (4) 使用Open Zipkin进行分布式调用耗时追踪，添加自定义span以追踪特定代码段的耗时情况
 
 ### CH12：微服务部署
 
