@@ -1,16 +1,16 @@
 [TOC]
 
-# Microservice and Spring Cloud笔记
+# 笔记及代码阅读
 
-## Spring Microservices in Action, 第二版
+## Spring Microservices in Action, 2nd Edition
 
 > <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/microservice/smia2_cover.jpg" width="250" /></div>
 
-在线阅读：[https://livebook.manning.com/book/spring-microservices-in-action-second-edition/](https://livebook.manning.com/book/spring-microservices-in-action-second-edition/)
+原书连接：[https://www.manning.com/books/spring-microservices-in-action-second-edition](https://www.manning.com/books/spring-microservices-in-action-second-edition)
+
+在线阅读：[https://livebook.manning.com/book/spring-microservices-in-action-second-edition](https://livebook.manning.com/book/spring-microservices-in-action-second-edition/)
 
 代码fork：[https://github.com/fangkun119/manning-smia](https://github.com/fangkun119/manning-smia)
-
-笔记链接：[https://github.com/fangkun119/manning-smia/blob/master/note/](https://github.com/fangkun119/manning-smia/blob/master/note/)
 
 ### CH01：微服务及构建模式
 
@@ -173,11 +173,15 @@
 
 ### CH12：微服务部署
 
-笔记链接：
+笔记链接：[https://github.com/fangkun119/manning-smia/blob/master/note/ch12_deployment.md](https://github.com/fangkun119/manning-smia/blob/master/note/ch12_deployment.md)
 
 内容概要：
 
-> 
+> (1) 微服务构建和部署Pipeline的整体结构
+>
+> (2) 在AWS上部署数据库（PostgreSQL/Redis）、ELK（Elasticsearch/LogStash/Kibana）、微服务Service
+>
+> (3) 在Github和Jenkins上将构建和部署过程自动化
 
 ### 附录1：微服务架构最佳实践
 
