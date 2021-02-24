@@ -27,7 +27,12 @@
     - [(8) ES6 Spread语法](#8-es6-spread%E8%AF%AD%E6%B3%95)
     - [(9) 用style属性来定义样式](#9-%E7%94%A8style%E5%B1%9E%E6%80%A7%E6%9D%A5%E5%AE%9A%E4%B9%89%E6%A0%B7%E5%BC%8F)
     - [(10) 根据index删除列表元素](#10-%E6%A0%B9%E6%8D%AEindex%E5%88%A0%E9%99%A4%E5%88%97%E8%A1%A8%E5%85%83%E7%B4%A0)
-  - [6. Hooks背后的理念：可复用性](#6-hooks%E8%83%8C%E5%90%8E%E7%9A%84%E7%90%86%E5%BF%B5%E5%8F%AF%E5%A4%8D%E7%94%A8%E6%80%A7)
+  - [6. `React`改进可复用性的历史：`Mixin` -> `HOC` -> `Render Props` -> `Hooks`](#6-react%E6%94%B9%E8%BF%9B%E5%8F%AF%E5%A4%8D%E7%94%A8%E6%80%A7%E7%9A%84%E5%8E%86%E5%8F%B2mixin---hoc---render-props---hooks)
+    - [(1) Mixin](#1-mixin)
+    - [(b) HOC: 高阶组件](#b-hoc-%E9%AB%98%E9%98%B6%E7%BB%84%E4%BB%B6)
+    - [(3) Render Props](#3-render-props)
+    - [(4) **Hooks**（背后的理念：可复用性）](#4-hooks%E8%83%8C%E5%90%8E%E7%9A%84%E7%90%86%E5%BF%B5%E5%8F%AF%E5%A4%8D%E7%94%A8%E6%80%A7)
+    - [(5) 总结](#5-%E6%80%BB%E7%BB%93)
   - [7. CSS 布局](#7-css-%E5%B8%83%E5%B1%80)
     - [(1) CSS盒模型](#1-css%E7%9B%92%E6%A8%A1%E5%9E%8B)
     - [(2) 弹性布局](#2-%E5%BC%B9%E6%80%A7%E5%B8%83%E5%B1%80)
@@ -36,7 +41,7 @@
       - [justify-content](#justify-content)
       - [align-items](#align-items)
       - [align-content](#align-content)
-  - [附录：参考文档](#%E9%99%84%E5%BD%95%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3)
+  - [8. 参考文档](#8-%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
