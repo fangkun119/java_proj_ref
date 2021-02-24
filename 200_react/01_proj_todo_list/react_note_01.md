@@ -148,11 +148,11 @@
 
 ### (1) 什么是钩子（Hook）
 >
-> 先看的`class component`写法  
+> 先看老式的`class component`写法  
 >
 >~~~javascript
 > import. React, { Component } from 'react';
-> export default class Button. extends Component {
+> export default class Button extends Component {
 > 	constructor() {
 > 		super();
 > 		this.state = { buttonText: "Click me"};  //状态
@@ -184,7 +184,7 @@
 > }
 > ~~~
 > 
->  `functional. compoent`加上`hooks`之后，基本上等同于`class component`。
+>  `functional compoent`加上`hooks`之后，功能上基本等同于`class component`。
 > 
 > * 状态以及组件生命周期，都可以用`hooks`钩进来（例如：`useState()`，`useContext()`，`useReducer()`,  `useEffect()`）
 > * 组件尽量写成纯函数，如果需要外部功能和副作用，就用`hooks`
@@ -199,9 +199,9 @@
 > 
 > ~~~javascript
 > onChange={(e) => {
->      console.log('before: ', value); 
->      setValue(e.target.value);       // 异步操作，只会把value变化提交给event loop
->      console.log('after: ', value);   // 输出的仍然是旧的value
+>    	console.log('before: ', value); 
+>    	setValue(e.target.value);        // 异步操作，调用setValue函数时，只是把value变化提交给event loop
+>    	console.log('after: ', value);   // 输出的仍然是旧的value
 > }}
 > ~~~
 > 
@@ -215,7 +215,7 @@
 > 
 > 文档：[https://zh-hans.reactjs.org/docs/hooks-state.html](https://zh-hans.reactjs.org/docs/hooks-state.html)
 
-### (3) `useEffect`钩子 
+### (3) `useEffect`钩子
 
 > ~~~javascript
 > // react.useEffect(()=>{}, [])是React的Effect Hook
@@ -224,11 +224,11 @@
 > //   useEffect(()=>{console.log("componentDidMount")}, [])
 > // * 当参数2没有提供时，参数1的回调函数在整个组件每轮渲染后执行
 > useEffect(()=>{
-> 	  // console.log("todos change"); 
->     // localStorage可存储少量数据（< 5 M）在浏览器本地，
->     // 1. 在Chrome DevTool的console中可以运行和实验相关函数，例如：localStorage.clear(); localStorage.removeItem('todos')
->     // 2. localStorage不能存储二进制数据，需要将其转化成JSON
->     localStorage.setItem('todos', JSON.stringify(todos));
+> 	// console.log("todos change"); 
+>    	// localStorage可存储少量数据（< 5 M）在浏览器本地，
+>    	// 1. 在Chrome DevTool的console中可以运行和实验相关函数，例如：localStorage.clear(); localStorage.removeItem('todos')
+>    	// 2. localStorage不能存储二进制数据，需要将其转化成JSON
+>    	localStorage.setItem('todos', JSON.stringify(todos));
 > }, [todos])
 > ~~~
 >
@@ -239,8 +239,8 @@
 
 > ~~~javascript
 >   const handleSubmit = (e) => {
->     e.preventDefault();  //屏蔽默认的on submit页面刷新行为
->     ...c
+>    	e.preventDefault();  //屏蔽默认的on submit页面刷新行为
+>    	...c
 >   }
 > ~~~
 > 
@@ -271,12 +271,12 @@
 > 
 > ~~~javascript
 >   const removeTodoItem = (e, index) => {
->     e.preventDefault();           //屏蔽<a>标签默认的url跳转（否则地址栏url会变）
->     e.stopPropagation();          //阻止事件向上传递，否则会从<a>向上传递到外层的<div>，触发该<div>的completeTodo回到函数
->     // console.log(index);
->     const newTodos = [...todos];  //拷贝列表
->     newTodos.splice(index, 1);    //根据index删除列表元素
->     setTodos(newTodos);           //更新状态重新渲染
+>    	e.preventDefault();           //屏蔽<a>标签默认的url跳转（否则地址栏url会变）
+>    	e.stopPropagation();          //阻止事件向上传递，否则会从<a>向上传递到外层的<div>，触发该<div>的completeTodo回到函数
+>    	// console.log(index);
+>    	const newTodos = [...todos];  //拷贝列表
+>    	newTodos.splice(index, 1);    //根据index删除列表元素
+>    	setTodos(newTodos);           //更新状态重新渲染
 >   }
 > ~~~
 
@@ -297,7 +297,7 @@
 
 > 用`<a>`标签包裹（需要使用`e.preventDefault()`屏蔽`<a>`标签的点击时默认的url跳转操作），也可以绑定在其他可点击的html标签中
 >
-> ~~~javascript
+> ~~~jsx
 > // 使用第三方提供的图标，例如 https://www.iconfont.cn/search/index?searchType=icon&q=remove
 > // 1. 点击'copy svg'，粘贴到下面的变量之后
 > // 2. 把'class'更改为'className'以符合JSX的要求（HTML to JSX）
@@ -314,16 +314,16 @@
 
 > `React`要求列表元素提供key属性、避免不必要的重新渲染以及渲染元素的唯一性。同时不推荐用index当做key，会导致诸如“表格插入行时重新渲染所有行”的情况。
 > 
-> ~~~javascript
+> ~~~jsx
 > <div className="todo-list">
->     <TodoForm addTodoItem={addTodo}/>
->     { 
->         todos.map((elem, index) => (
->          <TodoItem 
+>    	<TodoForm addTodoItem={addTodo}/>
+>    	{ 
+>    		todos.map((elem, index) => (
+>    		<TodoItem 
 >               key={elem.text}  // React使用key来做视图更新，避免不必要的重新渲染
 >               index={index} todoItem={elem} removeTodoItem={removeTodoItem} completeTodo={completeTodo}
 >           />))
->     }
+>    	}
 > </div> 
 > ~~~
 > 
@@ -416,15 +416,14 @@ Storage {length: 0}
 
 ### (10) 根据index删除列表元素
 
-> ~~~javascript
+> ~~~jsx
 > newTodos.splice(index, 1);    //根据index删除列表元素
 > ~~~
 
-## 6. Hooks背后的理念：可复用性
+## 6. `React`改进可复用性的历史：`Mixin` -> `HOC` -> `Render Props` -> `Hooks`
 
-> `React`改进可复用性的历史：`Mixin` -> `HOC` -> `Render Props` -> `Hooks`
+### (1) Mixin
 
-Mixin：
 >  
 > * 原自于OOP的思想，将比较通用的代码提取出来
 > * 缺陷：
@@ -433,7 +432,7 @@ Mixin：
 > 	* 引入mixin会倾向于产生更多状态，过多的mixin使得状态越来越复杂
 > * 已经被淘汰
 > 
-> ~~~javascript
+> ~~~jsx
 > // 公用代码：提供计时器功能的Mixin
 > var SetIntervalMixin = {
 > 	componentWillMount: function() {
@@ -465,18 +464,18 @@ Mixin：
 > });
 > ~~~
 
-HOC: 高阶组件
+### (b) HOC: 高阶组件
 
 > * 编写转换函数，把通用性低但是相似的基础组件、组装成通用性高的组件
 > * 优点：通过层级结构（通用的部分在转换函数中，不通用的部分在参数中）、降低了复杂度
 > * 缺点：
 > 	* 扩展性受限：需要改基础组件、让它能够与其他组件结构类似
 > 	* Ref传递问题：因为包裹了一层，ref属性的指向会发生问题，没有指向被包裹的组件
-> 	* `Wrapper  Hell`：`高阶组件`作为其他`高阶组件`的`基础组件`，包裹套包裹 ，复杂性叠加
+> 	* `Wrapper Hell`：`高阶组件`作为其他`高阶组件`的`基础组件`，包裹套包裹 ，复杂性叠加
 
 > 两个基础组件：`CommonList`、`BlogSpot`
 >
-> ~~~javascript
+> ~~~jsx
 > class CommonList extends React.Component {
 > 	constructor(props) {
 > 		super(props);
@@ -498,8 +497,8 @@ HOC: 高阶组件
 > }
 > ~~~
 > 
-> ~~~javascript
-> class BlogPost extends. React.Component {
+> ~~~jsx
+> class BlogPost extends React.Component {
 > 	constructor(props) {
 > 		super(props);
 > 		this.handleChange = this.handleChange.bind(this);
@@ -522,7 +521,7 @@ HOC: 高阶组件
 > 
 > 写一个更加通用的函数（业务低耦合），把基础组件转换成高阶组件
 > 
-> ~~~javascript
+> ~~~jsx
 > function withSubscription(WrappedComponent, selectDataFunc) {
 > 	return class extends React.Component. {
 > 		constructor(props) {
@@ -553,11 +552,11 @@ HOC: 高阶组件
 > const BlogPostWithSubscription = withSubscription(BlogPost, (DataSource, props) => DataSource.getBlogPost(props.id);
 > ~~~
 
-Render Props
+### (3) Render Props
 
 > 要定制化的部分`{this.props.render(this.state);}`空出来由外部代码传入
 > 
-> ~~~javascript
+> ~~~jsx
 > class Mouse extends React.Component {
 > 	constructor(props) {
 > 		super(props);
@@ -570,7 +569,7 @@ Render Props
 > 	render() {
 > 		return (
 > 			<div style=({height:'100vh'}} onMouseMove={this.handleMouseMove}>
-> 				{this.props.render(this.state) //把渲染函数通过属性传入}
+> 				{this.props.render(this.state)} //把渲染函数通过属性传入
 > 			</div>
 > 		);
 > 	}
@@ -579,7 +578,7 @@ Render Props
 > 
 > 外部代码传入定制化区域的渲染函数
 > 
-> ~~~javascript
+> ~~~jsx
 > class Cat extends React.Component {
 > 	render() {
 > 		const mouse = this.props.mouse;
@@ -602,13 +601,13 @@ Render Props
 
 `Mixin`，`HOC`，`Render Props`都需要编写公共组件才能复用，有没有可复用性更好的组件呢？
 
-**Hooks** 
+### (4) **Hooks**（背后的理念：可复用性）
 
 把公共部分抽出来变成一个方法，就可以了。不再需要以组件为粒度来写公共代码。例子如下：
 
 > 公用部分写在`自定义hook`（使用官方hook的函数）中：`useFriendStatus`
 > 
-> ~~~javascript
+> ~~~js
 > import { useState, useEffect } from 'react';
 > 
 > function useFriendStatus(friendID) {
@@ -628,7 +627,7 @@ Render Props
 > 
 > 两个组件`FriendStatus`, `FriendListItem`都可以复用上线的钩子
 > 
-> ~~~javascript
+> ~~~jsx
 > function Friendstatus(props) {
 > 	const isOnline = useFriendStatus(props.friend.id);
 > 	if (isOnline === null) {
@@ -649,6 +648,8 @@ Render Props
 > 
 > 文档：[https://zh-hans.reactjs.org/docs/hooks-effect.html](https://zh-hans.reactjs.org/docs/hooks-effect.html) 
 
+### (5) 总结 
+
 | 理论基础  | 方案   | 缺陷   |
 | -------------	| --------------- | --------------- |
 | 借鉴OOP复用模式	| Mixin| 组件复杂度陡升、难以理解 |
@@ -659,11 +660,11 @@ Render Props
 
 ### (1) CSS盒模型
 
-> ![](https://mdn.mozillademos.org/files/16560/box-model-devtools.png)
-> [`https://developer.mozilla.org/zh-CN/docs/Learn/CSS/Building_blocks/The_box_model`](https://developer.mozilla.org/zh-CN/docs/Learn/CSS/Building_blocks/The_box_model)
-> 
-> ![http://img.smyhvae.com/2015-10-03-css-27.jpg](http://img.smyhvae.com/2015-10-03-css-27.jpg)
-> ![http://img.smyhvae.com/2015-10-03-css-30.jpg](http://img.smyhvae.com/2015-10-03-css-30.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/200_react/react_css_box_model_general.jpg" width="700" /></div>
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/200_react/react_css_box_model_standard.jpg" width="700" /></div>
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/200_react/react_css_box_model_ie.jpg" width="700" /></div>
 
 ### (2) 弹性布局
 
@@ -679,9 +680,9 @@ Render Props
 
 #### [flex-wrap](https://developer.mozilla.org/zh-CN/docs/Web/CSS/flex-wrap)
 
-> * `no-wrap` (默认）：不换行、单行显式
-> * `wrap`：换行、多行显式，第一行在上方
-> * `wrap-reverse`：换行、多行显式，第一行在下方
+> * `no-wrap` (默认)：不换行、单行显示
+> * `wrap`：换行、多行显示，第一行在上方
+> * `wrap-reverse`：换行、多行显示，第一行在下方
 >
 > ~~~css
 > .box {
@@ -740,7 +741,7 @@ Render Props
 > }
 > ~~~
 
-## 附录：参考文档
+## 8. 参考文档
 
 > * JavaScript：[http://javascript.info/](http://javascript.info/)
 > * 解构赋值：[reference/destructing_assignment.pdf](reference/destructing_assignment.pdf)

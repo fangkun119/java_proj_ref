@@ -21,7 +21,7 @@
   border-radius: 3px;
   cursor: pointer;
   /* 让todo内容显示在最左，删除按钮显示在最右 */
-  /* /* https://developer.mozilla.org/zh-CN/docs/Web/CSS/justify-content */
+  /* https://developer.mozilla.org/zh-CN/docs/Web/CSS/justify-content */
   display: flex;  /*弹性布局*/
   justify-content: space-between; /* 均匀排列每个元素, 首个元素放置于起点，末尾元素放置于终点 */
 }

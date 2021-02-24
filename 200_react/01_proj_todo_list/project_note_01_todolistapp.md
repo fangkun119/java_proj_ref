@@ -16,6 +16,8 @@
 
 # 01 TO-DO List项目记录
 
+> 项目是使用React实现一个单页面的Todo List应用，
+
 ## 1. 安装react
 
 > 开发环境为Mac
