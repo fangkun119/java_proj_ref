@@ -100,7 +100,7 @@
 >
 >    (1) 链路搭建：[02B_proj_personal_center_stage2/react_note_02B.md#09-使用redux在视图层触发action获取后端数据](02B_proj_personal_center_stage2/react_note_02B.md#09-使用redux在视图层触发action获取后端数据)
 >
->    (2) 完整例子：[02B_proj_personal_center_stage2/react_note_02B.md#12-redux%E9%93%BE%E8%B7%AF%E5%AE%8C%E6%95%B4%E4%BE%8B%E5%AD%90](02B_proj_personal_center_stage2/react_note_02B.md#12-redux%E9%93%BE%E8%B7%AF%E5%AE%8C%E6%95%B4%E4%BE%8B%E5%AD%90)
+>    (2) 完整例子：[02B_proj_personal_center_stage2/react_note_02B.md#12-redux链路完整例子](02B_proj_personal_center_stage2/react_note_02B.md#12-redux链路完整例子)
 >
 >8. 使用拦截器
 >
