@@ -68,9 +68,9 @@
 >
 >7. Redux单向数据链路
 >
->    (1) 链路搭建：
+>    (1) 链路搭建：[02B_proj_personal_center_stage2/react_note_02B.md#09-使用redux在视图层触发action获取后端数据](02B_proj_personal_center_stage2/react_note_02B.md#09-使用redux在视图层触发action获取后端数据)
 >
->    (2) 完整例子：
+>    (2) 完整例子：[02B_proj_personal_center_stage2/react_note_02B.md#12-redux%E9%93%BE%E8%B7%AF%E5%AE%8C%E6%95%B4%E4%BE%8B%E5%AD%90](02B_proj_personal_center_stage2/react_note_02B.md#12-redux%E9%93%BE%E8%B7%AF%E5%AE%8C%E6%95%B4%E4%BE%8B%E5%AD%90)
 >
 >8. 使用拦截器
 >
@@ -106,4 +106,7 @@
 > * CSS选择器（含实例操作）：[https://www.runoob.com/cssref/css-selectors.html](https://www.runoob.com/cssref/css-selectors.html)
 > * CSS盒模型（含实例操作）：[https://www.runoob.com/css/css-boxmodel.html](https://www.runoob.com/css/css-boxmodel.html)
 > * CSS弹性布局模型（含实例操作）：[https://www.runoob.com/css3/css3-flexbox.html](https://www.runoob.com/css3/css3-flexbox.html)
-> * 
+> * 查看浏览器兼容性：[https://caniuse.com/](https://caniuse.com/)
+> * 查看一个包的体积：[http://bundlephobia.com](http://bundlephobia.com)
+> * React Router：[https://reactrouter.com/web/example/nesting](https://reactrouter.com/web/example/nesting)
+
