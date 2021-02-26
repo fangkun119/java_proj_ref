@@ -8,8 +8,7 @@
     - [(2) 实现原理](#2-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86)
     - [(3) 框架使用](#3-%E6%A1%86%E6%9E%B6%E4%BD%BF%E7%94%A8)
     - [(4) 浏览器输入地址到页面展示的过程](#4-%E6%B5%8F%E8%A7%88%E5%99%A8%E8%BE%93%E5%85%A5%E5%9C%B0%E5%9D%80%E5%88%B0%E9%A1%B5%E9%9D%A2%E5%B1%95%E7%A4%BA%E7%9A%84%E8%BF%87%E7%A8%8B)
-  - [02. 接口调用](#02-%E6%8E%A5%E5%8F%A3%E8%B0%83%E7%94%A8)
-  - [03. 通信协议：HTTP 1/2/3 以及 HTTPS](#03-%E9%80%9A%E4%BF%A1%E5%8D%8F%E8%AE%AEhttp-123-%E4%BB%A5%E5%8F%8A-https)
+  - [02. 通信协议：HTTP 1/2/3 以及 HTTPS](#02-%E9%80%9A%E4%BF%A1%E5%8D%8F%E8%AE%AEhttp-123-%E4%BB%A5%E5%8F%8A-https)
     - [(1) 状态码](#1-%E7%8A%B6%E6%80%81%E7%A0%81)
     - [(2) 常见字段](#2-%E5%B8%B8%E8%A7%81%E5%AD%97%E6%AE%B5)
     - [(3) Get / Post](#3-get--post)
@@ -20,7 +19,7 @@
       - [`HTTP/2` v.s `HTTP/1.1`](#http2-vs-http11)
       - [`HTTP/3` v.s `HTTP/2`](#http3-vs-http2)
     - [(6) 常用HTTP请求方法及含义](#6-%E5%B8%B8%E7%94%A8http%E8%AF%B7%E6%B1%82%E6%96%B9%E6%B3%95%E5%8F%8A%E5%90%AB%E4%B9%89)
-  - [04. `Ant Design`](#04-ant-design)
+  - [03. `Ant Design`](#03-ant-design)
     - [(1) 特点](#1-%E7%89%B9%E7%82%B9)
     - [(2) 组件化开发](#2-%E7%BB%84%E4%BB%B6%E5%8C%96%E5%BC%80%E5%8F%91)
     - [(3) `InputItem`实现过程中的一些技巧](#3-inputitem%E5%AE%9E%E7%8E%B0%E8%BF%87%E7%A8%8B%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E6%8A%80%E5%B7%A7)
@@ -28,8 +27,8 @@
       - [(b) 使用`antd`的`<Form.Item>`来获取`<Input/>`的值](#b-%E4%BD%BF%E7%94%A8antd%E7%9A%84formitem%E6%9D%A5%E8%8E%B7%E5%8F%96input%E7%9A%84%E5%80%BC)
       - [(c) 使用`antd`的表单API来操作状态`form`](#c-%E4%BD%BF%E7%94%A8antd%E7%9A%84%E8%A1%A8%E5%8D%95api%E6%9D%A5%E6%93%8D%E4%BD%9C%E7%8A%B6%E6%80%81form)
       - [(d) 其他`antd`的组件和函数](#d-%E5%85%B6%E4%BB%96antd%E7%9A%84%E7%BB%84%E4%BB%B6%E5%92%8C%E5%87%BD%E6%95%B0)
-  - [05. `Redux`](#05-redux)
-  - [06. CSS预处理器](#06-css%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8)
+  - [04. `Redux`](#04-redux)
+  - [05. CSS预处理器](#05-css%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8)
     - [(1) 用途](#1-%E7%94%A8%E9%80%94)
     - [(2) 市面上的预处理器](#2-%E5%B8%82%E9%9D%A2%E4%B8%8A%E7%9A%84%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8)
       - [(a) `SCSS`](#a-scss)
@@ -38,17 +37,17 @@
     - [(3) 怎样在create-react-app中加入CSS预处理器](#3-%E6%80%8E%E6%A0%B7%E5%9C%A8create-react-app%E4%B8%AD%E5%8A%A0%E5%85%A5css%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8)
       - [方法1：使用`yarn eject` / `npm eject`之后手动修改webpack配置](#%E6%96%B9%E6%B3%951%E4%BD%BF%E7%94%A8yarn-eject--npm-eject%E4%B9%8B%E5%90%8E%E6%89%8B%E5%8A%A8%E4%BF%AE%E6%94%B9webpack%E9%85%8D%E7%BD%AE)
       - [方法2：override `create-react-app` (简称`cra`)、不需`eject`可以继续保持零配置](#%E6%96%B9%E6%B3%952override-create-react-app-%E7%AE%80%E7%A7%B0cra%E4%B8%8D%E9%9C%80eject%E5%8F%AF%E4%BB%A5%E7%BB%A7%E7%BB%AD%E4%BF%9D%E6%8C%81%E9%9B%B6%E9%85%8D%E7%BD%AE)
-  - [07. 样式按需加载，避免全局引入](#07-%E6%A0%B7%E5%BC%8F%E6%8C%89%E9%9C%80%E5%8A%A0%E8%BD%BD%E9%81%BF%E5%85%8D%E5%85%A8%E5%B1%80%E5%BC%95%E5%85%A5)
+  - [06. 样式按需加载，避免全局引入](#06-%E6%A0%B7%E5%BC%8F%E6%8C%89%E9%9C%80%E5%8A%A0%E8%BD%BD%E9%81%BF%E5%85%8D%E5%85%A8%E5%B1%80%E5%BC%95%E5%85%A5)
   - [08. 使用`CSS modules`避免全局样式污染](#08-%E4%BD%BF%E7%94%A8css-modules%E9%81%BF%E5%85%8D%E5%85%A8%E5%B1%80%E6%A0%B7%E5%BC%8F%E6%B1%A1%E6%9F%93)
   - [09. 栅格系统](#09-%E6%A0%85%E6%A0%BC%E7%B3%BB%E7%BB%9F)
   - [10. effect钩子](#10-effect%E9%92%A9%E5%AD%90)
-  - [12. 如何在大组件重新渲染时，避免内部的小组件重新渲染](#12-%E5%A6%82%E4%BD%95%E5%9C%A8%E5%A4%A7%E7%BB%84%E4%BB%B6%E9%87%8D%E6%96%B0%E6%B8%B2%E6%9F%93%E6%97%B6%E9%81%BF%E5%85%8D%E5%86%85%E9%83%A8%E7%9A%84%E5%B0%8F%E7%BB%84%E4%BB%B6%E9%87%8D%E6%96%B0%E6%B8%B2%E6%9F%93)
-  - [13 用存JS实现计时器](#13-%E7%94%A8%E5%AD%98js%E5%AE%9E%E7%8E%B0%E8%AE%A1%E6%97%B6%E5%99%A8)
-    - [13.1 用`setTimeout`实现计时器](#131-%E7%94%A8settimeout%E5%AE%9E%E7%8E%B0%E8%AE%A1%E6%97%B6%E5%99%A8)
-    - [13.2 用`setInterval`实现计时器](#132-%E7%94%A8setinterval%E5%AE%9E%E7%8E%B0%E8%AE%A1%E6%97%B6%E5%99%A8)
-    - [13.3 用`promise`实现计时器](#133-%E7%94%A8promise%E5%AE%9E%E7%8E%B0%E8%AE%A1%E6%97%B6%E5%99%A8)
-  - [14 Promise](#14-promise)
-  - [15. 其他功能点](#15-%E5%85%B6%E4%BB%96%E5%8A%9F%E8%83%BD%E7%82%B9)
+  - [11. 如何在大组件重新渲染时，避免内部的小组件重新渲染](#11-%E5%A6%82%E4%BD%95%E5%9C%A8%E5%A4%A7%E7%BB%84%E4%BB%B6%E9%87%8D%E6%96%B0%E6%B8%B2%E6%9F%93%E6%97%B6%E9%81%BF%E5%85%8D%E5%86%85%E9%83%A8%E7%9A%84%E5%B0%8F%E7%BB%84%E4%BB%B6%E9%87%8D%E6%96%B0%E6%B8%B2%E6%9F%93)
+  - [12 用存JS实现计时器](#12-%E7%94%A8%E5%AD%98js%E5%AE%9E%E7%8E%B0%E8%AE%A1%E6%97%B6%E5%99%A8)
+    - [12.1 用`setTimeout`实现计时器](#121-%E7%94%A8settimeout%E5%AE%9E%E7%8E%B0%E8%AE%A1%E6%97%B6%E5%99%A8)
+    - [12.2 用`setInterval`实现计时器](#122-%E7%94%A8setinterval%E5%AE%9E%E7%8E%B0%E8%AE%A1%E6%97%B6%E5%99%A8)
+    - [12.3 用`promise`实现计时器](#123-%E7%94%A8promise%E5%AE%9E%E7%8E%B0%E8%AE%A1%E6%97%B6%E5%99%A8)
+  - [13 Promise](#13-promise)
+  - [14. 其他功能点](#14-%E5%85%B6%E4%BB%96%E5%8A%9F%E8%83%BD%E7%82%B9)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -131,9 +130,7 @@ Sample Code：
 > 6.	关闭HTTP连接
 > 7. 浏览器解析
 
-## 02. 接口调用
-
-## 03. 通信协议：HTTP 1/2/3 以及 HTTPS
+## 02. 通信协议：HTTP 1/2/3 以及 HTTPS
 
 ### (1) 状态码
 
@@ -235,7 +232,7 @@ Sample Code：
 > * `TRACE`：请求服务器回显其收到的请求信息，该方法主要用于HTTP请求的测试或诊断。
 > * `PATCH`：一般用于资源的部分更新，而PUT一般用于资源的整体更新；当资源不存在时，PATCH会创建一个新的资源，而PUT只会对已在资源进行更新。
 
-## 04. `Ant Design`
+## 03. `Ant Design`
 
 ### (1) 特点
 
@@ -350,7 +347,7 @@ Sample Code：
 >
 > 4. `<Row gutter={8}><Col>...</Col>...</Row>`，24格栅格系统，界面随着屏幕大小变化（Responsive），margin等属性值也都自动计算好（bootstrap是12格、antd是24格，用12或24是因为相除比较方便），gutter是Col之间间隔的像素值
 
-## 05. `Redux`
+## 04. `Redux`
 
 用途
 
@@ -358,7 +355,7 @@ Sample Code：
 >
 > `Readux`作为一个全局状态管理工具，用来解决此类问题，后续会详细介绍
 
-## 06. CSS预处理器
+## 05. CSS预处理器
 
 ### (1) 用途
 
@@ -473,7 +470,7 @@ Sample Code：
 
 4 . 现在项目已经支持`LESS`了，可以把代码中的全局`antd.css`替换成`antd.less`
 
-## 07. 样式按需加载，避免全局引入
+## 06. 样式按需加载，避免全局引入
 
 使用`babel-plugin-import`来让`antd`按需加载，使用`yarn`作为包管理器为例，步骤如下
 
@@ -619,7 +616,7 @@ Sample Code：
 >     );
 > ~~~
 
-## 12. 如何在大组件重新渲染时，避免内部的小组件重新渲染
+## 11. 如何在大组件重新渲染时，避免内部的小组件重新渲染
 
 > 默认大组件重新渲染时、内部的小组件会一起重新渲染。如果想让小组件不会联动渲染，可以在`export`时用`memo`包裹。这样内部小组件是否重新渲染，只取决于小组件的state、props是否发生变化。例如：
 > 
@@ -632,9 +629,9 @@ Sample Code：
 > 
 > 相当于`class component`时代时的`PureComponent` 
 
-## 13 用存JS实现计时器
+## 12 用存JS实现计时器
 
-### 13.1 用`setTimeout`实现计时器
+### 12.1 用`setTimeout`实现计时器
 
 > 错误方法
 >
@@ -662,7 +659,7 @@ Sample Code：
 > }
 > ~~~
 
-### 13.2 用`setInterval`实现计时器
+### 12.2 用`setInterval`实现计时器
 
 > ~~~javascript
 > var count = 0;
@@ -676,7 +673,7 @@ Sample Code：
 >
 > 但是如果count不是普通变量而是`react state`，就不能用这种方法，因为react state的更新是异步的，无法拿到count的最新值。此时仍然需要 [/src/components/InputItem/index.js](personal-app/src/components/InputItem/index.js) 中所使用的方法
 
-### 13.3 用`promise`实现计时器
+### 12.3 用`promise`实现计时器
 
 > ~~~javascript
 > fn = (i) => {
@@ -697,7 +694,7 @@ Sample Code：
 > Fn()
 > ~~~
 
-## 14 Promise
+## 13 Promise
 
 API：
 
@@ -711,7 +708,7 @@ API：
 
 > [https://juejin.im/post/6844904022223110151](https://juejin.im/post/6844904022223110151) 
 
-## 15. 其他功能点
+## 14. 其他功能点
 
 注册框密码、密码校验两个控件的交叉验证（改“密码校验”时触发验证，改“密码”时触发验证）
 

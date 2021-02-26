@@ -11,7 +11,7 @@
   - [06 时间处理和展示](#06-%E6%97%B6%E9%97%B4%E5%A4%84%E7%90%86%E5%92%8C%E5%B1%95%E7%A4%BA)
   - [07 HTML Header中的`<meta ...>`标签](#07-html-header%E4%B8%AD%E7%9A%84meta-%E6%A0%87%E7%AD%BE)
   - [08 `Ajax`封装](#08-ajax%E5%B0%81%E8%A3%85)
-  - [09 使用`Redux`在视图层触发`action`发起请求、获取数据](#09-%E4%BD%BF%E7%94%A8redux%E5%9C%A8%E8%A7%86%E5%9B%BE%E5%B1%82%E8%A7%A6%E5%8F%91action%E5%8F%91%E8%B5%B7%E8%AF%B7%E6%B1%82%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE)
+  - [09 使用Redux在视图层触发action获取后端数据](#09-%E4%BD%BF%E7%94%A8redux%E5%9C%A8%E8%A7%86%E5%9B%BE%E5%B1%82%E8%A7%A6%E5%8F%91action%E8%8E%B7%E5%8F%96%E5%90%8E%E7%AB%AF%E6%95%B0%E6%8D%AE)
     - [(1) Redux经典链路：单向数据流](#1-redux%E7%BB%8F%E5%85%B8%E9%93%BE%E8%B7%AF%E5%8D%95%E5%90%91%E6%95%B0%E6%8D%AE%E6%B5%81)
     - [(2) 单向数据流（`react`） v.s 双向绑定（早期的`angular`、`vue`）](#2-%E5%8D%95%E5%90%91%E6%95%B0%E6%8D%AE%E6%B5%81react-vs-%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A%E6%97%A9%E6%9C%9F%E7%9A%84angularvue)
     - [(3) 引入`redux`、`axios`](#3-%E5%BC%95%E5%85%A5reduxaxios)
@@ -25,7 +25,7 @@
     - [(a) 请求响应过程](#a-%E8%AF%B7%E6%B1%82%E5%93%8D%E5%BA%94%E8%BF%87%E7%A8%8B)
     - [(b) 使用Cookie的缺点和解决办法](#b-%E4%BD%BF%E7%94%A8cookie%E7%9A%84%E7%BC%BA%E7%82%B9%E5%92%8C%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95)
     - [(c) Token保存方法：Cookie、localStorage、sessionStorage的区别](#c-token%E4%BF%9D%E5%AD%98%E6%96%B9%E6%B3%95cookielocalstoragesessionstorage%E7%9A%84%E5%8C%BA%E5%88%AB)
-  - [12 Redux使用](#12-redux%E4%BD%BF%E7%94%A8)
+  - [12 Redux链路完整例子](#12-redux%E9%93%BE%E8%B7%AF%E5%AE%8C%E6%95%B4%E4%BE%8B%E5%AD%90)
     - [(1) dispatch后端调用action](#1-dispatch%E5%90%8E%E7%AB%AF%E8%B0%83%E7%94%A8action)
     - [(2) dispatch数据处理操作到reducer](#2-dispatch%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E6%93%8D%E4%BD%9C%E5%88%B0reducer)
       - [(a) 在root reducer中添加sub reducer](#a-%E5%9C%A8root-reducer%E4%B8%AD%E6%B7%BB%E5%8A%A0sub-reducer)
@@ -322,7 +322,7 @@
 > };
 > ~~~
 
-## 09 使用`Redux`在视图层触发`action`发起请求、获取数据
+## 09 使用Redux在视图层触发action获取后端数据
 
 ### (1) Redux经典链路：单向数据流
 
@@ -370,7 +370,7 @@
 > ...
 > 
 > const store = createStore(
-> 	reducer, 					// 数据处理模块（src/reducers/index.js中编写的reducers）
+> 	reducer, 				// 数据处理模块（src/reducers/index.js中编写的reducers）
 > 	applyMiddleware(thunk) 	// 应用让redux变为异步的中间件
 > )
 > 
@@ -569,7 +569,7 @@ demo中的代码：使用了local storage
 
 下一个项目使用weibo账号登录，会进一步介绍SSO
 
-## 12 Redux使用
+## 12 Redux链路完整例子
 
 > Redux用于跨层组件间的数据传递。创建一个统一的单向数据流，任何一个子组件访问后端获取/更新数据，都可以通过存入到redux storage中的方法，供所有的组件使用。
 

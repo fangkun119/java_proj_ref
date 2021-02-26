@@ -11,10 +11,10 @@ import { currentUser, fakeList } from './data.js'; // 后端没有开发好时�
 import { getUserProfile } from '../../actions/profile';
 import styles from './index.module.less';
 
-// 假数据、在后端开发完成之前调成前端用
-// const articleList = fakeList(10);
-// const applicationList = fakeList(10);
-// const projectList = fakeList(10);
+// 这个项目没有编写后端，因此用mock数据来替代
+const articleList = fakeList(10);
+const applicationList = fakeList(10);
+const projectList = fakeList(10);
 
 // 使用全局state中的profile部分(rootReducer的profile部分)
 // 后续代码使用redux的useMappedState从中提取后端返回的数据
