@@ -15,7 +15,7 @@
 
 项目代码：[01_proj_todo_list/todo-list/](01_proj_todo_list/todo-list/)
 
-项目文档：[01_proj_todo_list/project_note_01_todolistapp.md](01_proj_todo_list/project_note_01_todolistapp.md)
+功能点实现记录：[01_proj_todo_list/project_note_01_todolistapp.md](01_proj_todo_list/project_note_01_todolistapp.md)
 
 技术笔记：[01_proj_todo_list/react_note_01.md](01_proj_todo_list/react_note_01.md)
 
@@ -52,7 +52,7 @@
 
 项目代码：[02B_proj_personal_center_stage2/personal-app/](02B_proj_personal_center_stage2/personal-app/)
 
-项目文档：
+功能点实现记录：
 
 (1) 阶段1：[02A_proj_personal_center_stage1/proj_02_personal_center_01.md](02A_proj_personal_center_stage1/proj_02_personal_center_01.md)
 
@@ -116,11 +116,11 @@
 
 ## 项目3：weibo-client
 
-项目介绍：微博的web客户端，支持发微博/评论/滚屏功能，使用微博开放API作为后台
+项目介绍：微博的web客户端，支持登录/微博浏览/评论/滚屏等功能，使用微博开放API作为后台
 
 项目代码：[03_proj_weibo_client/weibo-app/](03_proj_weibo_client/weibo-app/)
 
-项目笔记：[03_proj_weibo_client/proj_03_weibo_client.md](03_proj_weibo_client/proj_03_weibo_client.md)
+功能点实现记录：[03_proj_weibo_client/proj_03_weibo_client.md](03_proj_weibo_client/proj_03_weibo_client.md)
 
 技术笔记：03_proj_weibo_client/react_note_03.md  (to do)
 
