@@ -20,15 +20,25 @@
 技术笔记：[01_proj_todo_list/react_note_01.md](01_proj_todo_list/react_note_01.md)
 
 > 1. Angular, React, VUE技术比较
+> 
 > 2. 脚手架`create-react-app`
+> 
 > 3. 用于快速学习和上手的项目：代码及注释链接
+> 
 > 4. React Hook：useState hook、useEffect hook
+> 
 > 5. 屏蔽表单提交时的默认操作；阻止点击实现向上传递
+> 
 > 6. 矢量图icon的使用
+> 
 > 7. 为列表元素指定key的作用，根据index来删除列表元素
+> 
 > 8. Local Storage的使用
+> 
 > 9. 解构赋值；ES6 Spread语法；使用style属性来定义样式
+> 
 > 10. React改进可复用性的历史：Mixin → HOC → Render Props → Hooks
+> 
 > 11. CSS盒模型布局，CSS弹性布局
 
 项目截图：
@@ -53,14 +63,23 @@
 (1) 阶段1：[02A_proj_personal_center_stage1/react_note_02A.md](02A_proj_personal_center_stage1/react_note_02A.md)
 
 >1. 使用React Router
+>
 >2. HTTP
+>
 >3. UI样式库的使用：以Ant Design为例
+>
 >4. CSS预处理器：SCSS、LESS等
+>
 >5. 样式按需加载：使用babel-plugin-import
+>
 >6. 使用CSS modules避免全局样式污染
+>
 >7. Ant Design样式库的栅格系统
+>
 >8. React effect Hook
+>
 >9. 在大组件重新渲染、阻止未发生变化的小组件被联动渲染
+>
 >10. JS计时器实现
 
 (2) 阶段2：[02B_proj_personal_center_stage2/react_note_02B.md](02B_proj_personal_center_stage2/react_note_02B.md)
