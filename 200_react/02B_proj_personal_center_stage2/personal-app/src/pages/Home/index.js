@@ -12,11 +12,11 @@ import { getUserProfile } from '../../actions/profile';
 import styles from './index.module.less';
 
 // 假数据、在后端开发完成之前调成前端用
-const articleList = fakeList(10);
-const applicationList = fakeList(10);
-const projectList = fakeList(10);
+// const articleList = fakeList(10);
+// const applicationList = fakeList(10);
+// const projectList = fakeList(10);
 
-// 真数据、使用全局state中的profile部分
+// 使用全局state中的profile部分(rootReducer的profile部分)
 // 后续代码使用redux的useMappedState从中提取后端返回的数据
 const mapState = (state) => (state.profile); 
 
@@ -92,6 +92,7 @@ const Home = () => {
     // * 如果传入一个空数组（[]），effect 内部的 props 和 state 就会一直拥有其初始值。尽管传入 [] 作为第二个参数更接近大家更熟悉的 componentDidMount 和 componentWillUnmount 思维模式，但我们有更好的方式来避免过于频繁的重复调用 effect。除此之外，请记得 React 会等待浏览器完成画面渲染之后才会延迟调用 useEffect，因此会使得额外操作很方便。
     // * 如果传入非空的数组（[abc])，那么仅在 abc 更改时更新
     useEffect(() => {
+        // getUserProfile返回一个方法、该方法提供参数以便让redux传入dispatch
         dispatch(getUserProfile());
     }, [dispatch]); // 把引入的变量dispatch放到依赖里，出于规范考虑
     

@@ -5,6 +5,7 @@ import { combineReducers } from 'redux';
 import profile from './profile';
 
 const rootReducer = combineReducers({
+    // 用来处理用户信息的Reducer
     profile,
 });
 

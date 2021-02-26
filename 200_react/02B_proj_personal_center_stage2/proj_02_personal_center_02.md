@@ -304,7 +304,7 @@ HTTP Header中增加的token
 
 在console中打印出的后端Response
 
->  ~~~json
+>  ~~~txt
 >  {
 >  	code: 0
 >  	data: {username: "test321", userTagList: Array(1), articleList: Array(2)}
@@ -452,50 +452,6 @@ Profile Reducer的数据是由对应的Profile Action来dispatch得到
 ## 16 `token`失效时跳转到登录页
 
 > token失效时后端会返回一个约定好的code，可以在拦截器中捕捉并处理
-> 
+>
 > [git commit](https://github.com/fangkun119/java_proj_ref/commit/d24694282f50e0e7c7dde2e5afd82219dc697c11) 
-> 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-~~~
-
-~~~
-
-~~~
-
-~~~
