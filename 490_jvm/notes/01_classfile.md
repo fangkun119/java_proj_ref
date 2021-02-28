@@ -87,16 +87,15 @@ java  virtual machine specifications
 > 1. `Magic Number`，`Minor Version`，`Major Version`：Version对应不同的JDK
 > 2. `constant_pool_count`，`constant_pool`：长度为`constant_pool_count - 1`的表
 > 3. `access_flags`：整个class的修饰符
-> 
->  	* `ACC_PUBLIC` `Ox0001`：是否为public
->  	* `ACC_FINAL` `Ox0010`：是否为final
->  	* `ACC_SUPER` `Ox0020`：该flag在JDK1.0.2之后要求必须设置、用来指明invokespectial指令使用新语义
->  	* `ACC_INTERFACE` `Ox0200`：是否为接口
->  	* `ACC_ABSTRACT` `Ox0400`：接口或者抽象类
->  	* `ACC_SYNTHETIC` `Ox1000`：编译期自动生成、并非用户代码产生
->  	* `ACC_ANNOTATION` `Ox2000`：是否是注解
->  	* `ACC_ENUM`：`Ox4000`：是否是enum 
-> 
+>     * `ACC_PUBLIC` `Ox0001`：是否为public
+>     * `ACC_FINAL` `Ox0010`：是否为final
+>     * `ACC_SUPER` `Ox0020`：该flag在JDK1.0.2之后要求必须设置、用来指明invokespectial指令使用新语义
+>     * `ACC_INTERFACE` `Ox0200`：是否为接口
+>     * `ACC_ABSTRACT` `Ox0400`：接口或者抽象类
+>     * `ACC_SYNTHETIC` `Ox1000`：编译期自动生成、并非用户代码产生
+>     * `ACC_ANNOTATION` `Ox2000`：是否是注解
+>     * `ACC_ENUM`：`Ox4000`：是否是enum 
+>
 > 4. `this_class`，`super_class`，`interfaces_count`，`interfaces`：当前类名、父类名、实现的接口，会指向常量池中对应的内容
 > 5. `fields_count`，`fields`，`methods_count`，`methods`：属性、方法
 > 6.	`attributes_count`，`attributes`：附加属性

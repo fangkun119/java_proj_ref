@@ -28,19 +28,21 @@
 
 ## 1. 步骤 
 
-> 1. Loading ：将`class文件`加载到内存，使用`双亲委派模型`和`Lazy Loading`
-> 2. Linking
-> 
->	* Verfication：检查`class文件`是否符合标准 
-> 	* Perparation：为`class`的静态变量赋<b>默认值</b>. 
-> 	* Resolution：把`class`常量池里面的`符号引用`转换成可以直接取到值的内容
-> 3. Initializing：把静态变量赋为初始值（这时才调用静态代码块）
+> (1) Loading ：将`class文件`加载到内存，使用`双亲委派模型`和`Lazy Loading`
+>
+> (2) Linking
+>
+> * Verfication：检查`class文件`是否符合标准 
+> * Perparation：为`class`的静态变量赋<b>默认值</b>. 
+> * Resolution：把`class`常量池里面的`符号引用`转换成可以直接取到值的内容
+>
+> (3) Initializing：把静态变量赋为初始值（这时才调用静态代码块）
 
 ## 2. 加载
 
 ### 2.1 理解类加载器（`ClassLoader`）
 
-1. 如何查某个类是被哪个ClassLoader加载到内存中的
+#### (1) 如何查某个类是被哪个ClassLoader加载到内存中的
 
 > 每一个类被加载之后，在内存中存在两部分内容：(1) 这个类的数据（在`metaspace`中）；(2) 一个`Class类对象`来代表这个类的类数据 
 > 
@@ -50,7 +52,7 @@
 > String.class.getClassLoader();
 > ~~~
 
-2. 类加载器层次
+#### (2) 类加载器层次
 
 类加载器层次如下，上面的加载器是下面的`父加载器`（`父子加载器`关系，不是`父子类`关系，在`ClassLoader`模板类实现中，父加载器通过子加载器的成员变量来访问）
 
@@ -68,7 +70,7 @@
 > //  输出 sun.misc.Launcher$AppClassLoader@18b4aac2，被App层的ClassLoader加载 
 > ~~~
 
-双亲委派模型：
+#### (3) 双亲委派模型
 
 > *  `检查阶段`：查看一个类是否已经被加载，是自底向上检查的过程，按`CustomClassLoader` -> `App层` -> `Extension层`  -> `Bootstrap层`的顺序检查，某一层确认已经加载时返回
 > *  `加载阶段`：加载一个还未被加载的类，是自顶向下尝试的过程：按`Bootstrap层` -> `Extension层` -> `App层`. -> `CustomClassLoader`的顺序匹配，如果某一层确认可以加载，就由这一层进行加载
@@ -78,7 +80,7 @@
 > * `检查阶段`：检查代码被写死了、不容许串改 （final native）
 > * `加载阶段`：加载代码也被写死了、必须父加载器先尝试加载
 
-类加载器的加载范围：
+#### (4) 类加载器的加载范围
 
 > ~~~java
 > // Bootstrap ClassLoader加载路径：sun.boot.class.path
@@ -89,14 +91,14 @@
 > String pathApp = System.getProperty("java.class.path");
 > ~~~
 
-Launch：
+#### (5) Launcher
 
 > * `sun.misc.Launcher$ExtClassLoader`表示`sun.misc.Launcher`类下面的一个内部类`ExtClassLoader`
 > * `Launcher`是`class loader的启动类`，如下图所示，从`Launcher`的代码中可以看出它内置的3个ClassLoader，以及这三个ClassLoader所负责的加载范围
 > 
 > <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/490_jvm/jvm_classloader_launcher.jpg" width="800" /></div>
 
-通过ClassLoader来加载一个类：
+#### (6) 通过ClassLoader来加载一个类
 
 > 例如Spring的动态代理、JRebal热部署，都需要通过ClassLoader来加载类
 > 
@@ -107,12 +109,11 @@ Launch：
 > 
 > 可以看出`loadClass(...)`方法是`ClassLoader`加载类的入口函数，以下是findClass的代码片段及注释翻译
 
-Demo代码：
+#### (7) Demo代码
 
 > * 查看一个类的加载器，加载器的加载器，加载器的父加载器：[grp02_classloader/Demo01ClassLoaderLevel.java](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo01ClassLoaderLevel.java)
 > * 加载器的加载器、加载器的父加载器比较：[grp02_classloader/Demo02ParentClassLoader.java](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo02ParentClassLoader.java)
 > * 各个类加载器的加载范围：[grp02_classloader/Demo03ClassLoaderScope.java](../demos/src/com/javaprojref/jvm/grp02_classloader/Demo03ClassLoaderScope.java)
-> * 
 
 ### 2.2. 双亲委派加载过程
 
