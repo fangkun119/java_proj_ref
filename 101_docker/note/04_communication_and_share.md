@@ -527,7 +527,7 @@ Volumn：数据卷、存储数据的单位
 > <h1>Volumn test page has been modified</h1>
 > ~~~
 
-## 3.4 使用共享容器来简化文件共享
+### 3.4 使用共享容器来简化文件共享
 
 > 创建共享容器：
 >
@@ -565,7 +565,7 @@ Volumn：数据卷、存储数据的单位
 > <h1>Volumn test page has been modified</h1>
 > ~~~
 
-## 3.5 环境清理
+### 3.5 环境清理
 
 > ~~~bash
 > [root@localhost ~]# docker ps
