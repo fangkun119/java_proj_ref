@@ -1,4 +1,21 @@
-# Kafka TOPIC管理
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [命令行Kafka TOPIC管理、消息订阅和发布](#%E5%91%BD%E4%BB%A4%E8%A1%8Ckafka-topic%E7%AE%A1%E7%90%86%E6%B6%88%E6%81%AF%E8%AE%A2%E9%98%85%E5%92%8C%E5%8F%91%E5%B8%83)
+  - [1. 启动Kafka集群](#1-%E5%90%AF%E5%8A%A8kafka%E9%9B%86%E7%BE%A4)
+  - [2. TOPIC管理](#2-topic%E7%AE%A1%E7%90%86)
+    - [(1) 创建TOPIC：`--create`](#1-%E5%88%9B%E5%BB%BAtopic--create)
+    - [(2) 查看TOPIC：`--list`，`--describe`](#2-%E6%9F%A5%E7%9C%8Btopic--list--describe)
+    - [(3) 修改TOPIC：`--alter`](#3-%E4%BF%AE%E6%94%B9topic--alter)
+    - [(4) 删除TOPIC：`--delete`](#4-%E5%88%A0%E9%99%A4topic--delete)
+    - [(5) TOPIC订阅和发布：`kafka-console-consumer.sh`、`kafka-console-producer.sh`](#5-topic%E8%AE%A2%E9%98%85%E5%92%8C%E5%8F%91%E5%B8%83kafka-console-consumershkafka-console-producersh)
+    - [(6) Kafka Consumer Group](#6-kafka-consumer-group)
+  - [3. 关闭zookeeper和kafka](#3-%E5%85%B3%E9%97%ADzookeeper%E5%92%8Ckafka)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# 命令行Kafka TOPIC管理、消息订阅和发布
 
 ## 1. 启动Kafka集群
 

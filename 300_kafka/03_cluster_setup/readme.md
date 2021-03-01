@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [Kafka集群安装](#kafka%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85)
+  - [1. CentOS环境准备](#1-centos%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87)
+    - [(1) 准备3台装有`Kafka`虚拟机](#1-%E5%87%86%E5%A4%873%E5%8F%B0%E8%A3%85%E6%9C%89kafka%E8%99%9A%E6%8B%9F%E6%9C%BA)
+    - [(2) 修改3台机器的静态IP、配置主机名和IP映射](#2-%E4%BF%AE%E6%94%B93%E5%8F%B0%E6%9C%BA%E5%99%A8%E7%9A%84%E9%9D%99%E6%80%81ip%E9%85%8D%E7%BD%AE%E4%B8%BB%E6%9C%BA%E5%90%8D%E5%92%8Cip%E6%98%A0%E5%B0%84)
+    - [(3) 网络连接检查](#3-%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5%E6%A3%80%E6%9F%A5)
+    - [运行环境配置及`Kafka`启动](#%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%8F%8Akafka%E5%90%AF%E5%8A%A8)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Kafka集群安装
 
 ## 1. CentOS环境准备
@@ -5,8 +18,8 @@
 ### (1) 准备3台装有`Kafka`虚拟机
 
 > 复用了[上一个实验](../02_single_node_setup/readme.md)创建的VM，将其复制出三份（复制VM时选择为所有网卡重新生成MAC地址，链接复制）
-
-![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafaka_vm_copies.jpg) 
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafaka_vm_copies.jpg" width="800" /></div> 
 
 ### (2) 修改3台机器的静态IP、配置主机名和IP映射
 

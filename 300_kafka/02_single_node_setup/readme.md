@@ -1,3 +1,20 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [单节点Kafka环境搭建（Linux）](#%E5%8D%95%E8%8A%82%E7%82%B9kafka%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BAlinux)
+  - [1. 环境准备](#1-%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87)
+    - [(1) 准备`CentOS` , `JDK 1.8+`的虚拟机](#1-%E5%87%86%E5%A4%87centos--jdk-18%E7%9A%84%E8%99%9A%E6%8B%9F%E6%9C%BA)
+    - [(2) 设置`JDK`, `JAVA_HOME`，](#2-%E8%AE%BE%E7%BD%AEjdk-java_home)
+    - [(3) 配置主机名和IP映射](#3-%E9%85%8D%E7%BD%AE%E4%B8%BB%E6%9C%BA%E5%90%8D%E5%92%8Cip%E6%98%A0%E5%B0%84)
+    - [(4) 关闭防火墙&防火墙开机自启动](#4-%E5%85%B3%E9%97%AD%E9%98%B2%E7%81%AB%E5%A2%99%E9%98%B2%E7%81%AB%E5%A2%99%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF%E5%8A%A8)
+    - [(5) 同步时钟ntpdate cn.pool.ntp.org | ntp[1-7].aliyun.com](#5-%E5%90%8C%E6%AD%A5%E6%97%B6%E9%92%9Fntpdate-cnpoolntporg--ntp1-7aliyuncom)
+    - [(5) 安装和启动Zookeeper](#5-%E5%AE%89%E8%A3%85%E5%92%8C%E5%90%AF%E5%8A%A8zookeeper)
+    - [(6) 安装和启动及关闭Kafka](#6-%E5%AE%89%E8%A3%85%E5%92%8C%E5%90%AF%E5%8A%A8%E5%8F%8A%E5%85%B3%E9%97%ADkafka)
+  - [2. 用生产者、消费者测试`Kafka`](#2-%E7%94%A8%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85%E6%B5%8B%E8%AF%95kafka)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 单节点Kafka环境搭建（Linux）
 
 > 本文档为在CentOS Linux上搭建单节点Kafka，在Mac上安装需参考另一份文档[single_node_kafka_on_mac.md](single_node_kafka_on_mac.md)

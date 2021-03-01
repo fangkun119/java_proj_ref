@@ -1,3 +1,34 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [Kafka高级API](#kafka%E9%AB%98%E7%BA%A7api)
+  - [1. 内容](#1-%E5%86%85%E5%AE%B9)
+  - [2. 启动三台虚拟机上的zookeeper和kafka](#2-%E5%90%AF%E5%8A%A8%E4%B8%89%E5%8F%B0%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8A%E7%9A%84zookeeper%E5%92%8Ckafka)
+  - [2. 消费者组消费偏移量`Offset`](#2-%E6%B6%88%E8%B4%B9%E8%80%85%E7%BB%84%E6%B6%88%E8%B4%B9%E5%81%8F%E7%A7%BB%E9%87%8Foffset)
+    - [(1) 新订阅`TOPIC`消费者组的起始偏移量](#1-%E6%96%B0%E8%AE%A2%E9%98%85topic%E6%B6%88%E8%B4%B9%E8%80%85%E7%BB%84%E7%9A%84%E8%B5%B7%E5%A7%8B%E5%81%8F%E7%A7%BB%E9%87%8F)
+    - [(2) `Kafka`如何获取消费者的`offset`状态](#2-kafka%E5%A6%82%E4%BD%95%E8%8E%B7%E5%8F%96%E6%B6%88%E8%B4%B9%E8%80%85%E7%9A%84offset%E7%8A%B6%E6%80%81)
+    - [(3) 由消费者管理`offset`](#3-%E7%94%B1%E6%B6%88%E8%B4%B9%E8%80%85%E7%AE%A1%E7%90%86offset)
+  - [3 `Acks`和`Retries`](#3-acks%E5%92%8Cretries)
+    - [3.1 配置](#31-%E9%85%8D%E7%BD%AE)
+      - [(1) `acks`配置级别](#1-acks%E9%85%8D%E7%BD%AE%E7%BA%A7%E5%88%AB)
+      - [(2) `retries`](#2-retries)
+    - [3.2 Demo](#32-demo)
+  - [4 `幂等写`](#4-%E5%B9%82%E7%AD%89%E5%86%99)
+    - [4.1 Kafka的幂等写](#41-kafka%E7%9A%84%E5%B9%82%E7%AD%89%E5%86%99)
+    - [4.2 配置](#42-%E9%85%8D%E7%BD%AE)
+    - [4.2 Demo](#42-demo)
+  - [5 Kafka事务](#5-kafka%E4%BA%8B%E5%8A%A1)
+    - [5.1 `生产者事务Only`与`消费者&生产者事务`](#51-%E7%94%9F%E4%BA%A7%E8%80%85%E4%BA%8B%E5%8A%A1only%E4%B8%8E%E6%B6%88%E8%B4%B9%E8%80%85%E7%94%9F%E4%BA%A7%E8%80%85%E4%BA%8B%E5%8A%A1)
+      - [(1) 生产者事务Only](#1-%E7%94%9F%E4%BA%A7%E8%80%85%E4%BA%8B%E5%8A%A1only)
+      - [(2) 消费者&生产者事务](#2-%E6%B6%88%E8%B4%B9%E8%80%85%E7%94%9F%E4%BA%A7%E8%80%85%E4%BA%8B%E5%8A%A1)
+      - [(3) 事务隔离级别](#3-%E4%BA%8B%E5%8A%A1%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB)
+    - [5.2 生产者事务](#52-%E7%94%9F%E4%BA%A7%E8%80%85%E4%BA%8B%E5%8A%A1)
+    - [5.3 消费者&生产者事务](#53-%E6%B6%88%E8%B4%B9%E8%80%85%E7%94%9F%E4%BA%A7%E8%80%85%E4%BA%8B%E5%8A%A1)
+  - [6 关闭zookeeper和kafka](#6-%E5%85%B3%E9%97%ADzookeeper%E5%92%8Ckafka)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Kafka高级API
 
 ## 1. 内容
@@ -398,13 +429,13 @@
 
 #### (1) 生产者事务Only
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_producer_transaction_only.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_producer_transaction_only.jpg" width="800" /></div>
 >
 > 生产者在同一个事物中，发送了3条消息（到3个不同分区），其中1条消息失败，会要求另外2条回滚
 
 #### (2) 消费者&生产者事务
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_cunsumer_producer_trainsaction.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_cunsumer_producer_trainsaction.jpg" width="800" /></div>
 >
 > 图中业务1既是消费者、也是生产者，作为生产者如果它向Topic2发送消息失败，而它上游topic1中对应的消息也不会认为消费成功，状态仍然是`un-committed`
 

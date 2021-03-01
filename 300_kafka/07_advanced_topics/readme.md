@@ -1,8 +1,33 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [Kafka其他主题](#kafka%E5%85%B6%E4%BB%96%E4%B8%BB%E9%A2%98)
+  - [1. High Water Mark机制与Leader Epoach机制](#1-high-water-mark%E6%9C%BA%E5%88%B6%E4%B8%8Eleader-epoach%E6%9C%BA%E5%88%B6)
+    - [(1) High Water Mark机制](#1-high-water-mark%E6%9C%BA%E5%88%B6)
+    - [(2) Leader Epoch机制](#2-leader-epoch%E6%9C%BA%E5%88%B6)
+  - [2 同步发送、异步发送和异步回调](#2-%E5%90%8C%E6%AD%A5%E5%8F%91%E9%80%81%E5%BC%82%E6%AD%A5%E5%8F%91%E9%80%81%E5%92%8C%E5%BC%82%E6%AD%A5%E5%9B%9E%E8%B0%83)
+    - [2.1 异步发送](#21-%E5%BC%82%E6%AD%A5%E5%8F%91%E9%80%81)
+    - [2.2 同步发送](#22-%E5%90%8C%E6%AD%A5%E5%8F%91%E9%80%81)
+    - [2.3 异步回调](#23-%E5%BC%82%E6%AD%A5%E5%9B%9E%E8%B0%83)
+    - [2.4 参考](#24-%E5%8F%82%E8%80%83)
+  - [3 spring-kafka](#3-spring-kafka)
+    - [3.1 Demo 1:  基本功能以及错误恢复(Error Recovery)](#31-demo-1--%E5%9F%BA%E6%9C%AC%E5%8A%9F%E8%83%BD%E4%BB%A5%E5%8F%8A%E9%94%99%E8%AF%AF%E6%81%A2%E5%A4%8Derror-recovery)
+    - [3.2 Demo 2: Multi-Method Lintener](#32-demo-2-multi-method-lintener)
+    - [3.3 Demo 3: 事务](#33-demo-3-%E4%BA%8B%E5%8A%A1)
+    - [3.4 参考](#34-%E5%8F%82%E8%80%83)
+    - [3.5 相关问题](#35-%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98)
+  - [4 在Spring Cloud Stream中使用Kafka](#4-%E5%9C%A8spring-cloud-stream%E4%B8%AD%E4%BD%BF%E7%94%A8kafka)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Kafka其他主题
 
-## 1 高水位（High Water Mark)
+## 1. High Water Mark机制与Leader Epoach机制
 
-背景：0.11版本之前的Kafka使用高水位机制来维护Leader和Follower之间的数据同步状态
+### (1) High Water Mark机制
+
+0.11版本之前的Kafka使用高水位机制来维护Leader和Follower之间的数据同步状态
 
 > * `Topic`被分为多个`分区`，`分区`按照`Segments`存储文件块，这样可以根据偏移量快速查找分区块，Kafka可以保证分区里的事件是有序的，`Leader`负责对分区的读写、`Follower`负责同步分区的数据
 > * 高水位机制被用于`0.11`版本之前Kafka的`Leader`和`Followers`建的数据同步（低于`HW`的`Record`表示已经同步给了所有`Followers`，而高于`HW`则不保证）
@@ -24,19 +49,25 @@
 
 > * Follower重启引发HW截断，同时Leader宕机使Follower（截断尚未恢复）成为Leader时，引发数据丢失（[High Watermark Truncation followed by Immediate Leader Election](https://cwiki.apache.org/confluence/display/KAFKA/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation#KIP101AlterReplicationProtocoltouseLeaderEpochratherthanHighWatermarkforTruncation-Scenario1:HighWatermarkTruncationfollowedbyImmediateLeaderElection)）
 >
->   ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_dataloss_s1.jpg)  
+>   <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_dataloss_s1.jpg" width="800" /></div>
 >
 > * Follower与Leader同时重启，先启动的Follower（截断尚未恢复）接收新数据时，引发数据不一致的问题（[Replica Divergence on Restart after Multiple Hard Failures](https://cwiki.apache.org/confluence/display/KAFKA/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation#KIP101AlterReplicationProtocoltouseLeaderEpochratherthanHighWatermarkforTruncation-Scenario2:ReplicaDivergenceonRestartafterMultipleHardFailures)）
 >
->   ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_replica_divergence_s1.jpg)
+>   <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_replica_divergence_s1.jpg" width="800" /></div>
 
-`Leader Epoch`机制（Kafka 0.11版本开始）：
+### (2) Leader Epoch机制
 
-> Kafka 0.11版本引入[`Leader Epoch`机制](https://cwiki.apache.org/confluence/display/KAFKA/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation#KIP101AlterReplicationProtocoltouseLeaderEpochratherthanHighWatermarkforTruncation-Solution)来解决上面的两个数据问题：
+Kafka 0.11版本引入[`Leader Epoch`机制](https://cwiki.apache.org/confluence/display/KAFKA/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation#KIP101AlterReplicationProtocoltouseLeaderEpochratherthanHighWatermarkforTruncation-Solution)来解决`High Water Mark机制`的数据就是和不一致问题
+
+> * 之前的`High Water Mark机制`仍然在使用、但只用于衡量同步状态，而不再用作数据截断的依据
 >
-> 高水位机制仍然使用、但只用于衡量同步状态，而不再作为数据截断的依据，数据截断交给`Leader Epoch`来判断
+> * 数据截断交给`Leader Epoch`来判断
+
+过程如下图
+
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_epoch.jpg" width="1024" /></div>
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_epoch.jpg)
+> 
 >
 > * `Leader Epoch`是一个维护在Zookeeper上的32位数字，表示是第几次Leader选举得出的Leader版本，由`Controller`来管理，存储在`Zookeeper`的分区状态信息中。发生`Leader`选举时，`Leader Epoch`会作为`LeaderAndIsrRequest`的一部分传给每一个新的Leader
 >
@@ -57,17 +88,17 @@
 >
 >       * `Follower`的`offset`比`Leader`小（左图对应`epoch_id`比新leader的小的情况；右图对应`epoch_id`相等的情况）：Follower根据Leader的offset来追赶数据
 >
->         ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_leaderepoch_sync_s1.jpg)
+>         <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_leaderepoch_sync_s1.jpg" width="900" /></div>
 >
 >       * `Follower`的`start_offset`比`Leader`的返回的`offset`大（左图对应`epoch_id`比新leader的小的情况；右图对应`epoch_id`相等的情况）：Follower根据Leader的数据重置自己的`Leader Epoch文件`并进行日志截断
 >
->         ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_leaderepoch_sync_s2.jpg)
+>         <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_leaderepoch_sync_s2.jpg" width="900" /></div>
 
 用`Leader Epoch机制`解决`高水位机制`的两个问题
 
 > * 解决“Follower重启引发HW截断，同时Leader宕机使Follower（截断尚未恢复）成为Leader时，引发数据丢失（[High Watermark Truncation followed by Immediate Leader Election](https://cwiki.apache.org/confluence/display/KAFKA/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation#KIP101AlterReplicationProtocoltouseLeaderEpochratherthanHighWatermarkforTruncation-Scenario1:HighWatermarkTruncationfollowedbyImmediateLeaderElection)）”的问题
 >
->   ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_leaderepoch_solve_dataloss.jpg)
+>   <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_leaderepoch_solve_dataloss.jpg" width="900" /></div>
 >
 >   原问题：A重启由于HW还未更新、将m2截断丢弃并连接Leader B同步数据；然而随后B宕机A变成Leader导致消息m2丢失
 >
@@ -75,7 +106,7 @@
 >
 > * 解决“Follower与Leader同时重启，先启动的Follower（截断尚未恢复）接收新数据时，引发数据不一致的问题（[Replica Divergence on Restart after Multiple Hard Failures](https://cwiki.apache.org/confluence/display/KAFKA/KIP-101+-+Alter+Replication+Protocol+to+use+Leader+Epoch+rather+than+High+Watermark+for+Truncation#KIP101AlterReplicationProtocoltouseLeaderEpochratherthanHighWatermarkforTruncation-Scenario2:ReplicaDivergenceonRestartafterMultipleHardFailures)）”的问题
 >
->   ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_leaderepoch_solve_inconsist.jpg)
+>   <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_leaderepoch_solve_inconsist.jpg" width="900" /></div>
 >
 >   原问题：A、B同时重启，Follower B先启动成为Leader接收数据m3，随后A也启动完成但相同offset位置的数据是m2，引发数据不一致
 >
@@ -115,16 +146,17 @@
 >
 > ```java
 > producer.send(
->         record,
->         new Callback() {
->             public void onCompletion(RecordMetadata metadata, Exception e) {
->                 if(e != null) {
->                     e.printStackTrace();
->                 } else {
->                     System.out.println("The offset of the record we just sent is: " + metadata.offset());
->                 }
->             }
->         });
+>      record,
+>      new Callback() {
+>          public void onCompletion(RecordMetadata metadata, Exception e) {
+>              if(e != null) {
+>                  e.printStackTrace();
+>              } else {
+>                  System.out.println("The offset of the record we just sent is: " + metadata.offset());
+>              }
+>          }
+>      }
+> );
 > ```
 >
 > **`Producer`何时认为自己收到了`ACK`**：取决于配置项`acks`：
@@ -194,11 +226,11 @@ Demo项目：
 > ```java
 > @KafkaListener(id = "fooListener", topics = "topic01")
 > public void topic01Listener(Foo2 foo) {
->    logger.info("recieve message from topic01: " + foo);
->    if (foo.getFoo().startsWith("fail")) {
->       throw new RuntimeException("failed"); //触发异常，交给errorHandler来处理
->    }
->    this.exec.execute(() -> System.out.println("Hit Enter to terminate..."));
+>    	logger.info("recieve message from topic01: " + foo);
+>    	if (foo.getFoo().startsWith("fail")) {
+>    		throw new RuntimeException("failed"); //触发异常，交给errorHandler来处理
+>    	}
+>    	this.exec.execute(() -> System.out.println("Hit Enter to terminate..."));
 > }
 > ```
 >
@@ -231,7 +263,7 @@ Demo项目：
 
 (4) 关闭Spring Boot
 
-### 3.2 Demo 2：Multi-Method Lintener
+### 3.2 Demo 2: Multi-Method Lintener
 
 功能点：
 
@@ -287,26 +319,26 @@ Demo项目：
 > @Component
 > @KafkaListener(id = "multiGroup", topics = { "foos", "bars" })
 > public class MultiMethodsListener {
->    @KafkaHandler
->    public void foo(Foo2 foo) {
->       System.out.println("Received: " + foo);
->    }
+>    	@KafkaHandler
+>    	public void foo(Foo2 foo) {
+>    		System.out.println("Received: " + foo);
+>    	}
 > 
->    @KafkaHandler
->    public void bar(Bar2 bar) {
->       System.out.println("Received: " + bar);
->    }
+>    	@KafkaHandler
+>    	public void bar(Bar2 bar) {
+>    		System.out.println("Received: " + bar);
+>    	}
 > 
->    @KafkaHandler(isDefault = true)
->    public void unknown(Object object) {
->       System.out.println("Received unknown: " + object);
->    }
+>    	@KafkaHandler(isDefault = true)
+>    	public void unknown(Object object) {
+>    		System.out.println("Received unknown: " + object);
+>    	}
 > }
 > ```
 
 (4) 关闭Spring  Boot
 
-## 3.3 Demo 3: 事务
+### 3.3 Demo 3: 事务
 
 功能：
 
@@ -341,10 +373,10 @@ Demo项目：
 >
 > ```java
 > this.template.executeInTransaction(kafkaTemplate -> {
->    StringUtils.commaDelimitedListToSet(commaDelimitedMsgList).stream()
->       .map(s -> new Foo1(s))
->       .forEach(foo -> kafkaTemplate.send("topic02", foo));
->    return null;
+>    	StringUtils.commaDelimitedListToSet(commaDelimitedMsgList).stream()
+>    		.map(s -> new Foo1(s))
+>    		.forEach(foo -> kafkaTemplate.send("topic02", foo));
+>    	return null;
 > });
 > ```
 
@@ -360,10 +392,10 @@ Demo项目：
 > ```java
 > // 在一个完整事务中发送一组消息
 > this.template.executeInTransaction(kafkaTemplate -> {
->    StringUtils.commaDelimitedListToSet(commaDelimitedMsgList).stream()
->       .map(s -> new Foo1(s))
->       .forEach(foo -> kafkaTemplate.send("topic02", foo));
->    return null;
+>    	StringUtils.commaDelimitedListToSet(commaDelimitedMsgList).stream()
+>    		.map(s -> new Foo1(s))
+>    		.forEach(foo -> kafkaTemplate.send("topic02", foo));
+>    	return null;
 > });
 > ```
 >
@@ -375,10 +407,10 @@ Demo项目：
 >
 > ```java
 > public void handleTopic02(List<Foo2> foos) throws IOException {
->     LOGGER.info("Received: " + foos);
->     foos.forEach(f -> kafkaTemplate.send("topic03", f.getFoo().toUpperCase()));
->     LOGGER.info("Messages forwarded to topic03, hit Enter to continue");
->     System.in.read();
+>    	LOGGER.info("Received: " + foos);
+>    	foos.forEach(f -> kafkaTemplate.send("topic03", f.getFoo().toUpperCase()));
+>    	LOGGER.info("Messages forwarded to topic03, hit Enter to continue");
+>    	System.in.read();
 > }
 > ```
 >
@@ -400,17 +432,36 @@ Demo项目：
 >
 > 在日志中还可以看到生产者和消费者的Kafka配置，如果有配置项需要修改，可以参考Demo1
 
-### 3.4 参考：
+### 3.4 参考
 
 > * [How to Work with Apache Kafka in Your Spring Boot Application](https://www.confluent.io/blog/apache-kafka-spring-boot-application/)
 > * [Spring for Apache Kafka Deep Dive - Part 1: Error Handling, Message Conversion and Transaction Support](https://www.confluent.io/blog/spring-for-apache-kafka-deep-dive-part-1-error-handling-message-conversion-transaction-support/)
 
-### 3.5 其他问题：
+### 3.5 相关问题
 
-##### (1) 多Listener以及多Kafka Template配置
+**多Listener以及多Kafka Template配置**
 
-> * 如何配置多个Listener，并且容许他们有不同的配置（例如连接不同的Kafka集群的Bootstrap Servers）：在Demo1中有演示，可以在[@Configuration类](../spring_kafka_samples/sample-01/src/main/java/com/javaprojref/spring_kafka/pnc_demo/config/KafkaConfig.java)中向不同的Listener传入不同的配置
-> * 如何配置多个Kafka Template，并容许他们有不同的配置（例如向不同的Kafka集群发送消息）：
->   * 目前这版spring-kafka不支持，只能配置1个Kafka Template，或者不配置（使用框架提供的默认template）
->   * 文章[https://blog.csdn.net/u010218286/article/details/104897703](https://blog.csdn.net/u010218286/article/details/104897703)中对此问题进行了分析，同时使用`@Bean(name="someKafkaTemplateName")`和` @Autowired   @Qualifier("someKafkaTemplateName")`来让不同的template注入到不同的producer中。但是如果使用框架的其他功能，如Error Recovery功能等，仍然会面临该注入哪个template bean的问题。
+(1) 让Listener从同一个Kafka集群的多个topic接收不同类型的消息
+
+> 在Demo2中有演示，使用MultiMethodListener
+
+(2) 向同一个Kafka集群的不同topic发送不同类型的消息
+
+> 使用同一个KafkaTemplate向多个topic发送不同消息：KafkaTemplate在调用send时可指定topic，在Demo3中有演示
+>
+> 装配多个KafkaTemplate，向多个topic发送不同消息：[https://stackoverflow.com/questions/57905042/can-we-use-multiple-kafka-template-in-spring-boot](https://stackoverflow.com/questions/57905042/can-we-use-multiple-kafka-template-in-spring-boot)
+
+(3) 装配多个Listener、让他们订阅不同Kafka集群的消息
+
+> 在Demo1中有演示，可以在[@Configuration类](../spring_kafka_samples/sample-01/src/main/java/com/javaprojref/spring_kafka/pnc_demo/config/KafkaConfig.java)中向不同的Listener传入不同的配置
+
+(4) 装配多个KafkaTemplate，分别向不同的Kafka集群发送消息
+
+> 参考：[https://blog.csdn.net/u010218286/article/details/104897703](https://blog.csdn.net/u010218286/article/details/104897703)
+>
+> 但是此时容器中有多个KafkaTemplate Bean，虽然对于业务代码可以使用`@Qualifier`注解来选择使用哪个Bean，但对于`Dead Letter Handling`等的框架代码，让它们选择使用该使用哪个KafkaTemplate仍然比较复杂
+
+## 4 在Spring Cloud Stream中使用Kafka
+
+> 参考：https://github.com/fangkun119/manning-smia/blob/master/note/ch10_sprint_cloud_stream.md
 

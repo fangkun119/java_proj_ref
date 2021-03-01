@@ -1,3 +1,40 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [Kafka基础API](#kafka%E5%9F%BA%E7%A1%80api)
+  - [1. 内容](#1-%E5%86%85%E5%AE%B9)
+  - [2. 启动虚拟机、zookeeper、kafka](#2-%E5%90%AF%E5%8A%A8%E8%99%9A%E6%8B%9F%E6%9C%BAzookeeperkafka)
+    - [(1) 启动虚拟机](#1-%E5%90%AF%E5%8A%A8%E8%99%9A%E6%8B%9F%E6%9C%BA)
+    - [(2) 启动三台虚拟机上的`zookeeper`](#2-%E5%90%AF%E5%8A%A8%E4%B8%89%E5%8F%B0%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8A%E7%9A%84zookeeper)
+    - [(3) 启动三台虚拟机上的`Kafka`](#3-%E5%90%AF%E5%8A%A8%E4%B8%89%E5%8F%B0%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8A%E7%9A%84kafka)
+    - [(4) 三个`Kafka`节点都启动后，检查`Kafka`的连通性](#4-%E4%B8%89%E4%B8%AAkafka%E8%8A%82%E7%82%B9%E9%83%BD%E5%90%AF%E5%8A%A8%E5%90%8E%E6%A3%80%E6%9F%A5kafka%E7%9A%84%E8%BF%9E%E9%80%9A%E6%80%A7)
+  - [3. `Demo`代码入口](#3-demo%E4%BB%A3%E7%A0%81%E5%85%A5%E5%8F%A3)
+    - [(1) 代码](#1-%E4%BB%A3%E7%A0%81)
+    - [(2) 运行](#2-%E8%BF%90%E8%A1%8C)
+  - [4. `Topic`管理](#4-topic%E7%AE%A1%E7%90%86)
+    - [(1) 代码](#1-%E4%BB%A3%E7%A0%81-1)
+    - [(2) 输出](#2-%E8%BE%93%E5%87%BA)
+  - [5. 生产者消费者](#5-%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85)
+    - [(1) 代码](#1-%E4%BB%A3%E7%A0%81-2)
+    - [(2) 实验输出](#2-%E5%AE%9E%E9%AA%8C%E8%BE%93%E5%87%BA)
+  - [6. 手动指定`消费者`消费的分区](#6-%E6%89%8B%E5%8A%A8%E6%8C%87%E5%AE%9A%E6%B6%88%E8%B4%B9%E8%80%85%E6%B6%88%E8%B4%B9%E7%9A%84%E5%88%86%E5%8C%BA)
+    - [(1) 代码](#1-%E4%BB%A3%E7%A0%81-3)
+    - [(2) 实验输出](#2-%E5%AE%9E%E9%AA%8C%E8%BE%93%E5%87%BA-1)
+  - [7. 生产者分区策略](#7-%E7%94%9F%E4%BA%A7%E8%80%85%E5%88%86%E5%8C%BA%E7%AD%96%E7%95%A5)
+    - [7.1 `Kafka`默认的分区方式](#71-kafka%E9%BB%98%E8%AE%A4%E7%9A%84%E5%88%86%E5%8C%BA%E6%96%B9%E5%BC%8F)
+    - [7.2 自定义分区策略](#72-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%88%86%E5%8C%BA%E7%AD%96%E7%95%A5)
+      - [(1) 配置自定义分区策略类](#1-%E9%85%8D%E7%BD%AE%E8%87%AA%E5%AE%9A%E4%B9%89%E5%88%86%E5%8C%BA%E7%AD%96%E7%95%A5%E7%B1%BB)
+      - [(2) 实现自定义分区策略类](#2-%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%88%86%E5%8C%BA%E7%AD%96%E7%95%A5%E7%B1%BB)
+      - [(3) Demo](#3-demo)
+  - [8.序列化](#8%E5%BA%8F%E5%88%97%E5%8C%96)
+    - [8.1 Kafka提供的序列化、解序列化类](#81-kafka%E6%8F%90%E4%BE%9B%E7%9A%84%E5%BA%8F%E5%88%97%E5%8C%96%E8%A7%A3%E5%BA%8F%E5%88%97%E5%8C%96%E7%B1%BB)
+    - [8.2 自定义序列化、解序列化的类](#82-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%BA%8F%E5%88%97%E5%8C%96%E8%A7%A3%E5%BA%8F%E5%88%97%E5%8C%96%E7%9A%84%E7%B1%BB)
+  - [9. 拦截器](#9-%E6%8B%A6%E6%88%AA%E5%99%A8)
+  - [10 关闭zookeeper和kafka](#10-%E5%85%B3%E9%97%ADzookeeper%E5%92%8Ckafka)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Kafka基础API
 
 ## 1. 内容
@@ -15,11 +52,11 @@
 
 > 在三台虚拟机的`Console`中查看`ip add`，得到它们在桥接网卡、HostOnly网卡下的IP地址分别如下
 > 
-> |  主机名 		| 桥接网卡IP（笔记本访问虚拟机、虚拟机访问外网时使用） | Host Only网卡IP（虚拟机之间互相访问时使用，已配成静态IP）
-> |  ---------	| ------------------	| ----------- |
-> | CentOSA  	| 192.168.1.124           	| 192.168.56.102 |
-> | CentOSB  	| 192.168.1.116            	| 192.168.56.103 |
-> | CentOSC 	| 192.168.1.117            	| 192.168.56.104 |
+> | 主机名  | 桥接网卡IP（笔记本访问VM，VM访问外网） | Host Only网卡IP（VM之间访问、已配成静态IP） |
+> | ------- | -------------------------------------- | ------------------------------------------- |
+> | CentOSA | 192.168.1.124                          | 192.168.56.102                              |
+> | CentOSB | 192.168.1.116                          | 192.168.56.103                              |
+> | CentOSC | 192.168.1.117                          | 192.168.56.104                              |
 
 ### (2) 启动三台虚拟机上的`zookeeper`
 
@@ -272,7 +309,7 @@
 
 ## 7. 生产者分区策略
 
-### 7.1 `Kafka`默认的分区方式：
+### 7.1 `Kafka`默认的分区方式
 
 * 生产者为`record`指定了key时、按照key的hash来分区
 * 没指定key时采用轮询的方式分区
@@ -345,8 +382,10 @@
 ### 8.1 Kafka提供的序列化、解序列化类
 
 > `package org.apache.kafka.common.serialization`： `StringSerializer`、`ByteArraySerializer`、……
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_common_serialization.jpg" width="1024" /></div> 
+>
 > 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/300_kafka/kafka_common_serialization.jpg) 
 
 ### 8.2 自定义序列化、解序列化的类
 

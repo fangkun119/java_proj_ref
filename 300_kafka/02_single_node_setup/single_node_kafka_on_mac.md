@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [单节点Kafka环境搭建（Mac）](#%E5%8D%95%E8%8A%82%E7%82%B9kafka%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BAmac)
+  - [1 安装Kafka](#1-%E5%AE%89%E8%A3%85kafka)
+  - [2 程序及配置文件目录](#2-%E7%A8%8B%E5%BA%8F%E5%8F%8A%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9B%AE%E5%BD%95)
+  - [3 修改配置文件](#3-%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6)
+  - [4 启动Zookeeper和Kafka](#4-%E5%90%AF%E5%8A%A8zookeeper%E5%92%8Ckafka)
+  - [5 Kafka命令行工具](#5-kafka%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7)
+  - [6 Demo](#6-demo)
+  - [7 关闭Kafka和Zookeeper](#7-%E5%85%B3%E9%97%ADkafka%E5%92%8Czookeeper)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 单节点Kafka环境搭建（Mac）
 
 ## 1 安装Kafka
@@ -14,19 +29,27 @@
 > ==> Pouring kafka-2.6.0_1.big_sur.bottle.tar.gz
 > ==> Caveats
 > To have launchd start kafka now and restart at login:
->   brew services start kafka
+> brew services start kafka
 > Or, if you don't want/need a background service you can just run:
->   zookeeper-server-start /usr/local/etc/kafka/zookeeper.properties & kafka-server-start /usr/local/etc/kafka/server.properties
+> zookeeper-server-start /usr/local/etc/kafka/zookeeper.properties & kafka-server-start /usr/local/etc/kafka/server.properties
 > ==> Summary
 > 🍺  /usr/local/Cellar/kafka/2.6.0_1: 186 files, 62.4MB
 > ~~~
 >
-> 如果安装时brew卡在`update brew`一步，有两种方法可以解决：(1) 按一下`Ctrl + c`等待几秒钟之后会跳过`update brew`继续安装；(2) 使用能提供代理地址的翻墙软件，并为terminal设置代理
+> 如果安装时brew卡在`update brew`一步，有两种方法可以解决：
+>
+> (1) 按一下`Ctrl + c`等待几秒钟之后会跳过`update brew`继续安装
+>
+> (2) 找到翻墙软件提供的代理地址、使用以下命令为terminal设置代理（有些翻墙软件会输出代理地址，有些在开启翻墙模式时可通过Mac的`系统偏好设置→网络设置→WIFI→高级→代理`找到代理地址）
 >
 > ~~~bash
 > __________________________________________________________________
 > $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/300_kafka/
 > $ export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7890
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/300_kafka/
+> $ brew reinstall kafka
+> ...
 > ~~~
 
 ## 2 程序及配置文件目录
