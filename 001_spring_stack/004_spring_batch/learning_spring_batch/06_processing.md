@@ -1,3 +1,15 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [6 Processing](#6-processing)
+  - [6.1 Interface: ItemProcessor](#61-interface-itemprocessor)
+  - [6.2 Filtering Items](#62-filtering-items)
+  - [6.3 Validating Items](#63-validating-items)
+  - [6.4 CompositeItemProcessors](#64-compositeitemprocessors)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## 6 Processing
 
 > 用来处理每个record的业务逻辑
@@ -287,5 +299,3 @@
 > {"id":17,"firstName":"FELICIA","lastName":"VINSON","birthdate":-316771200000}
 > {"id":19,"firstName":"RAMONA","lastName":"ACOSTA","birthdate":-237542400000}
 > ~~~
-
-## 

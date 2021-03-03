@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [5 Output](#5-output)
+  - [5.1 Interface ItemWriter](#51-interface-itemwriter)
+  - [5.2 Writing to Database](#52-writing-to-database)
+  - [5.3 Writing Flat Files](#53-writing-flat-files)
+  - [5.4 Writing to XML Files](#54-writing-to-xml-files)
+  - [5.5 Writing to Multiple Destinations](#55-writing-to-multiple-destinations)
+- [](#)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## 5 Output
 
 ### 5.1 Interface ItemWriter

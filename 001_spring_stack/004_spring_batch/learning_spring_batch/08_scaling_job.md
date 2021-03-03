@@ -1,3 +1,15 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [8 Scaling Jobs](#8-scaling-jobs)
+  - [8.1 Approaches](#81-approaches)
+  - [8.2 Multi-Threaded Step](#82-multi-threaded-step)
+  - [8.3 AsyncItemProcessor / AsyncItemWriter](#83-asyncitemprocessor--asyncitemwriter)
+  - [8.4 Local Partitioning](#84-local-partitioning)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## 8 Scaling Jobs
 
 ### 8.1 Approaches

@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [7 Error Handling](#7-error-handling)
+  - [7.1 Restart](#71-restart)
+  - [7.2 Retry](#72-retry)
+  - [7.3 Skip](#73-skip)
+  - [7.4 Listeners](#74-listeners)
+  - [7.5 SkipListeners](#75-skiplisteners)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## 7 Error Handling
 
 ### 7.1 Restart

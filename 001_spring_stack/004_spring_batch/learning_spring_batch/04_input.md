@@ -1,4 +1,20 @@
-## 4 Input
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [4 Input](#4-input)
+  - [4.1 ItemReader Interface](#41-itemreader-interface)
+  - [4.2 Reading From Database](#42-reading-from-database)
+  - [4.3 Reading From XML](#43-reading-from-xml)
+  - [4.4 Reading Flat File (CSV)](#44-reading-flat-file-csv)
+  - [4.5 Reading From Multiple Sources](#45-reading-from-multiple-sources)
+  - [4.6 ItemReader State](#46-itemreader-state)
+  - [4.7 ItemStream Interface](#47-itemstream-interface)
+  - [4.8 JsonItemReader](#48-jsonitemreader)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## 	4 Input
 
 ### 4.1 ItemReader Interface
 

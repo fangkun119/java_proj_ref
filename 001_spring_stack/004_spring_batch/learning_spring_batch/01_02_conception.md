@@ -1,8 +1,24 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [1 Spring Batch](#1-spring-batch)
+- [2 `Spring Batch`项目创建](#2-spring-batch%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA)
+- [2 `Job`与`Step`](#2-job%E4%B8%8Estep)
+  - [2.2 Job组成](#22-job%E7%BB%84%E6%88%90)
+  - [2.3 Job Repository及配置](#23-job-repository%E5%8F%8A%E9%85%8D%E7%BD%AE)
+    - [`JobRepository`：](#jobrepository)
+    - [`JDBC based repository`](#jdbc-based-repository)
+    - [Memory based repository](#memory-based-repository)
+  - [2.4 Job运行的状态数据](#24-job%E8%BF%90%E8%A1%8C%E7%9A%84%E7%8A%B6%E6%80%81%E6%95%B0%E6%8D%AE)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## 1 Spring Batch
 
 > [Spring Batch](https://docs.spring.io/spring-batch/docs/4.2.x/reference/html/domain.html#domainLanguageOfBatch)基于[JSR-352](https://jcp.org/en/jsr/detail?id=352)，其中的概念也来自于JSR-352，在文档中可以看到两者一一对应之处
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/004_spring_batch/springbatch_key_concept.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/004_spring_batch/springbatch_key_concept.jpg" width="800" /></div>
 
 Spring Batch的设计目标
 
@@ -143,7 +159,7 @@ Spring Batch的设计目标
 >
 > 数据库ER图如下，debug时会用到
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/004_spring_batch/spring_batch_job_state_db.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/004_spring_batch/spring_batch_job_state_db.jpg" width="1024" /></div>
 >
 > 其中
 >
