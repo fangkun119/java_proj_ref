@@ -46,7 +46,7 @@ Spring 3.2开始可以在`方法`上使用@Profile注解（3.1及之前版本只
 
 可通过最外层`<beans>`的profile属性标记整个XML属于哪个Profile
 
-> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_profile_2.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_profile_2.jpg" width="1024" /></div>
 
 可通过单个`<bean>`的profile属性标记某个bean属于哪个Profile
 
