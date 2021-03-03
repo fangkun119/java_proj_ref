@@ -14,11 +14,11 @@
       - [(3) 工具](#3-%E5%B7%A5%E5%85%B7)
   - [5 混合装配](#5-%E6%B7%B7%E5%90%88%E8%A3%85%E9%85%8D)
     - [5.1 自动装配](#51-%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D)
-    - [5.2 Java Config类](#52-java-config%E7%B1%BB)
-      - [(1) Configure类可以通过`@Import`注解来引入另一个Configure类中的bean](#1-configure%E7%B1%BB%E5%8F%AF%E4%BB%A5%E9%80%9A%E8%BF%87import%E6%B3%A8%E8%A7%A3%E6%9D%A5%E5%BC%95%E5%85%A5%E5%8F%A6%E4%B8%80%E4%B8%AAconfigure%E7%B1%BB%E4%B8%AD%E7%9A%84bean)
-      - [(2) Configure类可以通过`@ImportResource`注解，将定义在XML中的Bean也引入进来](#2-configure%E7%B1%BB%E5%8F%AF%E4%BB%A5%E9%80%9A%E8%BF%87importresource%E6%B3%A8%E8%A7%A3%E5%B0%86%E5%AE%9A%E4%B9%89%E5%9C%A8xml%E4%B8%AD%E7%9A%84bean%E4%B9%9F%E5%BC%95%E5%85%A5%E8%BF%9B%E6%9D%A5)
+    - [5.2 `@Configure`类](#52-configure%E7%B1%BB)
+      - [(1) 引入定义在另一个@Configure类中的Bean](#1-%E5%BC%95%E5%85%A5%E5%AE%9A%E4%B9%89%E5%9C%A8%E5%8F%A6%E4%B8%80%E4%B8%AAconfigure%E7%B1%BB%E4%B8%AD%E7%9A%84bean)
+      - [(2) 引入定义在XML配置中的Bean](#2-%E5%BC%95%E5%85%A5%E5%AE%9A%E4%B9%89%E5%9C%A8xml%E9%85%8D%E7%BD%AE%E4%B8%AD%E7%9A%84bean)
     - [5.3 XML配置](#53-xml%E9%85%8D%E7%BD%AE)
-      - [(1) XML配置文件可以通过`<import>`导入写在其他XML配置文件中的类，也可以通过`<bean>`标签导入Config类中的配置](#1-xml%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%8F%AF%E4%BB%A5%E9%80%9A%E8%BF%87import%E5%AF%BC%E5%85%A5%E5%86%99%E5%9C%A8%E5%85%B6%E4%BB%96xml%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E4%B8%AD%E7%9A%84%E7%B1%BB%E4%B9%9F%E5%8F%AF%E4%BB%A5%E9%80%9A%E8%BF%87bean%E6%A0%87%E7%AD%BE%E5%AF%BC%E5%85%A5config%E7%B1%BB%E4%B8%AD%E7%9A%84%E9%85%8D%E7%BD%AE)
+      - [(1) 引入定义在其他XML配置或@Configure类中的Bean](#1-%E5%BC%95%E5%85%A5%E5%AE%9A%E4%B9%89%E5%9C%A8%E5%85%B6%E4%BB%96xml%E9%85%8D%E7%BD%AE%E6%88%96configure%E7%B1%BB%E4%B8%AD%E7%9A%84bean)
   - [6 根配置](#6-%E6%A0%B9%E9%85%8D%E7%BD%AE)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -79,19 +79,25 @@
 
 > Spring会扫描所有的bean，不仅仅是@Component注解的类，也能够包含用JavaConfig类或者XML装配的类
 
-### 5.2 Java Config类
+### 5.2 `@Configure`类
 
-#### (1) Configure类可以通过`@Import`注解来引入另一个Configure类中的bean
+#### (1) 引入定义在另一个@Configure类中的Bean
+
+Configure类可以通过`@Import`注解来引入另一个Configure类中的bean
 
 > <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_mix_1.jpg" width="1024" /></div>
 
-#### (2) Configure类可以通过`@ImportResource`注解，将定义在XML中的Bean也引入进来               
+#### (2) 引入定义在XML配置中的Bean
+
+Configure类可以通过`@ImportResource`注解，将定义在XML中的Bean也引入进来               
 
 > <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_mix_2.jpg" width="1024" /></div>
 
 ### 5.3 XML配置
 
-#### (1) XML配置文件可以通过`<import>`导入写在其他XML配置文件中的类，也可以通过`<bean>`标签导入Config类中的配置
+#### (1) 引入定义在其他XML配置或@Configure类中的Bean
+
+XML配置文件可以通过`<import>`导入写在其他XML配置文件中的类，也可以通过`<bean>`标签导入`@Configiure类`中的配置
 
 > <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_mix_3.jpg" width="1024" /></div>
 
