@@ -1,6 +1,48 @@
-# Spring IOC简单示例
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
 
-[TOC]
+- [Spring IOC Demo](#spring-ioc-demo)
+  - [1 概念](#1-%E6%A6%82%E5%BF%B5)
+  - [2 XML依赖注入配置语法](#2-xml%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E9%85%8D%E7%BD%AE%E8%AF%AD%E6%B3%95)
+    - [2.1 使用多个xml配置文件](#21-%E4%BD%BF%E7%94%A8%E5%A4%9A%E4%B8%AAxml%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6)
+      - [方法1：初始化容器时，指定多个xml配置文件](#%E6%96%B9%E6%B3%951%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%B9%E5%99%A8%E6%97%B6%E6%8C%87%E5%AE%9A%E5%A4%9A%E4%B8%AAxml%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6)
+      - [方法2：初始化容器时，仅指定一个root  xml 配置文件 ，由这个root  xml来import多个其他的xml](#%E6%96%B9%E6%B3%952%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%B9%E5%99%A8%E6%97%B6%E4%BB%85%E6%8C%87%E5%AE%9A%E4%B8%80%E4%B8%AAroot--xml-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6-%E7%94%B1%E8%BF%99%E4%B8%AAroot--xml%E6%9D%A5import%E5%A4%9A%E4%B8%AA%E5%85%B6%E4%BB%96%E7%9A%84xml)
+    - [2.2 XML配置、构造函数注入](#22-xml%E9%85%8D%E7%BD%AE%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E6%B3%A8%E5%85%A5)
+      - [(1) 常用配置方式](#1-%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E6%96%B9%E5%BC%8F)
+    - [2.3 XML配置、属性注入](#23-xml%E9%85%8D%E7%BD%AE%E5%B1%9E%E6%80%A7%E6%B3%A8%E5%85%A5)
+      - [(1) 常用的配置方式](#1-%E5%B8%B8%E7%94%A8%E7%9A%84%E9%85%8D%E7%BD%AE%E6%96%B9%E5%BC%8F)
+      - [(2) `p-namespace`简写方式](#2-p-namespace%E7%AE%80%E5%86%99%E6%96%B9%E5%BC%8F)
+      - [(3) 空值注入及null值注入](#3-%E7%A9%BA%E5%80%BC%E6%B3%A8%E5%85%A5%E5%8F%8Anull%E5%80%BC%E6%B3%A8%E5%85%A5)
+      - [(4) 注入List、Set、Map类型、以及注入到java.util.Properties类型的属性上](#4-%E6%B3%A8%E5%85%A5listsetmap%E7%B1%BB%E5%9E%8B%E4%BB%A5%E5%8F%8A%E6%B3%A8%E5%85%A5%E5%88%B0javautilproperties%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%B1%9E%E6%80%A7%E4%B8%8A)
+      - [(5) 通过工厂来注入bean](#5-%E9%80%9A%E8%BF%87%E5%B7%A5%E5%8E%82%E6%9D%A5%E6%B3%A8%E5%85%A5bean)
+        - [动态工厂](#%E5%8A%A8%E6%80%81%E5%B7%A5%E5%8E%82)
+        - [静态工厂](#%E9%9D%99%E6%80%81%E5%B7%A5%E5%8E%82)
+    - [2.4 其他](#24-%E5%85%B6%E4%BB%96)
+      - [(1) `alias`: 为bean指定别名](#1-alias-%E4%B8%BAbean%E6%8C%87%E5%AE%9A%E5%88%AB%E5%90%8D)
+      - [(2) `lazy-init`和`depends-on`](#2-lazy-init%E5%92%8Cdepends-on)
+  - [3 自动装配](#3-%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D)
+    - [3.1 基于XML的自动装配](#31-%E5%9F%BA%E4%BA%8Exml%E7%9A%84%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D)
+      - [(1) 解决的问题](#1-%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98)
+      - [(2) 哪些Bean的依赖可被自动装配](#2-%E5%93%AA%E4%BA%9Bbean%E7%9A%84%E4%BE%9D%E8%B5%96%E5%8F%AF%E8%A2%AB%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D)
+        - [所有bean](#%E6%89%80%E6%9C%89bean)
+        - [特定的bean](#%E7%89%B9%E5%AE%9A%E7%9A%84bean)
+      - [(3) 如何找到依赖项](#3-%E5%A6%82%E4%BD%95%E6%89%BE%E5%88%B0%E4%BE%9D%E8%B5%96%E9%A1%B9)
+        - [`byType`](#bytype)
+        - [`byName`](#byname)
+      - [(4) 代码](#4-%E4%BB%A3%E7%A0%81)
+    - [3.2 基于注解的自动装配](#32-%E5%9F%BA%E4%BA%8E%E6%B3%A8%E8%A7%A3%E7%9A%84%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D)
+      - [(1) 简单例子](#1-%E7%AE%80%E5%8D%95%E4%BE%8B%E5%AD%90)
+  - [4 Bean的作用域](#4-bean%E7%9A%84%E4%BD%9C%E7%94%A8%E5%9F%9F)
+  - [5 Bean循环依赖问题](#5-bean%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E9%97%AE%E9%A2%98)
+  - [6 编码小技巧](#6-%E7%BC%96%E7%A0%81%E5%B0%8F%E6%8A%80%E5%B7%A7)
+    - [(1) `ToStringBuilder`：为对象提供`toString`代码支持](#1-tostringbuilder%E4%B8%BA%E5%AF%B9%E8%B1%A1%E6%8F%90%E4%BE%9Btostring%E4%BB%A3%E7%A0%81%E6%94%AF%E6%8C%81)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+
+
+# Spring IOC Demo
 
 ##  1 概念
 
