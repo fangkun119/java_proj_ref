@@ -117,7 +117,7 @@
 
 光定义切点还不够，要开启AspectJ才能完成切面
 
-> ![image-20210303160638558](/Users/fangkun/Library/Application Support/typora-user-images/image-20210303160638558.jpg" width="1024" /></div>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_aop/spring_aop_enable_aop.jpg" width="1024" /></div>
 
 说明
 
