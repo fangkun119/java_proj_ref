@@ -1,6 +1,37 @@
-# Spring Web项目示例
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
 
-[TOC]
+- [Spring Web项目示例](#spring-web%E9%A1%B9%E7%9B%AE%E7%A4%BA%E4%BE%8B)
+  - [01 拦截器及登录验证](#01-%E6%8B%A6%E6%88%AA%E5%99%A8%E5%8F%8A%E7%99%BB%E5%BD%95%E9%AA%8C%E8%AF%81)
+    - [1.1 拦截器](#11-%E6%8B%A6%E6%88%AA%E5%99%A8)
+    - [1.2 登录登出功能](#12-%E7%99%BB%E5%BD%95%E7%99%BB%E5%87%BA%E5%8A%9F%E8%83%BD)
+  - [02 完整的分页器（前后端）](#02-%E5%AE%8C%E6%95%B4%E7%9A%84%E5%88%86%E9%A1%B5%E5%99%A8%E5%89%8D%E5%90%8E%E7%AB%AF)
+    - [2.1 分页器](#21-%E5%88%86%E9%A1%B5%E5%99%A8)
+      - [(1) 后端代码及返回数据](#1-%E5%90%8E%E7%AB%AF%E4%BB%A3%E7%A0%81%E5%8F%8A%E8%BF%94%E5%9B%9E%E6%95%B0%E6%8D%AE)
+      - [(2) 前端显示（thymeleaf + bootstrap）](#2-%E5%89%8D%E7%AB%AF%E6%98%BE%E7%A4%BAthymeleaf--bootstrap)
+    - [2.2 JQuery异步调用后端](#22-jquery%E5%BC%82%E6%AD%A5%E8%B0%83%E7%94%A8%E5%90%8E%E7%AB%AF)
+    - [2.3 前端页面美化](#23-%E5%89%8D%E7%AB%AF%E9%A1%B5%E9%9D%A2%E7%BE%8E%E5%8C%96)
+    - [2.4 部署方式](#24-%E9%83%A8%E7%BD%B2%E6%96%B9%E5%BC%8F)
+      - [(1) Jar包部署方式（默认）](#1-jar%E5%8C%85%E9%83%A8%E7%BD%B2%E6%96%B9%E5%BC%8F%E9%BB%98%E8%AE%A4)
+      - [(2) 老式war包部署方式（很少会使用）](#2-%E8%80%81%E5%BC%8Fwar%E5%8C%85%E9%83%A8%E7%BD%B2%E6%96%B9%E5%BC%8F%E5%BE%88%E5%B0%91%E4%BC%9A%E4%BD%BF%E7%94%A8)
+  - [03 项目配置](#03-%E9%A1%B9%E7%9B%AE%E9%85%8D%E7%BD%AE)
+    - [3.1 Demo](#31-demo)
+    - [3.2 YAML](#32-yaml)
+    - [3.3 Properties文件](#33-properties%E6%96%87%E4%BB%B6)
+      - [(1) 程序运行参数注入](#1-%E7%A8%8B%E5%BA%8F%E8%BF%90%E8%A1%8C%E5%8F%82%E6%95%B0%E6%B3%A8%E5%85%A5)
+      - [(2) 参数引用](#2-%E5%8F%82%E6%95%B0%E5%BC%95%E7%94%A8)
+      - [(3) 随机数](#3-%E9%9A%8F%E6%9C%BA%E6%95%B0)
+  - [3.4 配置文件优先级](#34-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E4%BC%98%E5%85%88%E7%BA%A7)
+  - [3.5 多环境配置](#35-%E5%A4%9A%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE)
+      - [(1) 用多个properties文件配置（如本例）](#1-%E7%94%A8%E5%A4%9A%E4%B8%AAproperties%E6%96%87%E4%BB%B6%E9%85%8D%E7%BD%AE%E5%A6%82%E6%9C%AC%E4%BE%8B)
+      - [(2) 在一个yml文件中配置](#2-%E5%9C%A8%E4%B8%80%E4%B8%AAyml%E6%96%87%E4%BB%B6%E4%B8%AD%E9%85%8D%E7%BD%AE)
+  - [04 MyBatis多表访问](#04-mybatis%E5%A4%9A%E8%A1%A8%E8%AE%BF%E9%97%AE)
+  - [05 Restful Controller](#05-restful-controller)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# Spring Web项目示例
 
 ##  01 拦截器及登录验证
 
