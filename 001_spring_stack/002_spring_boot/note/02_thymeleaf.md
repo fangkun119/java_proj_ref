@@ -1,6 +1,35 @@
-# Thymeleaf使用速查
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
 
-[TOC]
+- [Thymeleaf使用速查](#thymeleaf%E4%BD%BF%E7%94%A8%E9%80%9F%E6%9F%A5)
+  - [01 概要](#01-%E6%A6%82%E8%A6%81)
+  - [02 URL地址`@{...}`](#02-url%E5%9C%B0%E5%9D%80)
+    - [(1) 指向基于context-path的相对路径](#1-%E6%8C%87%E5%90%91%E5%9F%BA%E4%BA%8Econtext-path%E7%9A%84%E7%9B%B8%E5%AF%B9%E8%B7%AF%E5%BE%84)
+    - [(2) 指向绝对路径](#2-%E6%8C%87%E5%90%91%E7%BB%9D%E5%AF%B9%E8%B7%AF%E5%BE%84)
+  - [03 `th:href`](#03-thhref)
+  - [04 文本字面](#04-%E6%96%87%E6%9C%AC%E5%AD%97%E9%9D%A2)
+  - [05 数字计算](#05-%E6%95%B0%E5%AD%97%E8%AE%A1%E7%AE%97)
+  - [06 boolean判断](#06-boolean%E5%88%A4%E6%96%AD)
+  - [07 比较](#07-%E6%AF%94%E8%BE%83)
+  - [08 三元运算符](#08-%E4%B8%89%E5%85%83%E8%BF%90%E7%AE%97%E7%AC%A6)
+  - [09 `th:utext`, `th:text`](#09-thutext-thtext)
+  - [10 设置属性](#10-%E8%AE%BE%E7%BD%AE%E5%B1%9E%E6%80%A7)
+  - [11 勾选框，下拉列表](#11-%E5%8B%BE%E9%80%89%E6%A1%86%E4%B8%8B%E6%8B%89%E5%88%97%E8%A1%A8)
+  - [12 日期格式化](#12-%E6%97%A5%E6%9C%9F%E6%A0%BC%E5%BC%8F%E5%8C%96)
+  - [13 循环](#13-%E5%BE%AA%E7%8E%AF)
+    - [(1) 与select一起使用](#1-%E4%B8%8Eselect%E4%B8%80%E8%B5%B7%E4%BD%BF%E7%94%A8)
+    - [(2) 状态变量（loopStatus）](#2-%E7%8A%B6%E6%80%81%E5%8F%98%E9%87%8Floopstatus)
+  - [14 `if / else`](#14-if--else)
+  - [15 `swich / case`多条件判断](#15-swich--case%E5%A4%9A%E6%9D%A1%E4%BB%B6%E5%88%A4%E6%96%AD)
+  - [16 内联表达式](#16-%E5%86%85%E8%81%94%E8%A1%A8%E8%BE%BE%E5%BC%8F)
+  - [17 内联JavaScript](#17-%E5%86%85%E8%81%94javascript)
+  - [18 URL](#18-url)
+  - [19 Session](#19-session)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# Thymeleaf使用速查
 
 ## 01 概要
 
@@ -14,7 +43,7 @@
 >
 > 在后端代码中向model传入数据，在模板中标记要使用的数据，模板引擎会将其解析成HTML页面，例如
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/002_spring_boot/spring_thymeleaf.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/002_spring_boot/spring_thymeleaf.jpg" width="800" /></div>
 
 例子
 

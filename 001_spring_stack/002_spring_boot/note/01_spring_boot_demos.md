@@ -1,6 +1,42 @@
-#  Spring Boot示例
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
 
-[TOC]
+- [Spring Boot Demos](#spring-boot-demos)
+  - [01 Spring Boot](#01-spring-boot)
+  - [02 Spring MVC](#02-spring-mvc)
+    - [2.1 Demo](#21-demo)
+    - [2.2 常用表单数据接收方式](#22-%E5%B8%B8%E7%94%A8%E8%A1%A8%E5%8D%95%E6%95%B0%E6%8D%AE%E6%8E%A5%E6%94%B6%E6%96%B9%E5%BC%8F)
+      - [Path Variable](#path-variable)
+      - [url参数名](#url%E5%8F%82%E6%95%B0%E5%90%8D)
+      - [普通实体对象](#%E6%99%AE%E9%80%9A%E5%AE%9E%E4%BD%93%E5%AF%B9%E8%B1%A1)
+      - [Json数据](#json%E6%95%B0%E6%8D%AE)
+    - [2.3 后端参数校验](#23-%E5%90%8E%E7%AB%AF%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C)
+      - [例子](#%E4%BE%8B%E5%AD%90)
+      - [常用注解](#%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3)
+  - [03 用JPA实现DAO](#03-%E7%94%A8jpa%E5%AE%9E%E7%8E%B0dao)
+    - [3.1 Demo](#31-demo)
+    - [3.2 JAP常用API](#32-jap%E5%B8%B8%E7%94%A8api)
+  - [04 JSP](#04-jsp)
+  - [05 Bootstrap, Thymeleaf, JPA定制查询](#05-bootstrap-thymeleaf-jpa%E5%AE%9A%E5%88%B6%E6%9F%A5%E8%AF%A2)
+    - [5.1 使用Thymeleaf + Bootstrap生成Web页面](#51-%E4%BD%BF%E7%94%A8thymeleaf--bootstrap%E7%94%9F%E6%88%90web%E9%A1%B5%E9%9D%A2)
+      - [(1) Demo](#1-demo)
+      - [(2) Thymeleaf](#2-thymeleaf)
+    - [5.2 JPA定制查询](#52-jpa%E5%AE%9A%E5%88%B6%E6%9F%A5%E8%AF%A2)
+      - [(1) Demo](#1-demo-1)
+      - [(2)  JPA自定义SQL注解`@Query`](#2--jpa%E8%87%AA%E5%AE%9A%E4%B9%89sql%E6%B3%A8%E8%A7%A3query)
+  - [06  MyBatis](#06--mybatis)
+    - [6.1 项目搭建](#61-%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA)
+    - [6.2 手写MyBatis Mapper](#62-%E6%89%8B%E5%86%99mybatis-mapper)
+    - [6.3 使用 MyBatis Generator  GUI编写MyBatis Mapper](#63-%E4%BD%BF%E7%94%A8-mybatis-generator--gui%E7%BC%96%E5%86%99mybatis-mapper)
+    - [6.4 分页器（后端部分）](#64-%E5%88%86%E9%A1%B5%E5%99%A8%E5%90%8E%E7%AB%AF%E9%83%A8%E5%88%86)
+  - [附录](#%E9%99%84%E5%BD%95)
+    - [附录1：常用配置](#%E9%99%84%E5%BD%951%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE)
+    - [附录2：文件上传](#%E9%99%84%E5%BD%952%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+#  Spring Boot Demos
 
 ## 01 Spring Boot
 
@@ -717,7 +753,7 @@ Spring项目结构
 
 > 使用MyBatis  Generator GUI生成DAO及Mapper配置类，配置好之后 ，它会连接数据库根据数据表的Schema生成代码
 >
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/002_spring_boot/mybatis_generator_gui_menu_mapper.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/002_spring_boot/mybatis_generator_gui_menu_mapper.jpg" width="800" /></div>
 >
 > DAO：[/src/main/java/.../mapper/MenuMapper.java](../demos/08_spring_boot_mvc_mybatis/src/main/java/com/javaref/springboot/mapper/MenuMapper.java)
 >
@@ -812,9 +848,9 @@ Spring项目结构
 >  }
 >  ```
 
-## 99 附录
+## 附录
 
-### 99.1 常用配置
+### 附录1：常用配置
 
 > ~~~properties
 > # JPA相关
@@ -844,7 +880,7 @@ Spring项目结构
 > spring.mvc.date-format=yyyy-MM-dd
 > ~~~
 
-### 99.2 文件上传
+### 附录2：文件上传
 
 > 指定大小
 >
