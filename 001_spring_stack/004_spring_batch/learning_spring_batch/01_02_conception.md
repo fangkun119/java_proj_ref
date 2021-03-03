@@ -7,12 +7,22 @@
 - [2 `Job`与`Step`](#2-job%E4%B8%8Estep)
   - [2.2 Job组成](#22-job%E7%BB%84%E6%88%90)
   - [2.3 Job Repository及配置](#23-job-repository%E5%8F%8A%E9%85%8D%E7%BD%AE)
-    - [`JobRepository`：](#jobrepository)
+    - [`JobRepository`](#jobrepository)
     - [`JDBC based repository`](#jdbc-based-repository)
     - [Memory based repository](#memory-based-repository)
   - [2.4 Job运行的状态数据](#24-job%E8%BF%90%E8%A1%8C%E7%9A%84%E7%8A%B6%E6%80%81%E6%95%B0%E6%8D%AE)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+> 配套代码
+>
+> 1. 官网[O‘Reilly Learning Spring Batch](http://shop.oreilly.com/product/0636920044673.do)
+>
+>     访问官网注册账号后，可开通课程观看视屏并下载源代码，新用户免费可以使用10天
+>
+> 2. https://github.com/fangkun119/spring_batch_demos （Private Git Repository）
+>
+>     代码版本已更新到当前最新的Spring Batch 4.2.5（对应Spring Boot 2.4.1）
 
 ## 1 Spring Batch
 
@@ -93,7 +103,7 @@ Spring Batch的设计目标
 
 ### 2.3 Job Repository及配置
 
-#### `JobRepository`：
+#### `JobRepository`
 
 > 用来存储Job运行时状态机的状态，包括step、chunk、item相关的数据，以便在故障时可以重启。它有两种实现方式
 >

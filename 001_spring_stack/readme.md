@@ -6,79 +6,65 @@
 
 ### (1) IOC基础装配
 
-> 资料来源：Spring In Action第4版第2章
->
-> 笔记链接:
+> 笔记链接（资料来源：Spring In Action第4版第2章）
 >
 > [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/001_spring_ioc_aop/note/01_spring_ioc_basic.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/001_spring_ioc_aop/note/01_spring_ioc_basic.md)
 
-内容介绍
+主要内容
 
-1 . `隐式自动装配`、`@Configure类`、`XML配置`三种装配方式
-
-2 . 三种装配方式混合使用
-
-`@Configure`类中使用`@Import`注解引入另一个`@Configure`类中的Bean
-
-`@Configure`类中使用`@ImportResource`注解引入定义在XML文件中的Bean
-
-`XML`配置中通过`<import>`导入其他XML配置文件中的Bean
+> 1. `隐式自动装配`、`@Configure类`、`XML配置`三种装配方式
+>
+> 2.  三种装配方式混合使用
+>
+>     `@Configure`类中使用`@Import`注解引入另一个`@Configure`类中的Bean
+>
+>     `@Configure`类中使用`@ImportResource`注解引入定义在XML文件中的Bean
+>
+>     `XML`配置中通过`<import>`导入其他XML配置文件中的Bean
 
 ### (2) IOC高级装配
 
-> 资料来源：Spring In Action第4版第3章
->
-> 笔记链接：
+> 笔记链接（资料来源：Spring In Action第4版第3章）
 >
 > [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/001_spring_ioc_aop/note/02_spring_ioc_advanced.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/001_spring_ioc_aop/note/02_spring_ioc_advanced.md)
 
 主要内容
 
-1 . Profile的使用：为不同的环境创建不同的Bean
-
-2 . 条件化Bean：根据程序计算结果决定是否创建某个Bean
-
-3 . 处理自动装配歧义：`Primary`、`Qualifier`以及Bean特征描述注解
-
-4 . Bean生命周期
-
-5 . 注入运行期的值：`属性占位符`以及使用`SPEL表达式`
+> 1. Profile的使用：为不同的环境创建不同的Bean
+> 2. 条件化Bean：根据程序计算结果决定是否创建某个Bean
+> 3. 处理自动装配歧义：`Primary`、`Qualifier`以及Bean特征描述注解
+> 4. Bean生命周期
+> 5. 注入运行期的值：`属性占位符`以及使用`SPEL表达式`
 
 技巧介绍
 
-1 .  Session Bean注入到Singleton Bean时，通过代理来保持其Session生命周期的特性
+> 1. Session Bean注入到Singleton Bean时，通过代理来保持其Session生命周期的特性
 
 ## 2. Spring AOP
 
-> 资料来源：Spring In Action第4版第4章
->
-> 笔记链接:
+> 笔记链接（资料来源：Spring In Action第4版第4章）
 >
 > [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/001_spring_ioc_aop/note/04_spring_aop.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/001_spring_ioc_aop/note/04_spring_aop.md)
 
 主要内容
 
-1 . AOP原理，对比传统AOP以及AspectJ，Spring AOP的特点
-
-2 . 使用注解定义Spring AOP切面
-
-3 . 使用XML配置定义Spring AOP切面
+> 1. AOP原理，对比传统AOP以及AspectJ，Spring AOP的特点
+> 2. 使用注解定义Spring AOP切面
+> 3. 使用XML配置定义Spring AOP切面
 
 ## 3. Spring 框架
 
 ### (1) Spring 框架介绍
 
-> 资料来源：Spring In Action第6版第1章
->
-> 笔记链接：
+> 笔记链接（资料来源：Spring In Action第6版第1章）：
 >
 > [https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch01_spring_intro.md](https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch01_spring_intro.md)
 
-内容
+主要内容
 
 > 1. Spring介绍、应用创建、项目结构
 
-技巧
+技巧介绍
 
 > 1. 理解`@SpringBootApplication`，`@SpringBootTest`注解
 > 2. 使用`@WebMvcTest`和`MockMvc`编写用于测试Controller的单元测试
@@ -86,17 +72,15 @@
 
 ### (2) Spring Boot Web项目
 
-> 资料来源：Spring In Action第6版第2章
-
-笔记链接
-
+> 笔记链接（资料来源：Spring In Action第6版第2章）
+>
 > [https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch02_web_app.md](https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch02_web_app.md)
 
-内容
+主要内容
 
 > 1. Spring Boot MVC项目的编写
 
-技巧
+技巧介绍
 
 > 1. 使用`lambok`简化Domain Object的编写
 > 2. 使用`@Slf4j`简化日志打印代码
@@ -108,13 +92,11 @@
 
 ### (3) 访问关系型数据库
 
-> 资料来源：Spring In Action第6版第3章
-
-笔记链接
-
+> 笔记链接（资料来源：Spring In Action第6版第3章）
+>
 > [https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch03_spring_data.md](https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch03_spring_data.md)
 
-内容
+主要内容
 
 > 1. `JDBC Template`
 >     * 将执行sql以外的操作封装在Template中
@@ -126,7 +108,7 @@
 >     * 使用方法签名推断声明自定义方法
 >     * 通过`@Query`注解（可以传入JPA Query和Native SQL）编写自定义方法
 
-技巧
+技巧介绍
 
 > 1. 使用H2内存数据库作为开发环境
 > 2. 程序启动自动执行sql脚本
@@ -136,11 +118,11 @@
 
 ### (4) 访问NoSQL数据库
 
-> 资料来源： Spring In Action第6版第4章
+> 笔记链接（资料来源： Spring In Action第6版第4章）
+>
+> [https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch04_non_relational_data.md](https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch04_non_relational_data.md)
 
-笔记：[https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch04_non_relational_data.md](https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch04_non_relational_data.md)
-
-内容
+主要内容
 
 > 1. `Spring Data MongoDB`
 >
@@ -148,13 +130,11 @@
 
 ### (5) 用户注册和登录认证
 
-> 资料来源： Spring In Action第6版第5章
-
-笔记链接
-
+> 笔记链接（资料来源： Spring In Action第6版第5章）
+>
 > [https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch05_security.md](https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch05_security.md)
 
-内容
+主要内容
 
 > 1. `PasswordEncoder`，`UserDetailsService`，`SecurityFilterChain`三个Bean的配置
 >     * `PasswordEncoder`：密码明文加密编码器的选择
@@ -165,7 +145,7 @@
 >
 > 3. 使用`spring-boot-starter-oauth2-client`实现第三方认证
 
-技巧
+技巧介绍
 
 > 1. 理解引入`spring-boot-starter-security`之后Spring所完成的自动配置
 > 2. 使用SpEL表达式自定义访问规则
@@ -178,13 +158,11 @@
 
 ### (6) Configuration Properties
 
-> 资料来源：Spring In Action第6版第6章
-
-笔记链接
-
+> 笔记链接（资料来源：Spring In Action第6版第6章）
+>
 > [https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch06_configuration.md](https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch06_configuration.md)
 
-内容
+主要内容
 
 > 1. `Configuration Properties`的作用：聚合多个配置数据源、提供一站式配置服务
 >
@@ -201,7 +179,7 @@
 >
 > 3. 使用spring profile来为不同的运行环境编写不同的配置
 
-技巧
+技巧介绍
 
 > 1. Spring框架内置的`Configuration Properties`使用举例
 >
@@ -227,27 +205,27 @@
 
 ### (1) REST Service
 
-> 资料来源：Spring In Action第6版第7章
+> 笔记链接（资料来源：Spring In Action第6版第7章）
+>
+> [https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch07_rest_services.md](https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch07_rest_services.md)
 
-笔记链接：[https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch07_rest_services.md](https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch07_rest_services.md)
-
-内容
+主要内容
 
 > 1. Restful Controller的编写
 > 2. HATEOAS（超媒体应用状态引擎的使用）
 > 3. 使用Spring Data REST自动生成REST API Endpoint
 
-技巧
+技巧介绍
 
 > 1. PUT和PATCH语义表达的区别
 
 ### (2) REST Client
 
-> 资料来源：Spring In Action第6版第8章
+> 笔记链接（资料来源：Spring In Action第6版第8章）
+>
+> [https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch08_rest_client.md](https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch08_rest_client.md)
 
-笔记链接：[https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch08_rest_client.md](https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch08_rest_client.md)
-
-内容
+主要内容
 
 > 1. 使用RestTemplate来访问REST API
 > 2. 使用Traverson来根据HATEOAS返回的API Relation进行导航
@@ -256,24 +234,22 @@
 
 > Spring In Action第6版第9章尚未出版（全书预计出版日期2021.07）
 >
-> 以下是相关内容《Spring Microservice In Action 第2版第9章：身份验证及访问管理》的笔记
-
-笔记链接：[https://github.com/fangkun119/manning-smia/blob/master/note/ch09_security.md](https://github.com/fangkun119/manning-smia/blob/master/note/ch09_security.md)
-
-> 内容
+> 笔记链接（资料来源：Spring Microservice In Action 第2版第9章：身份验证及访问管理）
 >
+> [https://github.com/fangkun119/manning-smia/blob/master/note/ch09_security.md](https://github.com/fangkun119/manning-smia/blob/master/note/ch09_security.md)
+
+主要内容
+
 > 1. 用开源的KeyCloak搭建身份验证服务器，并在微服务调用链中传播Access Token
 > 2. 使用Access Token验证REST调用是否合法
 
 ### (4) 异步消息收发
 
-> 资料来源：Spring In Action第5版第8章（对应尚未出版的Spring In Action第6版第10章）
-
-笔记链接
-
+> 笔记链接（资料来源：Spring In Action第5版第8章，对应尚未出版的Spring In Action第6版第10章）
+>
 > [https://github.com/fangkun119/spring-in-action-5-samples/blob/master/note/ch08_async_msg.md](https://github.com/fangkun119/spring-in-action-5-samples/blob/master/note/ch08_async_msg.md)
 
-内容
+主要内容
 
 > 1. 使用`JMS + ActiveMQ Artemis / Legacy AcrtiveMQ`作为消息队列
 > 2. 使用`AMQP + RabbitMQ`作为消息队列
@@ -286,13 +262,11 @@
 
 ### (5) Spring Integration
 
-> 资料来源：Spring In Action第5版第9章（对应尚未出版的Spring In Action第6版第11章）
-
-笔记链接
-
+> 笔记链接（资料来源：Spring In Action第5版第9章，对应尚未出版的Spring In Action第6版第11章）
+>
 > [https://github.com/fangkun119/spring-in-action-5-samples/blob/master/note/ch09_spring_integ.md](https://github.com/fangkun119/spring-in-action-5-samples/blob/master/note/ch09_spring_integ.md)
 
-内容
+主要内容
 
 > (1) Spring Integration Flow用于连接外部系统的小Demo演示，`XML`/`Java`/`DSL`三种配置方式
 >
@@ -300,9 +274,44 @@
 >
 > (3) Demo项目：轮询Email收件箱→从邮件中解析订单对象→自动调用REST API提交订单
 
-### 3. 其他
+## 5. Spring Batch
 
-Reactive  Spring（CH12-15：Reactor，RSocket，Reactively）
+> 资料来源：[O‘Reilly Learning Spring Batch](http://shop.oreilly.com/product/0636920044673.do)
+
+### (1) Concept
+
+> 笔记链接：[https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/01_02_conception.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/01_02_conception.md)
+
+主要内容
+
+> 1. JSR-352 Batch框架结构以及各模块介绍
+>
+>     JobRepository、Job、JobOperator、Step（ItemReader/ItemProcessor/ItemWriter
+>
+> 2. 项目创建
+>
+> 3. JobRepository配置（用于开发环境的Memory Based Repository，用于生产环境的JDBC Repository）以及DB表结构
+
+### (2) Job Flow
+
+> 
+
+## 6. 一些参考
+
+### (1) IOC Demo
+
+> [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/001_spring_ioc_aop/note/03_spring_ioc_demos.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/001_spring_ioc_aop/note/03_spring_ioc_demos.md)
+
+内容
+
+> 1. Bean装配Demo，Bean声明周期
+> 2. Bean循环依赖问题
+
+## 
+
+## 7. 进行中
+
+Reactive  Spring（Spring In Action第6版 CH12-15：Reactor，RSocket，Reactively）
 
 > 笔记尚未完成，包含4章：
 >
@@ -314,7 +323,7 @@ Reactive  Spring（CH12-15：Reactor，RSocket，Reactively）
 >
 > CH15 Persisting Data Reactively：对应[第5版CH12](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-12?origin=product-toc)
 
-Deploying Spring（CH16-19：Actuator，JMX，Administerning，Deploying）
+Deploying Spring（Spring In Action第6版  CH16-19：Actuator，JMX，Administerning，Deploying）
 
 > 笔记尚未完成，包含4章：
 >

@@ -12,6 +12,16 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+> 配套代码
+>
+> 1. 官网[O‘Reilly Learning Spring Batch](http://shop.oreilly.com/product/0636920044673.do)
+>
+>     访问官网注册账号后，可开通课程观看视屏并下载源代码，新用户免费可以使用10天
+>
+> 2. https://github.com/fangkun119/spring_batch_demos （Private Git Repository）
+>
+>     代码版本已更新到当前最新的Spring Batch 4.2.5（对应Spring Boot 2.4.1）
+
 ## 5 Output
 
 ### 5.1 Interface ItemWriter
