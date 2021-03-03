@@ -16,33 +16,33 @@
 
 ## 2 自动装配
 
-![](https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_1_autowire.jpg)
+<div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_1_autowire.jpg" width="1024" /></div>
 
 ## 3 Java Config类
 
-![](https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_2_javaconfig.jpg)
+<div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_2_javaconfig.jpg" width="1024" /></div>
 
 ## 4 XML装配
 
 ### 4.1/4.2 构造函数注入，装配集合
 
-![](https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_3_xml_1.jpg)
+<div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_3_xml_1.jpg" width="1024" /></div>
 
 ### 4.2 属性注入
 
 #### (1) 介绍
 
-![](https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_3_xml_2.jpg)
+<div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_3_xml_2.jpg" width="1024" /></div>
 
 #### (2) 方法
 
-![](https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_3_xml_3.jpg)
+<div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_3_xml_3.jpg" width="1024" /></div>
 
-![](https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_3_xml_4.jpg)
+<div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_3_xml_4.jpg" width="1024" /></div>
 
 #### (3) 工具
 
-![](https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_3_xml_5.jpg)
+<div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_3_xml_5.jpg" width="1024" /></div>
 
 ## 5 混合装配
 
@@ -58,17 +58,17 @@
 
 #### (1) Configure类可以通过`@Import`注解来引入另一个Configure类中的bean
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_mix_1.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_mix_1.jpg" width="1024" /></div>
 
-#### (2) Configure类可以通过`@ImportResource`注解，将定义在XML中的类也import进来               
+#### (2) Configure类可以通过`@ImportResource`注解，将定义在XML中的Bean也引入进来               
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_mix_2.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_mix_2.jpg" width="1024" /></div>
 
 ### 5.3 XML配置
 
 #### (1) XML配置文件可以通过`<import>`导入写在其他XML配置文件中的类，也可以通过`<bean>`标签导入Config类中的配置
 
-> ![](https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_mix_3.jpg)
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/spring_ioc_approach_mix_3.jpg" width="1024" /></div>
 
 ## 6 根配置
 
