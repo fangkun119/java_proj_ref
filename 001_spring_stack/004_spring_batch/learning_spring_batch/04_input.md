@@ -34,12 +34,12 @@
 >
 > 该接口实现`RecordType read()`方法，每次调用返回一条记录
 
-`ItemREader<RecordType>`接口
+`ItemReader<RecordType>`接口
 
 > ```java
 > public interface ItemReader<T> {
->  @Nullable
->  T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException;
+>  	@Nullable
+>  	T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException;
 > }
 > ```
 >
@@ -56,21 +56,21 @@
 > ```java
 > @Bean
 > public MyReader myReader() {
->    //构造时传入字符串，每次调用read都返回其中一个，全部都返回之后返回null告诉框架读取完毕
->    //注意，如果MyReader如果不会return null，那么batch job就不会停止，它会无限运行下去
->  return new MyReader(Arrays.asList("Foo", "Bar", "Baz"));
+>    	//构造时传入字符串，每次调用read都返回其中一个，全部都返回之后返回null告诉框架读取完毕
+>    	//注意，如果MyReader如果不会return null，那么batch job就不会停止，它会无限运行下去
+>  	return new MyReader(Arrays.asList("Foo", "Bar", "Baz"));
 > }
 > 
 > @Bean
 > public Step step1() {
->  return stepBuilderFactory.get("step1")
->         .<String, String>chunk(2) // 每2条记录作为1个chunk
->         .reader(myReader())
->         .writer(list -> {
->             for (String curItem : list) {
->             System.out.println("curItem = " + curItem);
->         }
->     }).build();
+>  	return stepBuilderFactory.get("step1")
+>    		.<String, String>chunk(2) // 每2条记录作为1个chunk
+>    		.reader(myReader())
+>    		.writer(list -> {
+>    			for (String curItem : list) {
+>    			System.out.println("curItem = " + curItem);
+>    		}
+>    	}).build();
 > }
 > ```
 >
@@ -78,7 +78,7 @@
 >
 > ```java
 > public interface ItemWriter<T> {
->     void write(List<? extends T> var1) throws Exception;
+>    	void write(List<? extends T> var1) throws Exception;
 > }
 > ```
 
@@ -93,11 +93,11 @@
 > ```java
 > @Bean
 > public ItemReader<Customer> cursorItemReader() {
->      JdbcCursorItemReader<Customer> reader = new JdbcCursorItemReader<>();
->      reader.setSql("select id, firstName, lastName, birthdate from customer order by lastName, firstName");
->      reader.setDataSource(this.dataSource);
->      reader.setRowMapper(new CustomerRowMapper()); //Mapping each DB Item to POJO
->      return reader;
+>    	JdbcCursorItemReader<Customer> reader = new JdbcCursorItemReader<>();
+>    	reader.setSql("select id, firstName, lastName, birthdate from customer order by lastName, firstName");
+>    	reader.setDataSource(this.dataSource);
+>    	reader.setRowMapper(new CustomerRowMapper()); //Mapping each DB Item to POJO
+>    	return reader;
 > }
 > ```
 >
@@ -112,25 +112,25 @@
 > ```java
 > @Bean
 > public ItemReader<Customer> pagingItemReader() {
-> 	 // sort
->      Map<String, Order> sortKeys = new HashMap<>(1);
->      sortKeys.put("id", Order.ASCENDING);
+> 	// sort
+>    	Map<String, Order> sortKeys = new HashMap<>(1);
+>    	sortKeys.put("id", Order.ASCENDING);
 > 
->      // query provider：用来生成返回1 page的SQL
->      MySqlPagingQueryProvider queryProvider = new MySqlPagingQueryProvider();
->      queryProvider.setSelectClause("id, firstName, lastName, birthdate");
->      queryProvider.setFromClause("from customer");
->      // JdbcPagingItemReader会为每一页生成一个SQL，为了保证这些SQL获取的数据之间连贯一致，必须进行排序
+>    	// query provider：用来生成返回1 page的SQL
+>    	MySqlPagingQueryProvider queryProvider = new MySqlPagingQueryProvider();
+>    	queryProvider.setSelectClause("id, firstName, lastName, birthdate");
+>    	queryProvider.setFromClause("from customer");
+>    	// JdbcPagingItemReader会为每一页生成一个SQL，为了保证这些SQL获取的数据之间连贯一致，必须进行排序
 >        // 同时JdbcPagingItemReader也根据sorting key来判断下一页从哪里开始，因此也需要这个key是unique key
->      queryProvider.setSortKeys(sortKeys); 
+>    	queryProvider.setSortKeys(sortKeys); 
 > 
->      // reader
->      JdbcPagingItemReader<Customer> reader = new JdbcPagingItemReader<>();
->          reader.setDataSource(this.dataSource);
->          reader.setFetchSize(10); //每页10条，通常配成与chunk size相同的大小
->          reader.setRowMapper(new CustomerRowMapper());
->      reader.setQueryProvider(queryProvider);
->      return reader;
+>    	// reader
+>    	JdbcPagingItemReader<Customer> reader = new JdbcPagingItemReader<>();
+>    		reader.setDataSource(this.dataSource);
+>    		reader.setFetchSize(10); //每页10条，通常配成与chunk size相同的大小
+>    		reader.setRowMapper(new CustomerRowMapper());
+>    	reader.setQueryProvider(queryProvider);
+>    	return reader;
 > }
 > ```
 >
@@ -156,21 +156,21 @@
 > ```java
 > @Bean
 > public StaxEventItemReader<Customer> customerItemReader() {
->     // unmarshaller规则
->     Map<String, Class> aliases = new HashMap<>();
->     aliases.put("customer"/*xml tag*/, Customer.class /*Domain Object Class*/); 
+>    	// unmarshaller规则
+>    	Map<String, Class> aliases = new HashMap<>();
+>    	aliases.put("customer"/*xml tag*/, Customer.class /*Domain Object Class*/); 
 > 
->     // unmarshaller
->     XStreamMarshaller unmarshaller = new XStreamMarshaller();
->     unmarshaller.setAliases(aliases);
+>    	// unmarshaller
+>    	XStreamMarshaller unmarshaller = new XStreamMarshaller();
+>    	unmarshaller.setAliases(aliases);
 > 
->     // ItemReader
->     StaxEventItemReader<Customer> reader = new StaxEventItemReader<>();
->     reader.setResource(new ClassPathResource("/data/customers.xml"));
->     reader.setFragmentRootElementName("customer"); //reader负责找到customer tag
->     reader.setUnmarshaller(unmarshaller); // unmarshaller负责生成Domain Object
+>    	// ItemReader
+>    	StaxEventItemReader<Customer> reader = new StaxEventItemReader<>();
+>    	reader.setResource(new ClassPathResource("/data/customers.xml"));
+>    	reader.setFragmentRootElementName("customer"); //reader负责找到customer tag
+>    	reader.setUnmarshaller(unmarshaller); // unmarshaller负责生成Domain Object
 > 
->     return reader;
+>    	return reader;
 > }
 > ```
 
@@ -179,19 +179,19 @@
 > ```xml
 > <?xml version="1.0" encoding="UTF-8" ?>
 > <customers>
-> <customer>
->    <id>1</id>
->    <firstName>Mufutau</firstName>
->    <lastName>Maddox</lastName>
->    <birthdate>2016-06-05 19:43:51PM</birthdate>
-> </customer>
-> <customer>
->    <id>2</id>
->    <firstName>Brenden</firstName>
->    <lastName>Cobb</lastName>
->    <birthdate>2016-01-06 13:18:17PM</birthdate>
-> </customer>
-> ...
+>     <customer>
+>            <id>1</id>
+>            <firstName>Mufutau</firstName>
+>            <lastName>Maddox</lastName>
+>            <birthdate>2016-06-05 19:43:51PM</birthdate>
+>     </customer>
+>     <customer>
+>            <id>2</id>
+>            <firstName>Brenden</firstName>
+>            <lastName>Cobb</lastName>
+>            <birthdate>2016-01-06 13:18:17PM</birthdate>
+>     </customer>
+>     ...
 > </customers>
 > ```
 
@@ -200,16 +200,16 @@ pom.xml修改：`Spring Boot 2.4.1`（`Spring Batch 4.2.5`）创建项目时，�
 > ```xml
 > <!-- https://mvnrepository.com/artifact/org.springframework/spring-oxm -->
 > <dependency>
-> <groupId>org.springframework</groupId>
-> <artifactId>spring-oxm</artifactId>
-> <version>5.3.2</version>
+>     <groupId>org.springframework</groupId>
+>     <artifactId>spring-oxm</artifactId>
+>     <version>5.3.2</version>
 > </dependency>
 > 
 > <!-- https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream -->
 > <dependency>
-> <groupId>com.thoughtworks.xstream</groupId>
-> <artifactId>xstream</artifactId>
-> <version>1.4.15</version>
+>     <groupId>com.thoughtworks.xstream</groupId>
+>     <artifactId>xstream</artifactId>
+>     <version>1.4.15</version>
 > </dependency>
 > ```
 
@@ -224,22 +224,22 @@ pom.xml修改：`Spring Boot 2.4.1`（`Spring Batch 4.2.5`）创建项目时，�
 > ```java
 > @Bean
 > public FlatFileItemReader<Customer> customerItemReader() {
->     //（1） DelimitedLineTokenizer：将一行数据按照分隔符分成列映射到FieldSet中的各个field中
->     DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
->     tokenizer.setNames(new String[] {"id", "firstName", "lastName", "birthdate"}); // 列名 
+>    	//（1） DelimitedLineTokenizer：将一行数据按照分隔符分成列映射到FieldSet中的各个field中
+>    	DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
+>    	tokenizer.setNames(new String[] {"id", "firstName", "lastName", "birthdate"}); // 列名 
 > 
->     // (2) DefaultLineMapper<Customer>：将一行数据转换成一个Domain Ojbect
->     DefaultLineMapper<Customer> customerLineMapper = new DefaultLineMapper<>();
->     customerLineMapper.setLineTokenizer(tokenizer);// 把一个String转换成一个FieldSet
->     customerLineMapper.setFieldSetMapper(new CustomerFieldSetMapper()); 
->     customerLineMapper.afterPropertiesSet();
+>    	// (2) DefaultLineMapper<Customer>：将一行数据转换成一个Domain Ojbect
+>    	DefaultLineMapper<Customer> customerLineMapper = new DefaultLineMapper<>();
+>    	customerLineMapper.setLineTokenizer(tokenizer);// 把一个String转换成一个FieldSet
+>    	customerLineMapper.setFieldSetMapper(new CustomerFieldSetMapper()); 
+>    	customerLineMapper.afterPropertiesSet();
 > 
->     // (3) FlatFileItemReader：组装处理csv文件用的ItemReader
->     FlatFileItemReader<Customer> reader = new FlatFileItemReader<>();
->     reader.setLinesToSkip(1);
->     reader.setResource(new ClassPathResource("/data/customer.csv"));
->     reader.setLineMapper(customerLineMapper);
->     return reader;
+>    	// (3) FlatFileItemReader：组装处理csv文件用的ItemReader
+>    	FlatFileItemReader<Customer> reader = new FlatFileItemReader<>();
+>    	reader.setLinesToSkip(1);
+>    	reader.setResource(new ClassPathResource("/data/customer.csv"));
+>    	reader.setLineMapper(customerLineMapper);
+>    	return reader;
 > }	
 > ```
 
@@ -247,13 +247,13 @@ pom.xml修改：`Spring Boot 2.4.1`（`Spring Batch 4.2.5`）创建项目时，�
 
 > ```java
 > public class CustomerFieldSetMapper implements FieldSetMapper<Customer> {
->     @Override
->     public Customer mapFieldSet(FieldSet fieldSet) throws BindException {
->        return new Customer(fieldSet.readLong("id"),
->              fieldSet.readString("firstName"),
->              fieldSet.readString("lastName"),
->              fieldSet.readDate("birthdate", "yyyy-MM-dd HH:mm:ss"));
->     }
+>    	@Override
+>    	public Customer mapFieldSet(FieldSet fieldSet) throws BindException {
+>    		return new Customer(fieldSet.readLong("id"),
+>    			fieldSet.readString("firstName"),
+>    			fieldSet.readString("lastName"),
+>    			fieldSet.readDate("birthdate", "yyyy-MM-dd HH:mm:ss"));
+>    	}
 > }
 > ```
 
@@ -291,16 +291,16 @@ pom.xml修改：`Spring Boot 2.4.1`（`Spring Batch 4.2.5`）创建项目时，�
 > 
 > @Bean
 > public FlatFileItemReader<Customer> customerItemReader() {
->    // 参考上一小节或原始demo的代码，与上一小有差异的点列在本节的说明中
+>    	// 参考上一小节或原始demo的代码，与上一小有差异的点列在本节的说明中
 > }
 > 
 > @Bean
 > public MultiResourceItemReader<Customer> multiResourceItemReader() {
->     MultiResourceItemReader<Customer> reader = new MultiResourceItemReader<>();
->     // 读取单个文件的任务代理给customerItemReader
->     reader.setDelegate(customerItemReader()); 
->     reader.setResources(inputFiles);
->     return reader;
+>    	MultiResourceItemReader<Customer> reader = new MultiResourceItemReader<>();
+>    	// 读取单个文件的任务代理给customerItemReader
+>    	reader.setDelegate(customerItemReader()); 
+>    	reader.setResources(inputFiles);
+>    	return reader;
 > }
 > ```
 >
@@ -315,7 +315,7 @@ pom.xml修改：`Spring Boot 2.4.1`（`Spring Batch 4.2.5`）创建项目时，�
 >
 >     ```java
 >     public void setDelegate(ResourceAwareItemReaderItemStream<? extends T> delegate) {
->        this.delegate = delegate;
+>     	this.delegate = delegate;
 >     }
 >     ```
 >
@@ -323,16 +323,16 @@ pom.xml修改：`Spring Boot 2.4.1`（`Spring Batch 4.2.5`）创建项目时，�
 >
 >     ```java
 >     public class Customer implements ResourceAware {
->        private final long id;
->        private final String firstName;
->        private final String lastName;
->        private final Date birthdate;
->        private Resource resource;
->        ...
->        @Override
->        public void setResource(Resource resource) {
->           this.resource = resource;
->        }
+>     	private final long id;
+>     	private final String firstName;
+>     	private final String lastName;
+>     	private final Date birthdate;
+>     	private Resource resource;
+>     	...
+>     	@Override
+>     	public void setResource(Resource resource) {
+>     		this.resource = resource;
+>     	}
 >     }
 >     ```
 
@@ -352,7 +352,7 @@ pom.xml修改：`Spring Boot 2.4.1`（`Spring Batch 4.2.5`）创建项目时，�
 
 ### 4.6 ItemReader State
 
-作用：维护Step内部文件处理的状态（State），可以提供更好的容错性
+**作用**：维护Step内部文件处理的状态（State），可以提供更好的容错性
 
 ItemReader State通过三部分来实现
 
@@ -360,48 +360,54 @@ ItemReader State通过三部分来实现
 > * `ExecutionContext`：维护state，从而能够让job instance重启时继续完成之前未完成的工作
 > * `JobRepository`：持久化每个job instance的状态，存储在`BATCH_STEP_EXECUTION_CONTEXT`表
 
-`ItemStream`接口要求实现3个方法：
+**`ItemStream`接口**
 
+> 该接口要求实现3个方法
+>
 > * `open()`：step启动时被调用、重启的step可以从context中加载state
 > * `update()`：每个chunk被处理完之后被调用向context更新state，chunk是spring batch实现事务的方式
 > * `close()`：step运行完毕时被调用
 
-`BATCH_STEP_EXECUTION_CONTEXT`表中的state数据
+**`BATCH_STEP_EXECUTION_CONTEXT`表中的状态数据**
 
-> (1) 以4.3小节的`StaxEventItemReader`为例，存储`BATCH_STEP_EXECUTION_CONTEXT`表中的数据如下
->
+(1) 以4.3小节的`StaxEventItemReader`为例，存储`BATCH_STEP_EXECUTION_CONTEXT`表中的数据如下
+
 > ~~~json
-> {"@class":"java.util.HashMap","batch.taskletType":"org.springframework.batch.core.step.item.ChunkOrientedTasklet","StaxEventItemReader.read.count":1001,"batch.stepType":"org.springframework.batch.core.step.tasklet.TaskletStep"}
+>{"@class":"java.util.HashMap","batch.taskletType":"org.springframework.batch.core.step.item.ChunkOrientedTasklet","StaxEventItemReader.read.count":1001,"batch.stepType":"org.springframework.batch.core.step.tasklet.TaskletStep"}
 > ~~~
->
-> (2) 以4.2小节的Demo为例，如果使用的是`JdbcPagingItemReader<Customer>`，存储在`BATCH_STEP_EXECUTION_CONTEXT`中的状态数据为
->
+> 
+
+(2) 以4.2小节的Demo为例，如果使用的是`JdbcPagingItemReader<Customer>`，存储在`BATCH_STEP_EXECUTION_CONTEXT`中的状态数据为
+
 > ~~~json
-> {
->  "@class": "java.util.HashMap",
->  "JdbcPagingItemReader.start.after": {
->      "@class": "java.util.LinkedHashMap",
->      "id": 1000
->  },
->  "JdbcPagingItemReader.read.count": 1001,
->  "batch.taskletType": "org.springframework.batch.core.step.item.ChunkOrientedTasklet",
->  "batch.stepType": "org.springframework.batch.core.step.tasklet.TaskletStep"
-> }
-> ~~~
->
-> 这里`JdbcPagingItemReader`向Job Repository存入了两个状态：
->
-> * `"JdbcPagingItemReader.start.after": {"id":1000}`：表示成功处理了1000条数据
-> * `"JdbcPagingItemReader.read.count": 1001`：表示接下来去处理第1001条数据（这个字段在会跳过某些record的场景下有用）
->
+>{
+> 	"@class": "java.util.HashMap",
+> 	"JdbcPagingItemReader.start.after": {
+> 		"@class": "java.util.LinkedHashMap",
+>		"id": 1000
+> 	},
+>	"JdbcPagingItemReader.read.count": 1001,
+> 	"batch.taskletType": "org.springframework.batch.core.step.item.ChunkOrientedTasklet",
+> 	"batch.stepType": "org.springframework.batch.core.step.tasklet.TaskletStep"
+>  }
+>  ~~~
+>    
+>    这里`JdbcPagingItemReader`向Job Repository存入了两个状态：
+>  
+>  * `"JdbcPagingItemReader.start.after": {"id":1000}`：表示成功处理了1000条数据
+>  * `"JdbcPagingItemReader.read.count": 1001`：表示接下来去处理第1001条数据（这个字段在会跳过某些record的场景下有用）
+>  
 > 这两个字段会被`JdbcPagingItemReader`用来生成获取下一页数据的SQL，当job instance失败重启时，也可以依据这两个字段从上一次执行完之后位置开始继续执行
->
-> (3) `StaxEventItemWriter`和`FlatFileItemWriter`也是会向`BATCH_STEP_EXECUTION_CONTEXT`表中写入两个状态数据：
+> 
+
+ **`StaxEventItemWriter`和`FlatFileItemWriter`**
+
+> 也会向`BATCH_STEP_EXECUTION_CONTEXT`表中写入两个状态数据
 >
 > * 已知成功写入的record数量
 > * 已知成功写入的所有record之后的文件偏移量
->
-> 这是因为写文件的“事务属性”无法通过step的chuck机制来保证，需要额外增加两个状态来保证写文件的原子性
+> 
+>这是因为写文件的“事务属性”无法通过step的chuck机制来保证，需要额外增加两个状态来保证写文件的原子性
 
 另外还有一张表`BATCH_EXECUTION_CONTEXT`用来维护跨越多个Step的状态
 
@@ -417,49 +423,49 @@ ItemReader State通过三部分来实现
 
 > ```java
 > public class StatefulItemReader implements ItemStreamReader<String> {
->     // 用来表示当前读取状态的成员变量  
->     private int curIndex = -1;	
->     ......
+>    	// 用来表示当前读取状态的成员变量  
+>    	private int curIndex = -1;	
+>    	......
 > 
->     @Override
->     public String read() throws Exception {
->        //每次调用会返回一个Item
->        ......
->     }
+>    	@Override
+>    	public String read() throws Exception {
+>    		//每次调用会返回一个Item
+>    		......
+>    	}
 > 
->     // 每次step启动时被调用
->     @Override
->     public void open(ExecutionContext executionContext) throws ItemStreamException {
->        if(executionContext.containsKey("curIndex")) {
->           // job重启时能够根据Context中state，从上次失败时的位置开始继续执行
->           this.curIndex = executionContext.getInt("curIndex");
->        } else {
->           this.curIndex = 0;
->           executionContext.put("curIndex", this.curIndex);
->        }
->     }
+>    	// 每次step启动时被调用
+>    	@Override
+>    	public void open(ExecutionContext executionContext) throws ItemStreamException {
+>    		if(executionContext.containsKey("curIndex")) {
+>    			// job重启时能够根据Context中state，从上次失败时的位置开始继续执行
+>    			this.curIndex = executionContext.getInt("curIndex");
+>    		} else {
+>    			this.curIndex = 0;
+>    			executionContext.put("curIndex", this.curIndex);
+>    		}
+>    	}
 > 
->     // 每个chunk处理结束时被调用
->     @Override
->     public void update(ExecutionContext executionContext) throws ItemStreamException {
->        // 记录当前的状态到job repository
->        executionContext.put("curIndex", this.curIndex);
->     }
+>    	// 每个chunk处理结束时被调用
+>    	@Override
+>    	public void update(ExecutionContext executionContext) throws ItemStreamException {
+>    		// 记录当前的状态到job repository
+>    		executionContext.put("curIndex", this.curIndex);
+>    	}
 > 
->     // 所有数据都处理完时被调用
->     @Override
->     public void close() throws ItemStreamException {
->     }
+>    	// 所有数据都处理完时被调用
+>    	@Override
+>    		public void close() throws ItemStreamException {
+>    	}
 > }
 > 
 > @Bean
 > @StepScope
 > public StatefulItemReader itemReader() {
-> 		List<String> items = new ArrayList<>(100);
-> 		for(int i = 1; i <= 100; i++) {
-> 			items.add(String.valueOf(i));
-> 		}
-> 		return new StatefulItemReader(items);
+> 	List<String> items = new ArrayList<>(100);
+> 	for(int i = 1; i <= 100; i++) {
+> 		items.add(String.valueOf(i));
+> 	}
+> 	return new StatefulItemReader(items);
 > }
 > ```
 

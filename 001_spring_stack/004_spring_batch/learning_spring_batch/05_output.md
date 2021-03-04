@@ -8,7 +8,7 @@
   - [5.3 Writing Flat Files](#53-writing-flat-files)
   - [5.4 Writing to XML Files](#54-writing-to-xml-files)
   - [5.5 Writing to Multiple Destinations](#55-writing-to-multiple-destinations)
-- [](#)
+  - [5.6 Item Writer States](#56-item-writer-states)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -34,16 +34,16 @@
 
 > ```java
 > public class SysOutItemWriter implements ItemWriter<String> {
->    // 在一个chunk被处理完时被调用
->    @Override
->    public void write(List<? extends String> items /*一个chunck的所有item*/) throws Exception {
->         // 打印日志观察write方法何时被调用
->         System.out.println("The size of this chunk was: " + items.size());
->         // 打印Item观察每次调用传给writer哪些数据
->         for (String item : items) {
->             System.out.println(">> " + item);
->         }
->    }
+>    	// 在一个chunk被处理完时被调用
+>    	@Override
+>    	public void write(List<? extends String> items /*一个chunck的所有item*/) throws Exception {
+>    		// 打印日志观察write方法何时被调用
+>    		System.out.println("The size of this chunk was: " + items.size());
+>    		// 打印Item观察每次调用传给writer哪些数据
+>    		for (String item : items) {
+>    			System.out.println(">> " + item);
+>    		}
+>    	}
 > }
 > ```
 
@@ -52,16 +52,16 @@
 > ```java
 > @Bean
 > public SysOutItemWriter itemWriter() {
->     return new SysOutItemWriter();
+>    	return new SysOutItemWriter();
 > }
 > 
 > @Bean
 > public Step step() {
->     return stepBuilderFactory.get("item_writer_demo_step")
->         .<String, String>chunk(10)  //每10条数据一个chunk
->         .reader(itemReader())
->         .writer(itemWriter())
->         .build();
+>    	return stepBuilderFactory.get("item_writer_demo_step")
+>    		.<String, String>chunk(10)  //每10条数据一个chunk
+>    		.reader(itemReader())
+>    		.writer(itemWriter())
+>    		.build();
 > }
 > ```
 
@@ -105,35 +105,34 @@
 > ```java
 > @Bean
 > public JdbcBatchItemWriter<Customer> customerItemWriter() {
->   // JdbcBatchItemWriter在一个jdbc batch update中写入所有数据
->   // 线程安全，write方法在一个事务中被执行
->    JdbcBatchItemWriter<Customer> itemWriter = new JdbcBatchItemWriter<>();
+>   	// JdbcBatchItemWriter在一个jdbc batch update中写入所有数据
+>   	// 线程安全，write方法在一个事务中被执行
+>    	JdbcBatchItemWriter<Customer> itemWriter = new JdbcBatchItemWriter<>();
 > 
->   // 设置DataSource、SQL模板、SQL模板参数Provider
->    itemWriter.setDataSource(this.dataSource);
->    itemWriter.setSql(
->       "INSERT INTO CUSTOMER VALUES (:id, :firstName, :lastName, :birthdate)");
->    itemWriter.setItemSqlParameterSourceProvider(
->       new BeanPropertyItemSqlParameterSourceProvider());
-> 
->   // 检查必须的properties是否都已经设置，并返回ItemWriter
->    itemWriter.afterPropertiesSet();
->    return itemWriter;
-> }
+>   	// 设置DataSource、SQL模板、SQL模板参数Provider
+>    	itemWriter.setDataSource(this.dataSource);
+>    	itemWriter.setSql(
+>    		"INSERT INTO CUSTOMER VALUES (:id, :firstName, :lastName, :birthdate)");
+>    	itemWriter.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider());
+>    
+> 	// 检查必须的properties是否都已经设置，并返回ItemWriter
+>   	itemWriter.afterPropertiesSet();
+>    	return itemWriter;
+>    }
 > 
 > @Bean
 > public Step step1() {
->     return stepBuilderFactory.get("step1")
->         .<Customer, Customer>chunk(10) //每10条记录一个chunk
->         .reader(customerItemReader())
->         .writer(customerItemWriter())
->         .build();
-> }
+> 	return stepBuilderFactory.get("step1")
+>    		.<Customer, Customer>chunk(10) //每10条记录一个chunk
+>    		.reader(customerItemReader())
+>    		.writer(customerItemWriter())
+>    		.build();
+>    }
 > ```
->
-> `Customer`是普通的domain object
->
-> 除了`JdbcBatchItemWriter`，还有`JpaItemWriter`，`HibernateItemWriter`，其他开源的lib也提供自己的ItemWriter，例如Mybatis提供的`MyBatisItemWriter`
+> 
+>`Customer`是普通的domain object
+> 
+>除了`JdbcBatchItemWriter`，还有`JpaItemWriter`，`HibernateItemWriter`，其他开源的lib也提供自己的ItemWriter，例如Mybatis提供的`MyBatisItemWriter`
 
 ### 5.3 Writing Flat Files
 
@@ -141,7 +140,7 @@
 
 原始Demo：`Learning Spring Batch - Working Files / Chapter 4 / flatFileOutput`
 
-`FlatFileItemWriter`：
+`FlatFileItemWriter`
 
 > 在一个chunck的最后时刻执行写操作，在job instance失败的情况下，如何fault tolerance，见后续的第7小节
 
@@ -150,21 +149,21 @@
 > ```java
 > @Bean
 > public FlatFileItemWriter<Customer> customerItemWriter() throws Exception {
->     // file resource generated from template
->     String customerOutputPath = File.createTempFile("customerOutput_", ".out").getAbsolutePath();
->     System.out.println(">> Output Path: " + customerOutputPath);
->     Resource resource = new FileSystemResource(customerOutputPath);
+>    	// file resource generated from template
+>    	String customerOutputPath = File.createTempFile("customerOutput_", ".out").getAbsolutePath();
+>    	System.out.println(">> Output Path: " + customerOutputPath);
+>    	Resource resource = new FileSystemResource(customerOutputPath);
 > 
->     // item reader
->     FlatFileItemWriter<Customer> itemWriter = new FlatFileItemWriter<>();
->     // (1) aggregator：决定Domain Object如何map到写文件的格式中
->     // itemWriter.setLineAggregator(new PassThroughLineAggregator<>());
->     itemWriter.setLineAggregator(new CustomerLineAggregator());
->     // (2) 设置resource
->     itemWriter.setResource(new FileSystemResource(customerOutputPath));
->     // (3) 检查是否所有的必需的properties都已经设置
->     itemWriter.afterPropertiesSet();
->     return itemWriter;
+>    	// item reader
+>    	FlatFileItemWriter<Customer> itemWriter = new FlatFileItemWriter<>();
+>    	// (1) aggregator：决定Domain Object如何map到写文件的格式中
+>    	// itemWriter.setLineAggregator(new PassThroughLineAggregator<>());
+>    	itemWriter.setLineAggregator(new CustomerLineAggregator());
+>    	// (2) 设置resource
+>    	itemWriter.setResource(new FileSystemResource(customerOutputPath));
+>    	// (3) 检查是否所有的必需的properties都已经设置
+>    	itemWriter.afterPropertiesSet();
+>    	return itemWriter;
 > }
 > ```
 
@@ -184,16 +183,16 @@
 > import org.springframework.batch.item.file.transform.LineAggregator;
 > 
 > public class CustomerLineAggregator implements LineAggregator<Customer> {
->     private ObjectMapper objectMapper = new ObjectMapper();
+>    	private ObjectMapper objectMapper = new ObjectMapper();
 > 
->     @Override
->     public String aggregate(Customer item) {
->         try {
->             return objectMapper.writeValueAsString(item);
->         } catch (JsonProcessingException e) {
->             throw new RuntimeException("Unable to serialize Customer", e);
->         }
->  }
+>    	@Override
+>    	public String aggregate(Customer item) {
+>    		try {
+>    			return objectMapper.writeValueAsString(item);
+>    		} catch (JsonProcessingException e) {
+>    			throw new RuntimeException("Unable to serialize Customer", e);
+>    		}
+>  	}
 > }
 > ```
 
@@ -212,28 +211,28 @@ StaxEventItemWriter：
 > ```java
 > @Bean
 > public StaxEventItemWriter<Customer> customerItemWriter() throws Exception {
->     // XML标签、与Domain Object的映射关系
->     Map<String, Class> aliases = new HashMap<>();
->     aliases.put("customer", Customer.class); 
+>    	// XML标签、与Domain Object的映射关系
+>    	Map<String, Class> aliases = new HashMap<>();
+>    	aliases.put("customer", Customer.class); 
 > 
->     // marshaller：使用了XMLStreamMarshaller
->     // 也可以使用任何实现org.springframework.oxm.Marshaller接口的类
->     XStreamMarshaller marshaller = new XStreamMarshaller();
->     marshaller.setAliases(aliases);
+>    	// marshaller：使用了XMLStreamMarshaller
+>    	// 也可以使用任何实现org.springframework.oxm.Marshaller接口的类
+>    	XStreamMarshaller marshaller = new XStreamMarshaller();
+>    	marshaller.setAliases(aliases);
 > 
->     // 输出文件、文件名根据模板生成
->     String customerOutputPath 
->         = File.createTempFile("customerOutput", ".xml").getAbsolutePath();
->     System.out.println(">> Output Path: " + customerOutputPath);
->     Resource outputResource = new FileSystemResource(customerOutputPath);
+>    	// 输出文件、文件名根据模板生成
+>    	String customerOutputPath 
+>    		= File.createTempFile("customerOutput", ".xml").getAbsolutePath();
+>    	System.out.println(">> Output Path: " + customerOutputPath);
+>    	Resource outputResource = new FileSystemResource(customerOutputPath);
 > 
->     // Item Writer
->     StaxEventItemWriter<Customer> itemWriter = new StaxEventItemWriter<>();
->     itemWriter.setRootTagName("customers"); // root element名称
->     itemWriter.setMarshaller(marshaller);
->     itemWriter.setResource(outputResource);
->     itemWriter.afterPropertiesSet(); //检查属性设置
-> 		return itemWriter;
+>    	// Item Writer
+>    	StaxEventItemWriter<Customer> itemWriter = new StaxEventItemWriter<>();
+>    	itemWriter.setRootTagName("customers"); // root element名称
+>    	itemWriter.setMarshaller(marshaller);
+>    	itemWriter.setResource(outputResource);
+>    	itemWriter.afterPropertiesSet(); //检查属性设置
+> 	return itemWriter;
 > }
 > ```
 >
@@ -258,17 +257,17 @@ StaxEventItemWriter：
 > ```java
 > @Bean
 > public CompositeItemWriter<Customer> itemWriter() throws Exception {
->  List<ItemWriter<? super Customer>> writers = new ArrayList<>(2);
+>  	List<ItemWriter<? super Customer>> writers = new ArrayList<>(2);
 > 
->  writers.add(xmlItemWriter());
->  writers.add(jsonItemWriter());
+>  	writers.add(xmlItemWriter());
+>  	writers.add(jsonItemWriter());
 > 
->  CompositeItemWriter<Customer> itemWriter = new CompositeItemWriter<>();
+>  	CompositeItemWriter<Customer> itemWriter = new CompositeItemWriter<>();
 > 
->  itemWriter.setDelegates(writers);
->  itemWriter.afterPropertiesSet();
+>  	itemWriter.setDelegates(writers);
+>  	itemWriter.afterPropertiesSet();
 > 
->  return itemWriter;
+>  	return itemWriter;
 > }
 > ```
 >
@@ -277,13 +276,13 @@ StaxEventItemWriter：
 > ~~~java
 > @Bean
 > public Step step1() throws Exception {
-> return stepBuilderFactory.get("step1")
->    .<Customer, Customer>chunk(10)
->    .reader(pagingItemReader())
->    .writer(itemWriter())
->    // .stream(xmlItemWriter())
->    // .stream(jsonItemWriter())
->    .build();
+> 	return stepBuilderFactory.get("step1")
+>    		.<Customer, Customer>chunk(10)
+>    		.reader(pagingItemReader())
+>    		.writer(itemWriter())
+>    		// .stream(xmlItemWriter())
+>    		// .stream(jsonItemWriter())
+>    		.build();
 > }
 > ~~~
 
@@ -293,19 +292,19 @@ StaxEventItemWriter：
 >
 >  ```java
 >  public class CustomerClassifier implements Classifier<Customer, ItemWriter<? super Customer>> {
->      private ItemWriter<Customer> evenItemWriter;
->    private ItemWriter<Customer> oddItemWriter;
+>    	private ItemWriter<Customer> evenItemWriter;
+>    	private ItemWriter<Customer> oddItemWriter;
 >  
->    public CustomerClassifier(
->      ItemWriter<Customer> evenItemWriter, ItemWriter<Customer> oddItemWriter) {
->    this.evenItemWriter = evenItemWriter;
->    this.oddItemWriter = oddItemWriter;
->      } 
+>    	public CustomerClassifier(
+>    		ItemWriter<Customer> evenItemWriter, ItemWriter<Customer> oddItemWriter) {
+>    		this.evenItemWriter = evenItemWriter;
+>    		this.oddItemWriter = oddItemWriter;
+>    	} 
 >  
->    @Override
->    public ItemWriter<? super Customer> classify(Customer customer) {
->      return customer.getId() % 2 == 0 ? evenItemWriter : oddItemWriter;
->    }
+>    	@Override
+>    	public ItemWriter<? super Customer> classify(Customer customer) {
+>      		return customer.getId() % 2 == 0 ? evenItemWriter : oddItemWriter;
+>    	}
 >  }
 >  ```
 >
@@ -338,4 +337,15 @@ StaxEventItemWriter：
 >  }
 >  ```
 
-## 
+### 5.6 Item Writer States
+
+ **`StaxEventItemWriter`和`FlatFileItemWriter`**
+
+> 也会向`BATCH_STEP_EXECUTION_CONTEXT`表中写入两个状态数据
+>
+> * 已知成功写入的record数量
+> * 已知成功写入的所有record之后的文件偏移量
+>
+> 这是因为写文件的“事务属性”无法通过step的chuck机制来保证，需要额外增加两个状态来保证写文件的原子性
+
+维护states的原理与Item Reader类似

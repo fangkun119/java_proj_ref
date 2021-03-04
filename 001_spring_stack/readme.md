@@ -278,43 +278,156 @@
 
 > 资料来源：[O‘Reilly Learning Spring Batch](http://shop.oreilly.com/product/0636920044673.do)
 
-### (1) Concept
+### (1&2) 框架结构、执行过程、任务状态存储
 
-> 笔记链接：[https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/01_02_conception.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/01_02_conception.md)
+> [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/01_02_conception.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/01_02_conception.md)
 
 主要内容
 
-> 1. JSR-352 Batch框架结构以及各模块介绍
+> 1. 项目创建
 >
->     JobRepository、Job、JobOperator、Step（ItemReader/ItemProcessor/ItemWriter
+> 2. JSR-352 Batch框架结构以及各模块介绍
 >
-> 2. 项目创建
+>     Tasklet与Chunk Based Step两种Step的执行过程
 >
-> 3. JobRepository配置（用于开发环境的Memory Based Repository，用于生产环境的JDBC Repository）以及DB表结构
+> 3. JobRepository
+>
+>     用于开发环境的Memory Based Repository，用于生产环境的JDBC Repository
+>
+>     JobRepository数据库表结构、用途、Job故障重启时所执行的操作
+>
+>     Job、Job Instance、Job Instance Execution层级结构
 
-### (2) Job Flow
+### (3) 定义Batch Job的执行流程
 
-> 
+> [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/03_job_flow.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/03_job_flow.md)
 
-## 6. 一些参考
+主要内容：定义Spring Batch步骤之间的依赖跳转关系
 
-### (1) IOC Demo
+> 1. Transactions：用串行依赖，或者有向图依赖关系定义Step之间的跳转关系
+> 2. Flows：将一组Step间的依赖关系抽象为一个Flow，增强代码复用和对复杂业务的支持
+> 3. Splits：让两个Flow并发执行
+> 4. Decisions：在Step依赖关系中加入判断节点
+> 5. Nested Jobs：在一个Job执行过程中调用另一个Job
+> 6. Listeners：在Job Instance生命周期的各个时间节（Job、Step、Chunk、Item Read/Process/Write）点执行预设的回调函数
+> 7. Parameters：向Batch Job传递参数
+
+### (4) 输入
+
+> [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/04_input.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/04_input.md)
+
+主要内容：Spring Batch的输入
+
+> 1. `ItemReader<T>`接口，以及ItemReader Bean的组装和使用
+> 2. `JdbcPagingItemReader`（读取数据库）/`StaxEventItemReader`（读取XML）/`FlatFileItemReader`（读取CSV文件）
+> 3. `MultiResourceItemReader`以代理的方式从多个文件读取数据 / `JsonItemReader`（读取JSON）
+> 4. `ItemStreamReader`对读取状态维护，以及在读取数据时向BATCH_STEP_EXECUTION_CONTEXT表写入的状态数据；扩展`ItemStreamReader<T>`的方式编写可以维度读取状态的Reader，以便在job instance异常退出并重启后，可以从state记录的位置继续运行
+
+### (5) 输出
+
+> [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/05_output.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/05_output.md)
+
+主要内容：Spring Batch的输出
+
+> 1. `ItemWriter`接口及ItemWriter Bean的组装和使用
+>
+> 2. `JdbcBatchItemWriter`（写到数据库）/`FlatFileItemWriter`（写到CSV文件）/ `StaxEventItemWriter`（写到XML文件）
+>
+> 3. `CompositeItemWriter`
+>
+>     (1) 数据输出两份拷贝，分别到两个不同类型的输出目的地
+>
+>     (2) 一部分数据输出到目的地A，一部分输出到目的地B
+>
+> 4. Item Writer的状态维护
+
+### (6) Item转换
+
+> 笔记链接
+>
+> https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/06_processing.md
+
+主要内容：在Reader/Writer之间，对每个Item做数据加工的Processor
+
+> 1. `ItemProcessor`接口及Processor Bean的组装和使用
+>
+> 2. 应用例子
+>
+>     (1) Item挑选（Filter）
+>
+>     (2) 忽略异常Item（`Validator<T>`）
+>
+>     (3) 以代理的方式组装多个ItemProcessor（`CompositeItemProcessor`）
+
+### (7) 故障处理方法
+
+> 笔记链接
+>
+> [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/07_error_handling.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/004_spring_batch/learning_spring_batch/07_error_handling.md)
+
+主要内容：Job Instance故障失败时的处理方法及Demo演示
+
+> 1. 重启：跳过已经completed step，跳过失败step已经处理完毕的chunk，从发生故障的chunck开始继续执行
+>
+> 2. 自动重试：在遇到特定类型的Exception（例如网络请求失败）时自动重试
+>
+> 3. 忽略错误：
+>
+>     (1) 忽略一定数量抛出指定Excetion的Item
+>
+>     (2) 设置监听器，当有Item处理错误时，调用监听器的回调函数 
+
+## 6. 其他
+
+### (1) Spring IOC Demo
 
 > [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/001_spring_ioc_aop/note/03_spring_ioc_demos.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/001_spring_ioc_aop/note/03_spring_ioc_demos.md)
 
 内容
 
-> 1. Bean装配Demo，Bean声明周期
+> 1. Bean装配Demo，Bean生命周期
 > 2. Bean循环依赖问题
 
-## 
+### (2) Spring Boot Demo 1
+
+> [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/002_spring_boot/note/01_spring_boot_demos.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/002_spring_boot/note/01_spring_boot_demos.md)
+
+内容
+
+> 1. 表单接收
+> 2. 后端参数校验
+> 3. Spring JPA及常用API
+> 4. JSP的使用
+> 5. Bootstrap、Thymeleaf的使用
+> 6. MyBatis、MyBatis Generator GUI，分页器PageHelper在后端部分的使用
+> 7. Spring Boot Web项目常用配置
+> 8. 文件上传
+
+### (4) Spring Boot Demo 2
+
+> [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/003_spring_webproj_ref/note/01_spring_webprojref_demos.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/003_spring_webproj_ref/note/01_spring_webprojref_demos.md)
+
+内容
+
+> 1. 拦截器、登录、登出功能
+> 2. 完整分页器使用：前端bootstrap + thymeleaf；后端MyBatis
+> 3. JQuery异步调用
+> 4. 项目配置文件
+> 5. MyBatis Controller
+> 6. REST Controller
+
+### (3) Thymeleaf参考文档
+
+> [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/002_spring_boot/note/02_thymeleaf.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/002_spring_boot/note/02_thymeleaf.md)
 
 ## 7. 进行中
 
-Reactive  Spring（Spring In Action第6版 CH12-15：Reactor，RSocket，Reactively）
+### (1) Reactive  Spring：Reactor/RSocket/Reactively
 
-> 笔记尚未完成，包含4章：
->
+> Spring In Action第6版 CH12-15：Reactor，RSocket，Reactively
+
+笔记尚未完成，包含4章
+
 > CH12 Introducing Reactor：对应[第5版CH10](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-10?origin=product-toc)
 >
 > CH13 Developing Reactive API：对应[第5版CH11](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-11?origin=product-toc)
@@ -323,10 +436,12 @@ Reactive  Spring（Spring In Action第6版 CH12-15：Reactor，RSocket，Reactiv
 >
 > CH15 Persisting Data Reactively：对应[第5版CH12](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-12?origin=product-toc)
 
-Deploying Spring（Spring In Action第6版  CH16-19：Actuator，JMX，Administerning，Deploying）
+### (2) Deploying Spring：Actuator/JMX/Administerning/Delpoying
 
-> 笔记尚未完成，包含4章：
->
+> Spring In Action第6版  CH16-19：Actuator，JMX，Administerning，Deploying）
+
+笔记尚未完成，包含4章
+
 > CH16 Spring Boot Actuator：对应[第5版CH16](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-16?origin=product-toc)
 >
 > CH17 Admnistering Spring：对应[第5版CH17](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-17?origin=product-toc)
@@ -336,15 +451,6 @@ Deploying Spring（Spring In Action第6版  CH16-19：Actuator，JMX，Administe
 > CH19 Delpoying Spring：对应[第5版CH19](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-19?origin=product-toc)
 
 
-
-### (3) IOC Demo
-
-> [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/001_spring_ioc_aop/note/03_spring_ioc_demos.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/001_spring_ioc_aop/note/03_spring_ioc_demos.md)
-
-内容
-
-> 1. Bean装配Demo，Bean声明周期
-> 2. Bean循环依赖问题
 
 ## 
 

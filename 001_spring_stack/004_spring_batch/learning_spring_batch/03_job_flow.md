@@ -36,19 +36,19 @@
 > ~~~java
 > @Bean
 > public Job transitionJobSimpleNext() {
-> 		//next(): transition to next step on successful completion of the current step. All other outcomes are treated as failures
->     return jobBuilderFactory.get("transitionJobNext")
->         .start(step1()) 
->         .next(step2()) 
->         .next(step3()) 
->         .build();			
->        // 等价于
->      // return jobBuilderFactory.get("transitionJobNext")
->         //      .start(step1()).on("COMPLETED").to(step2())
->        //      // 理解为有向图中的一条边，表示从<step2,COMPLETED>到<step3>的依赖关系
->         //      .from(step2()).on("COMPLETED").to(step3()) 
->         //      .from(step3()).on("COMPLETED").end()
->         //      .build();
+> 	//next(): transition to next step on successful completion of the current step. All other outcomes are treated as failures
+>    	return jobBuilderFactory.get("transitionJobNext")
+>    		.start(step1()) 
+>    		.next(step2()) 
+>    		.next(step3()) 
+>    		.build();			
+>    		// 等价于
+>    		// return jobBuilderFactory.get("transitionJobNext")
+>    		//      .start(step1()).on("COMPLETED").to(step2())
+>    		//      // 理解为有向图中的一条边，表示从<step2,COMPLETED>到<step3>的依赖关系
+>    		//      .from(step2()).on("COMPLETED").to(step3()) 
+>    		//      .from(step3()).on("COMPLETED").end()
+>    		//      .build();
 > }
 > ~~~
 
@@ -57,20 +57,20 @@
 > ```java
 > @Bean
 > public Job transitionJobSimpleNext() {
->     // from(),on(),to()：增加一条任务依赖，相当于向任务依赖有向图（DAG）中添加一条有向边
->    //		from()	：用来指定基于哪个step的执行结果
->    //		on()		：用来指定基于这个step的哪种执行结果
->    //		to()		：用来指定满足from(),on()条件时，接下来执行哪个step
->    // 整条有向边的起点是`(from(),on())`二元组所表示的状态，终点是`to()`
->     return jobBuilderFactory.get("transitionJobNext")
->         // 从step1开始，step1成功后执行step2
->         .start(step1()).on("COMPLETED").to(step2())
->         // 在step2、3之间加入instance stop
->         // 程序会在step2成功后退出，下次执行从step3开始继续（需要jdbc job repository）
->         // 使用场景例如需要在两个step之间执行人工操作等场景
->         .from(step2()).on("COMPLETED").stopAndRestart(step3()) 
->         .from(step3()).end()
->         .build();
+>    	// from(),on(),to()：增加一条任务依赖，相当于向任务依赖有向图（DAG）中添加一条有向边
+>    	//		from()	：用来指定基于哪个step的执行结果
+>    	//		on()		：用来指定基于这个step的哪种执行结果
+>    	//		to()		：用来指定满足from(),on()条件时，接下来执行哪个step
+>    	// 整条有向边的起点是`(from(),on())`二元组所表示的状态，终点是`to()`
+>    	return jobBuilderFactory.get("transitionJobNext")
+>    		// 从step1开始，step1成功后执行step2
+>    		.start(step1()).on("COMPLETED").to(step2())
+>    		// 在step2、3之间加入instance stop
+>    		// 程序会在step2成功后退出，下次执行从step3开始继续（需要jdbc job repository）
+>    		// 使用场景例如需要在两个step之间执行人工操作等场景
+>    		.from(step2()).on("COMPLETED").stopAndRestart(step3()) 
+>    		.from(step3()).end()
+>    		.build();
 > }
 > ```
 >
@@ -98,11 +98,11 @@ Flow的配置形式如下：
 > ```java
 > @Bean
 > public Flow flowA() {
->     FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("flowA");
->     flowBuilder.start(innerStep1())
->          .next(innerStep2())
->          .end();
->     return flowBuilder.build();
+>    	FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("flowA");
+>    	flowBuilder.start(innerStep1())
+>    		.next(innerStep2())
+>    		.end();
+>    	return flowBuilder.build();
 > }
 > ```
 
@@ -111,12 +111,12 @@ Flow的配置形式如下：
 > ```java
 > @Bean
 > public Job flowBLastJob(@Qualifier("flowB") Flow flowB) {
->     return jobBuilderFactory.get("flowBLastJob")
->         .start(outStep1())
->         .next(outStep2())
->         .on("COMPLETED").to(flowB) //对于flow没有next()这样的快捷方式
->         .end()
->         .build();
+>    	return jobBuilderFactory.get("flowBLastJob")
+>    		.start(outStep1())
+>    		.next(outStep2())
+>    		.on("COMPLETED").to(flowB) //对于flow没有next()这样的快捷方式
+>    		.end()
+>    	.build();
 > }
 > ```
 
@@ -125,16 +125,16 @@ Flow的配置形式如下：
 > ```java
 > @Bean
 > public Job parallelFlowsJob(@Qualifier("flowA") Flow flowA, @Qualifier("flowB") Flow flowB) {
->     FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("parallelFlow");
->     Flow parallelFlow = flowBuilder
->         .split(new SimpleAsyncTaskExecutor()).add(flowA, flowB)
->         .end();
->     return jobBuilderFactory.get("splitJob")
->         .start(outStep1())
->         .next(outStep2())
->         .on("COMPLETED").to(parallelFlow)
->         .end()
->         .build();
+>    	FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("parallelFlow");
+>    	Flow parallelFlow = flowBuilder
+>    		.split(new SimpleAsyncTaskExecutor()).add(flowA, flowB)
+>    		.end();
+>    	return jobBuilderFactory.get("splitJob")
+>    		.start(outStep1())
+>    		.next(outStep2())
+>    		.on("COMPLETED").to(parallelFlow)
+>    		.end()
+>    		.build();
 > }
 > ```
 
@@ -153,13 +153,13 @@ Flow的配置形式如下：
 > ```java
 > Flow parallelFlow = flowBuilder
 > 				.split(new SimpleAsyncTaskExecutor()).add(flowA, flowB)
->  		.end();
+>  				.end();
 > return jobBuilderFactory.get("splitJob")
->      .start(outStep1())
->      .next(outStep2())
->      .on("COMPLETED").to(parallelFlow)
->      .end()
->      .build();
+>    		.start(outStep1())
+>    		.next(outStep2())
+>    		.on("COMPLETED").to(parallelFlow)
+>    		.end()
+>    		.build();
 > ```
 >
 > 方法2：`start()`后面使用`split`，创建一个并行执行的flow
@@ -167,12 +167,12 @@ Flow的配置形式如下：
 > ```java
 > @Bean
 > public Job job() {
->     return jobBuilderFactory.get("job")
->         // 如果在to()或者next()之后创建并发流，应当使用方法1
->         // 方法2无法让flow2执行，即无法创建并发的flow
->         .start(flow1()).split(new SimpleAsyncTaskExecutor()).add(flow2())
->         .end()
->         .build();
+>    	return jobBuilderFactory.get("job")
+>    		// 如果在to()或者next()之后创建并发流，应当使用方法1
+>    		// 方法2无法让flow2执行，即无法创建并发的flow
+>    		.start(flow1()).split(new SimpleAsyncTaskExecutor()).add(flow2())
+>    		.end()
+>    		.build();
 > }
 > ```
 
@@ -182,45 +182,59 @@ Flow的配置形式如下：
 >
 > ```java
 > public static class DemoTasklet implements Tasklet {
->  @Override
->  public RepeatStatus execute(
->      StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
->      System.out.println(String.format(
->          "%s has been executed on thread %s",
->          chunkContext.getStepContext().getStepName(), Thread.currentThread().getName()));
->      // 用来查看执行step的DemoTasklet对象是不是同一个对象
->      System.out.println("Tasklet hashcode: " + this.hashCode());
->      return RepeatStatus.FINISHED;
->  }
+> 	@Override
+> 	public RepeatStatus execute(
+> 		StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+> 		System.out.println(String.format(
+> 			"%s has been executed on thread %s",
+> 			chunkContext.getStepContext().getStepName(), Thread.currentThread().getName()));
+> 		// 用来查看执行step的DemoTasklet对象是不是同一个对象
+> 		System.out.println("Tasklet hashcode: " + this.hashCode());
+> 		return RepeatStatus.FINISHED;
+> 	}
 > }
 > 
-> // 如果不设置StepScope，这个bean会是单例的
-> // 意味着全局共享同一个DemoTasklet对象，包括并发运行的两个Flow
+> // 如果不设置StepScope，这个bean会是单例的、即全局共享同一个DemoTasklet对象
+> // 为了让两个并发运行的Step不会相互干扰，增加@StepScope注解
 > @Bean
 > @StepScope 
 > public Tasklet tasklet() {
->  return new DemoTasklet();
+> 	return new DemoTasklet();
 > }
 > ```
 >
-> 使用tasklet
+> 使用tasklet定义两个Flow
 >
 > ```java
 > @Bean
 > public Flow flow1() {
->  return new FlowBuilder<Flow>("flow1")
->      .start(stepBuilderFactory.get("step1").tasklet(tasklet()).build())
->      .build();
+> return new FlowBuilder<Flow>("flow1")
+> 	.start(stepBuilderFactory.get("step1").tasklet(tasklet()).build())
+> 	.build();
 > }
 > 
 > @Bean
 > public Flow flow2() {
->  return new FlowBuilder<Flow>("flow2")
->      .start(stepBuilderFactory.get("step2").tasklet(tasklet()).build())
->      .next( stepBuilderFactory.get("step3").tasklet(tasklet()).build())
->      .build();
+> return new FlowBuilder<Flow>("flow2")
+> 	.start(stepBuilderFactory.get("step2").tasklet(tasklet()).build())
+> 	.next( stepBuilderFactory.get("step3").tasklet(tasklet()).build())
+> 	.build();
 > }
 > ```
+>
+> 让两个Flow并发执行
+>
+> ~~~java
+> @Bean
+> public Job job() {
+> 	return jobBuilderFactory.get("job")
+> 		// 如果在to()或者next()之后创建并发流，应当使用方法1
+> 		// 方法2无法让flow2执行，即无法创建并发的flow
+> 		.start(flow1()).split(new SimpleAsyncTaskExecutor()).add(flow2())
+> 		.end()
+> 		.build();
+> }
+> ~~~
 >
 > 输出
 >
@@ -256,23 +270,23 @@ Flow的配置形式如下：
 > ```java
 > // 定义decider，它会放在一个Singleton Bean中
 > public static class StepABDecider implements JobExecutionDecider {
->  @Override
->  public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
->      // 如果需要基于前一个Step的执行状态来做判断，可以使用stepExecution.getExitStatus()
->      switch (getXYZStatus()) {
->          case XYZStatus.X:
->          case XYZStatus.Y:   
->              return new FlowExecutionStatus("GO_STEP_A");
->          case XYZStatus.Z:
->          default:
->              return new FlowExecutionStatus("GO_STEP_B");          
->      }
->  }
+>  	@Override
+>  	public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
+>    		// 如果需要基于前一个Step的执行状态来做判断，可以使用stepExecution.getExitStatus()
+>    		switch (getXYZStatus()) {
+>    			case XYZStatus.X:
+>    			case XYZStatus.Y:   
+>    				return new FlowExecutionStatus("GO_STEP_A");
+>    			case XYZStatus.Z:
+>    			default:
+>    				return new FlowExecutionStatus("GO_STEP_B");          
+>    		}
+>  	}
 > }
 > 
 > @Bean
 > public JobExecutionDecider stepABDecider() {
->  return new StepABDecider();
+>  	return new StepABDecider();
 > }
 > ```
 
@@ -282,16 +296,16 @@ Flow的配置形式如下：
 > @Bean
 > public Job job() {
 >  return jobBuilderFactory.get("job")
->         // "起始节点"执行成功后进入"判断节点"，调用一次"decide()"
->      .start(startStep()).next(stepABDecider()) 				
->         // "判断节点"返回"GO_STEP_A"时执行"stepA()"
->      .from(stepABDecider()).on("GO_STEP_A").to(stepA())		
->         // "判断节点"返回"GO_STEP_B"时执行"stepB()"
->      .from(stepABDecider()).on("GO_STEP_B").to(stepB())
->         // 对于"stepA()"，不论执行结果如何，都跳转到"判断节点"进行判断
->      .from(stepA()).on("*").to(stepABDecider())
->      .end()
->      .build();
+>    	// "起始节点"执行成功后进入"判断节点"，调用一次"decide()"
+>    	.start(startStep()).next(stepABDecider()) 				
+>    	// "判断节点"返回"GO_STEP_A"时执行"stepA()"
+>    	.from(stepABDecider()).on("GO_STEP_A").to(stepA())		
+>    	// "判断节点"返回"GO_STEP_B"时执行"stepB()"
+>    	.from(stepABDecider()).on("GO_STEP_B").to(stepB())
+>    	// 对于"stepA()"，不论执行结果如何，都跳转到"判断节点"进行判断
+>    	.from(stepA()).on("*").to(stepABDecider())
+>    	.end()
+>    	.build();
 > }
 > ```
 
@@ -317,18 +331,18 @@ Flow的配置形式如下：
 > // 定义Parent Job
 > @Bean
 > public Job parentJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
->  // 把childJob包装在一个step中，这样它可以与普通的step和flow组合
->  Step childJobStep = new JobStepBuilder(new StepBuilder("childJobStep"))
->      .job(childJob)
->      // 在child job的层级、需要显示地指定、不能自动注入
->      .launcher(jobLauncher).repository(jobRepository).transactionManager(transactionManager)
->      .build();
+>  	// 把childJob包装在一个step中，这样它可以与普通的step和flow组合
+>  	Step childJobStep = new JobStepBuilder(new StepBuilder("childJobStep"))
+>    		.job(childJob)
+>    		// 在child job的层级、需要显示地指定、不能自动注入
+>    		.launcher(jobLauncher).repository(jobRepository).transactionManager(transactionManager)
+>    		.build();
 > 
->  // 定义Parent Job，其中的step1只是parent job中的一个普通step
->  return jobBuilderFactory.get("parentJob")
->      .start(step1())
->      .next(childJobStep)
->      .build();
+>  	// 定义Parent Job，其中的step1只是parent job中的一个普通step
+>  	return jobBuilderFactory.get("parentJob")
+>    		.start(step1())
+>    		.next(childJobStep)
+>    		.build();
 > }
 > ```
 >
@@ -381,20 +395,20 @@ Flow的配置形式如下：
 >
 > ```java
 > public class MyChunkListener implements org.springframework.batch.core.ChunkListener {
->      @Override
->      public void beforeChunk(ChunkContext context) {
->          System.out.println("MyChunkListener.beforeChunk is running");
->      }
+>    	@Override
+>    	public void beforeChunk(ChunkContext context) {
+>    		System.out.println("MyChunkListener.beforeChunk is running");
+>    	}
 > 
->      @Override
->      public void afterChunk(ChunkContext context) {
->          System.out.println("MyChunkListener.afterChunk is running");
->      }
+>    	@Override
+>    	public void afterChunk(ChunkContext context) {
+>    		System.out.println("MyChunkListener.afterChunk is running");
+>    	}
 > 
->      @Override
->      public void afterChunkError(ChunkContext context) {
->          System.out.println("MyChunkListener.afterChunkError is running");
->      }
+>    	@Override
+>    	public void afterChunkError(ChunkContext context) {
+>    		System.out.println("MyChunkListener.afterChunkError is running");
+>    	}
 > }
 > ```
 >
@@ -402,16 +416,16 @@ Flow的配置形式如下：
 >
 > ```java
 > public class MyStepListener implements org.springframework.batch.core.StepExecutionListener {
->      @Override
->      public void beforeStep(StepExecution stepExecution) {
->          System.out.println("MyStepListener.beforeStep is running");
->      }
+>    	@Override
+>    	public void beforeStep(StepExecution stepExecution) {
+>    		System.out.println("MyStepListener.beforeStep is running");
+>    	}
 > 
->      @Override
->      public ExitStatus afterStep(StepExecution stepExecution) {
->          System.out.println("MyStepListener.afterStep is running");
->          return stepExecution.getExitStatus();
->      }
+>    	@Override
+>    	public ExitStatus afterStep(StepExecution stepExecution) {
+>    		System.out.println("MyStepListener.afterStep is running");
+>    		return stepExecution.getExitStatus();
+>    	}
 > }
 > ```
 >
@@ -420,14 +434,14 @@ Flow的配置形式如下：
 > ```java
 > @Bean
 > public Step step1() {
->  return stepBuilderFactory.get("step1")
->          // 每2条记录作为一个chunk，输入输出类型都是String
->          .<String, String>chunk(2) 
->          .reader(reader()) 					// 设置reader
->          .writer(writer()) 					// 设置writer
->          .listener(new MyStepListener())  	// 设置step listener
->          .listener(new MyChunkListener()) 	// 设置chunk listener
->          .build();
+>  	return stepBuilderFactory.get("step1")
+>    		// 每2条记录作为一个chunk，输入输出类型都是String
+>    		.<String, String>chunk(2) 
+>    		.reader(reader()) 					// 设置reader
+>    		.writer(writer()) 					// 设置writer
+>    		.listener(new MyStepListener())  	// 设置step listener
+>    		.listener(new MyChunkListener()) 	// 设置chunk listener
+>    		.build();
 > }
 > ```
 
@@ -437,16 +451,16 @@ Flow的配置形式如下：
 >
 > ```java
 > public class MyJobListener implements JobExecutionListener {
->      @Override
->      public void beforeJob(JobExecution jobExecution) {
->          String jobName = jobExecution.getJobInstance().getJobName();
->          System.out.println("jobListener.beforeJob is running");
->      }
+>    	@Override
+>    	public void beforeJob(JobExecution jobExecution) {
+>    		String jobName = jobExecution.getJobInstance().getJobName();
+>    		System.out.println("jobListener.beforeJob is running");
+>    	}
 > 
->      @Override
->      public void afterJob(JobExecution jobExecution) {
->          System.out.println("JobListener.afterJob is running");
->      }
+>    	@Override
+>    	public void afterJob(JobExecution jobExecution) {
+>    		System.out.println("JobListener.afterJob is running");
+>    	}
 > }
 > ```
 >
@@ -504,13 +518,13 @@ Flow的配置形式如下：
 > @Bean
 > @StepScope 
 > public Tasklet helloWorldTasklet(
->      // "#{jobParameters['message']}": SEPL Expression
->      @Value("#{jobParameters['message']}") String message
+>    		// "#{jobParameters['message']}": SEPL Expression
+>    		@Value("#{jobParameters['message']}") String message
 > ) {
->      return (stepContribution, chunkContext) -> {
->          System.out.println(this.hashCode() + ": " + message);
->          return RepeatStatus.FINISHED;
->      };
+>    	return (stepContribution, chunkContext) -> {
+>    		System.out.println(this.hashCode() + ": " + message);
+>    		return RepeatStatus.FINISHED;
+>    	};
 > }
 > 
 > @Bean

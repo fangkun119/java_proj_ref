@@ -300,7 +300,7 @@ Spring项目结构
 > spring.datasource.password=12345678
 > ```
 
-### 3.2 JAP常用API
+### 3.2 JPA常用API
 
 > ~~~txt
 > And     	--- 等价于 SQL 中的 and 关键字，比如 findByUsernameAndPassword(String user, Striang pwd)；
@@ -749,7 +749,7 @@ Spring项目结构
 > -->
 > ```
 
-### 6.3 使用 MyBatis Generator  GUI编写MyBatis Mapper
+### 6.3 使用 MyBatis Generator GUI编写MyBatis Mapper
 
 > 使用MyBatis  Generator GUI生成DAO及Mapper配置类，配置好之后 ，它会连接数据库根据数据表的Schema生成代码
 >

@@ -40,15 +40,15 @@
 >
 > ```java
 > public class UpperCaseItemProcessor implements ItemProcessor<Customer, Customer> {
-> @Override
-> public Customer process(Customer item) throws Exception {
->    // 对每一个Item，都会调用一次process方法
->    // 为了保证幂等性，不要影响Reader的读取
->    return new Customer(item.getId(),
->          item.getFirstName().toUpperCase(),
->          item.getLastName().toUpperCase(),
->          item.getBirthdate());
-> }
+> 	@Override
+> 	public Customer process(Customer item) throws Exception {
+>    	// 对每一个Item，都会调用一次process方法
+>    	// 为了保证幂等性，不要影响Reader的读取
+>    	return new Customer(item.getId(),
+>    		item.getFirstName().toUpperCase(),
+>    		item.getLastName().toUpperCase(),
+>    		item.getBirthdate());
+> 	}
 > }
 > ```
 >
@@ -57,7 +57,7 @@
 > ```java
 > @Bean
 > public UpperCaseItemProcessor itemProcessor() {
-> return new UpperCaseItemProcessor();
+> 	return new UpperCaseItemProcessor();
 > }
 > ```
 
@@ -107,14 +107,14 @@
 >
 > ```java
 > public class FilteringItemProcessor implements ItemProcessor<Customer, Customer> {
-> @Override
-> public Customer process(Customer item) throws Exception {
->    if(item.getId() % 2 == 0) {
->       return null; //返回null表示过滤
->    } else {
->       return item;
->    }
-> }
+> 	@Override
+> 	public Customer process(Customer item) throws Exception {
+>    		if(item.getId() % 2 == 0) {
+>    			return null; //返回null表示过滤
+>    		} else {
+>    			return item;
+>    		}
+> 	}
 > }
 > ```
 >
@@ -123,7 +123,7 @@
 > ```java
 > @Bean
 > public FilteringItemProcessor itemProcessor() {
-> return new FilteringItemProcessor();
+> 	return new FilteringItemProcessor();
 > }
 > ```
 
@@ -172,15 +172,15 @@
 >
 > ```java
 > public class CustomerValidator implements Validator<Customer> {
-> @Override
-> public void validate(Customer value) throws ValidationException {
->    // 打印customer id以便在日志中观察输出处理情况
->    System.out.println(value.getId() + "\t: "  + value.getFirstName());
->    // 假定name以'A'开始的都是异常数据
->    if(value.getFirstName().startsWith("A")) {
->       throw new ValidationException("First names that begin with A are invalid: " + value);
->    }
-> }
+> 	@Override
+> 	public void validate(Customer value) throws ValidationException {
+>    		// 打印customer id以便在日志中观察输出处理情况	
+>    		System.out.println(value.getId() + "\t: "  + value.getFirstName());
+>    		// 假定name以'A'开始的都是异常数据
+>    		if(value.getFirstName().startsWith("A")) {
+>    			throw new ValidationException("First names that begin with A are invalid: " + value);
+>    		}
+> 	}
 > }
 > ```
 >
@@ -190,13 +190,13 @@
 > @Bean
 > public ValidatingItemProcessor<Customer> itemProcessor() {
 > 	ValidatingItemProcessor<Customer> customerValidatingItemProcessor =
->       new ValidatingItemProcessor<>(new CustomerValidator());
+>    	new ValidatingItemProcessor<>(new CustomerValidator());
 > 
->  // 设为false时，遇到ValidationException，job instance会抛异常并，标记为fail
+>  	// 设为false时，遇到ValidationException，job instance会抛异常并，标记为fail
 > 	// 设为true时，遇到ValidationException，会跳过这条数据，继续执行
 > 	customerValidatingItemProcessor.setFilter(true);
 > 
-> 	return customerValidatingItemProcessor;
+> 	(return customerValidatingItemProcessor;
 > }
 > ```
 
@@ -273,11 +273,11 @@
 > ```java
 > @Bean
 > public CompositeItemProcessor<Customer, Customer> itemProcessor() throws Exception {
-> CompositeItemProcessor<Customer, Customer> processor = new CompositeItemProcessor<>();
-> processor.setDelegates(Arrays.asList(
->             new FilteringItemProcessor(), new UpperCaseItemProcessor()));
-> processor.afterPropertiesSet();
-> return processor;
+> 	CompositeItemProcessor<Customer, Customer> processor = new CompositeItemProcessor<>();
+> 	processor.setDelegates(Arrays.asList(
+>    		new FilteringItemProcessor(), new UpperCaseItemProcessor()));
+> 	processor.afterPropertiesSet();
+> 	return processor;
 > }
 > ```
 

@@ -42,33 +42,35 @@
 > @Bean
 > @StepScope 
 > public Tasklet restartTasklet() {
-> return new Tasklet() {
->    @Override
->    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
->       // Step名称 
->       String stepName = chunkContext.getStepContext().getStepName();
->       // 读Step Context数据：这个API获得的数据是只读版本，向其中写数据会触发异常
->       Map<String, Object> readOnlyContext = chunkContext
->           .getStepContext().getStepExecutionContext();
->       if(false == readOnlyContext.containsKey("problem_solved")) {
->          // 模拟故障场景
->          System.out.println("exception in step " +  stepName);
->          // 写Step Context：这个API返回的不是Map而是ExecutionContext对象，可以写数据 
->          chunkContext.getStepContext().getStepExecution()
->              .getExecutionContext().put("problem_solved", true); 
->          throw new RuntimeException("exception when executing step "  +  stepName);
->       } else {
->          // 模拟bug已经解决的场景
->          System.out.println("problems has been solved in step " + stepName);
->          return RepeatStatus.FINISHED;
->       }
->    }
-> };
+> 	return new Tasklet() {
+> 		@Override
+> 		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+> 			// Step名称 
+> 			String stepName = chunkContext.getStepContext().getStepName();
+> 			// 读Step Context数据：这个API获得的数据是只读版本，向其中写数据会触发异常
+> 			Map<String, Object> readOnlyContext 
+> 				= chunkContext.getStepContext().getStepExecutionContext();
+> 			if(false == readOnlyContext.containsKey("problem_solved")) {
+> 				// 模拟故障场景
+> 				System.out.println("exception in step " +  stepName);
+> 				// 写Step Context：这个API返回的不是Map而是ExecutionContext对象，可以写数据 
+> 				chunkContext
+> 					.getStepContext()
+> 					.getStepExecution().getExecutionContext()
+> 					.put("problem_solved", true); 
+> 				throw new RuntimeException("exception when executing step "  +  stepName);
+> 			} else {
+> 				// 模拟bug已经解决的场景
+> 				System.out.println("problems has been solved in step " + stepName);
+> 				return RepeatStatus.FINISHED;
+> 			}
+> 		}
+> 	};
 > }
 > 
 > @Bean
 > public Step step1() {
-> return stepBuilderFactory.get("step1").tasklet(restartTasklet()).build();
+> 	return stepBuilderFactory.get("step1").tasklet(restartTasklet()).build();
 > }
 > 
 > @Bean
@@ -79,9 +81,9 @@
 > @Bean
 > public Job job() {
 > return jobBuilderFactory.get("restart_application_demo")
->       .start(step1())
->       .next(step2())
->       .build();
+>    .start(step1())
+>    .next(step2())
+>    .build();
 > }
 > ```
 
@@ -202,41 +204,39 @@
 > @Bean
 > @StepScope
 > public RetryItemProcessor processor(@Value("#{jobParameters['retry']}")String retry) {
->    RetryItemProcessor processor = new RetryItemProcessor();
->    boolean enableRetry = StringUtils.hasText(retry)
->          && Arrays.stream(retry.split(",")).anyMatch(
->                param -> param.equalsIgnoreCase("processor"));
->    processor.setEnableRetry(enableRetry);
->    return processor;
-> }
+>    	RetryItemProcessor processor = new RetryItemProcessor();
+>    	boolean enableRetry = StringUtils.hasText(retry)
+>    		&& Arrays.stream(retry.split(",")).anyMatch(param -> param.equalsIgnoreCase("processor"));
+>    	processor.setEnableRetry(enableRetry);
+>    	return processor;
+>    }
 > 
 > @Bean
 > @StepScope
 > public RetryItemWriter writer(@Value("#{jobParameters['retry']}")String retry) {
->    RetryItemWriter writer = new RetryItemWriter();
->    boolean enableRetry = StringUtils.hasText(retry)
->          && Arrays.stream(retry.split(",")).anyMatch(
->          param -> param.equalsIgnoreCase("writer"));
->    writer.setEnableRetry(enableRetry);
->    return writer;
-> }
-> 
+> 	RetryItemWriter writer = new RetryItemWriter();
+>    	boolean enableRetry = StringUtils.hasText(retry) 
+>    		&& Arrays.stream(retry.split(",")).anyMatch(param -> param.equalsIgnoreCase("writer"));
+>    	writer.setEnableRetry(enableRetry);
+>    	return writer;
+>    }
+>    
 > @Bean
 > public Step step1() {
->    return stepBuilderFactory.get("step")
->          .<String, String>chunk(10)
->          .reader(reader())
->          .processor(processor(null))
->          .writer(writer(null))
->        	 // 调用`falultTolerent()`将返回一个能使用retry等方法的Builder
->          .faultTolerant() 
->          // 捕获CustomRetryableException时重试，捕获其他Exception会导致job fail
->          .retry(CustomRetryableException.class)
->        	 // 这个step最多retry 15次
->          .retryLimit(15)
->          .build();
-> }
-> ```
+> return stepBuilderFactory.get("step")
+> 	.<String, String>chunk(10)
+>    	.reader(reader())
+>    	.processor(processor(null))
+>    	.writer(writer(null))
+>    	// 调用`falultTolerent()`将返回一个能使用retry等方法的Builder
+>    	.faultTolerant() 
+>    	// 捕获CustomRetryableException时重试，捕获其他Exception会导致job fail
+>    	.retry(CustomRetryableException.class)
+>    	// 这个step最多retry 15次
+>    	.retryLimit(15)
+>    	.build();
+>    }
+>    ```
 
 测试：不传入命令行参数，让step跑其他Exception时，会触发异常，job失败
 
@@ -426,39 +426,37 @@
 > ```java
 > @Bean
 > @StepScope
-> public SkipItemProcessor processor(@Value("#{jobParameters['skip']}")String skip) {
->    SkipItemProcessor processor = new SkipItemProcessor();
->    boolean enableSkip = StringUtils.hasText(skip)
->          && Arrays.stream(skip.split(",")).anyMatch(
->                param -> param.equalsIgnoreCase("processor"));
->    processor.setEnableSkip(enableSkip);
->    return processor;
-> }
+> public SkipItemProcessor processor(@Value("#{jobParameters['skip']}") String skip) {
+>    	SkipItemProcessor processor = new SkipItemProcessor();
+>    	boolean enableSkip = StringUtils.hasText(skip)
+>    		&& Arrays.stream(skip.split(",")).anyMatch(param -> param.equalsIgnoreCase("processor"));
+>    	processor.setEnableSkip(enableSkip);
+>    	return processor;
+>    }
 > 
 > @Bean
 > @StepScope
-> public SkipItemWriter writer(@Value("#{jobParameters['skip']}")String skip) {
->    SkipItemWriter writer = new SkipItemWriter();
->    boolean enableSkip = StringUtils.hasText(skip)
->          && Arrays.stream(skip.split(",")).anyMatch(
->                param -> param.equalsIgnoreCase("processor"));
->    writer.setEnableSkip(enableSkip);
->    return writer;
-> }
-> 
+> public SkipItemWriter writer(@Value("#{jobParameters['skip']}") String skip) {
+> 	SkipItemWriter writer = new SkipItemWriter();
+>    	boolean enableSkip = StringUtils.hasText(skip) 
+>            && Arrays.stream(skip.split(",")).anyMatch(param -> param.equalsIgnoreCase("processor"));
+>    	writer.setEnableSkip(enableSkip);
+>    	return writer;
+>    }
+>    
 > @Bean
 > public Step step1() {
->    return stepBuilderFactory.get("step")
->          .<String, String>chunk(10)
->          .reader(reader())
->          .processor(processor(null))
->          .writer(writer(null))
->          .faultTolerant()
->          .skip(CustomSkipException.class)
->          .skipLimit(15)
->          .build();
-> }
-> ```
+> return stepBuilderFactory.get("step")
+> 	.<String, String>chunk(10)
+>    	.reader(reader())
+>    	.processor(processor(null))
+>    	.writer(writer(null))
+>    	.faultTolerant()
+>    	.skip(CustomSkipException.class)
+>    	.skipLimit(15)
+>    	.build();
+>    }
+>    ```
 
 运行：命令行参数`skip=processor,writer`
 
@@ -589,7 +587,7 @@
 > 			boolean hasError = item.equalsIgnoreCase("-84");
 > 			if (hasError) {
 > 				System.out.println("writing item " + item + " failed, skip");
->                 throw new CustomSkipException("write fail, item: " + item);
+>    				throw new CustomSkipException("write fail, item: " + item);
 > 			} else {
 > 				// 没有故障
 > 				System.out.println(item);
@@ -603,20 +601,20 @@
 
 > ```java
 > public class CustomSkipListener implements SkipListener {
->    @Override
->    public void onSkipInRead(Throwable t) {
->        //拿不到record，但是可以在Reader代码中提供一些信息
->    }
+>    	@Override
+>    	public void onSkipInRead(Throwable t) {
+>    		//拿不到record，但是可以在Reader代码中提供一些信息
+>    	}
 > 
->    @Override
->    public void onSkipInWrite(Object item, Throwable t) {
->       System.out.println(">> Skipping " + item + " because writing it caused the error: " + t.getMessage());
->    }
+>    	@Override
+>    	public void onSkipInWrite(Object item, Throwable t) {
+>    		System.out.println(">> Skipping " + item + " because writing it caused the error: " + t.getMessage());
+>    	}
 > 
->    @Override
->    public void onSkipInProcess(Object item, Throwable t) {
->       System.out.println(">> Skipping " + item + " because processing it caused the error: " + t.getMessage());
->    }
+>    	@Override
+>    	public void onSkipInProcess(Object item, Throwable t) {
+>    		System.out.println(">> Skipping " + item + " because processing it caused the error: " + t.getMessage());
+>    	}
 > }
 > ```
 
@@ -626,13 +624,13 @@
 > @Bean
 > @StepScope
 > public SkipItemProcessor processor() {
->    return new SkipItemProcessor();
+>    	return new SkipItemProcessor();
 > }
 > 
 > @Bean
 > @StepScope
 > public SkipItemWriter writer() {
->    return new SkipItemWriter();
+>    	return new SkipItemWriter();
 > }
 > 
 > @Bean
