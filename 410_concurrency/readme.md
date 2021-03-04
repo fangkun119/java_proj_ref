@@ -119,7 +119,7 @@
 >
 > 中文版
 >
-> [https://github.com/LingCoder/OnJava8/blob/91c862c8fe45b6fdf80c06531d714ddae9b890fa/docs/book/24-Concurrent-Programming.md](https://github.com/LingCoder/OnJava8/blob/91c862c8fe45b6fdf80c06531d714ddae9b890fa/docs/book/24-Concurrent-Programming.md)
+> [https://github.com/LingCoder/OnJava8/blob/1ef7ec48e492862300e667e24c245e9b3a5ccd98/docs/book/24-Concurrent-Programming.md](https://github.com/LingCoder/OnJava8/blob/1ef7ec48e492862300e667e24c245e9b3a5ccd98/docs/book/24-Concurrent-Programming.md)
 >
 > 代码
 >
