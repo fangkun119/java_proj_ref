@@ -112,14 +112,19 @@
 
 >  (1) 原子变量和乐观锁：
 >
-> * `compareAndSet`，`updateAndGet`/`accumulateAndGet`
-> * 乐观锁分组封装以减少线程互斥：`LongAdder`/`DoubleAdder`/`LongAccumulator`/`DoubleAccumulator`
-> * 底层乐观锁API：`StampedLock`
+>  * `compareAndSet`，`updateAndGet`/`accumulateAndGet`
+>  * 乐观锁分组封装以减少线程互斥：`LongAdder`/`DoubleAdder`/`LongAccumulator`/`DoubleAccumulator`
+>  * 底层乐观锁API：`StampedLock`
 >
-> (2) ConcurrentHashMap改进
+>  (2) ConcurrentHashMap改进
 >
-> * 设计改进：分组降低互斥；mappingCount()解决int32溢出；拉链扫描优化
-> * 原子性保证：`replace`，`LongAdder`作为value类型，`compute`/`merge`方法
+>  * 设计改进：分组降低互斥；mappingCount()解决int32溢出；拉链扫描优化
+>  * 原子性保证：`replace`，`LongAdder`作为value类型，`compute`/`merge`方法
+>  * Set视图：新建或映射Hash Key为一个`Set<Key>`
+>
+>  (3) 并行数组操作（Arrays类）：并行排序，使用lambda表达式并行地设置数组元素
+>
+>  (4) 支持回调函数的`CompletableFuture<T>`以及CompletableFuture流水线创建
 
 ## 7. JS Engine Noshorn（跳过）
 

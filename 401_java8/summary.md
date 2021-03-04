@@ -67,6 +67,9 @@
       - [(2) ConcurrentHashMap改进](#2-concurrenthashmap%E6%94%B9%E8%BF%9B)
         - [设计改进：分组降低互斥；mappingCount()；拉链扫描优化](#%E8%AE%BE%E8%AE%A1%E6%94%B9%E8%BF%9B%E5%88%86%E7%BB%84%E9%99%8D%E4%BD%8E%E4%BA%92%E6%96%A5mappingcount%E6%8B%89%E9%93%BE%E6%89%AB%E6%8F%8F%E4%BC%98%E5%8C%96)
         - [原子性保证：`replace`，`LongAdder`作为value类型，`compute`/`merge`方法](#%E5%8E%9F%E5%AD%90%E6%80%A7%E4%BF%9D%E8%AF%81replacelongadder%E4%BD%9C%E4%B8%BAvalue%E7%B1%BB%E5%9E%8Bcomputemerge%E6%96%B9%E6%B3%95)
+        - [Set视图：新建或映射Hash Key为一个`Set<Key>`](#set%E8%A7%86%E5%9B%BE%E6%96%B0%E5%BB%BA%E6%88%96%E6%98%A0%E5%B0%84hash-key%E4%B8%BA%E4%B8%80%E4%B8%AAsetkey)
+      - [(3) 并行数组操作（Arrays类）](#3-%E5%B9%B6%E8%A1%8C%E6%95%B0%E7%BB%84%E6%93%8D%E4%BD%9Carrays%E7%B1%BB)
+      - [(4) 支持回调函数的`CompletableFuture<T>`以及CompletableFuture流水线创建](#4-%E6%94%AF%E6%8C%81%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0%E7%9A%84completablefuturet%E4%BB%A5%E5%8F%8Acompletablefuture%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%88%9B%E5%BB%BA)
   - [7. JS Engine Noshorn（跳过）](#7-js-engine-noshorn%E8%B7%B3%E8%BF%87)
   - [8. 其他改进](#8-%E5%85%B6%E4%BB%96%E6%94%B9%E8%BF%9B)
     - [完整笔记](#%E5%AE%8C%E6%95%B4%E7%AC%94%E8%AE%B0-5)
@@ -602,6 +605,45 @@
 >     );
 >     concurrentHashMap.merge(word, 1L, Long::sum);
 >     ~~~
+
+###### Set视图：新建或映射Hash Key为一个`Set<Key>`
+
+> ~~~java
+> // 用静态方法`ConcurrentHashMap.<K>newKeySet()`新建一个支持并发的`Set<T>`
+> Set<String> words = ConcurrentHashMap.<String>newKeySet();
+> // 用方法`keySet(V)`将已有的`ConcurrentHashMap<K,V>`映射成`Set<K>`并共享底层数据
+> ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<>();
+> words = map.keySet(1L); //默认值 1
+> words.add("Java");
+> System.out.println(map.get("Java"));
+> // 输出: 1
+> ~~~
+
+##### (3) 并行数组操作（Arrays类）
+
+> ~~~java
+> // 以多线程的方式对数组进行排序，还可以传入Comparator，可以指定对数组的哪一段进行排序
+> Arrays.parallelSort(strArray);
+> // [, , , , ...... , youth, youth, youth, zigzag, zip]
+> 
+> // 用传入的lambda表达式，根据数组下标计算出一个值填充到数组中
+> int[] values = new int[20];
+> Arrays.parallelSetAll(values, i -> i % 10);
+> System.out.println(Arrays.toString(values));
+> // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+> 
+> // 用数组从下标0到当前下标i的累积运算（由传入的lambda表达式指定）计算出来的值填充数组
+> Arrays.parallelSetAll(values, i -> i + 1);
+> System.out.println(Arrays.toString(values));
+> // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+> Arrays.parallelPrefix(values, (x, y) -> x * y);
+> System.out.println(Arrays.toString(values));
+> // [1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600, 1932053504, 1278945280, 2004310016, 2004189184, -288522240, -898433024, 109641728, -2102132736]
+> ~~~
+
+##### (4) 支持回调函数的`CompletableFuture<T>`以及CompletableFuture流水线创建
+
+> 详细内容见完整笔记
 
 ### 7. JS Engine Noshorn（跳过）
 
