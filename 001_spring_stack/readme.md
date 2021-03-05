@@ -1,4 +1,43 @@
-[TOC]
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [Spring笔记](#spring%E7%AC%94%E8%AE%B0)
+  - [1. Spring IOC](#1-spring-ioc)
+    - [(1) IOC基础装配](#1-ioc%E5%9F%BA%E7%A1%80%E8%A3%85%E9%85%8D)
+    - [(2) IOC高级装配](#2-ioc%E9%AB%98%E7%BA%A7%E8%A3%85%E9%85%8D)
+  - [2. Spring AOP](#2-spring-aop)
+  - [3. Spring 框架](#3-spring-%E6%A1%86%E6%9E%B6)
+    - [(1) Spring 框架介绍](#1-spring-%E6%A1%86%E6%9E%B6%E4%BB%8B%E7%BB%8D)
+    - [(2) Spring Boot Web项目](#2-spring-boot-web%E9%A1%B9%E7%9B%AE)
+    - [(3) 访问关系型数据库](#3-%E8%AE%BF%E9%97%AE%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93)
+    - [(4) 访问NoSQL数据库](#4-%E8%AE%BF%E9%97%AEnosql%E6%95%B0%E6%8D%AE%E5%BA%93)
+    - [(5) 用户注册和登录认证](#5-%E7%94%A8%E6%88%B7%E6%B3%A8%E5%86%8C%E5%92%8C%E7%99%BB%E5%BD%95%E8%AE%A4%E8%AF%81)
+    - [(6) Configuration Properties](#6-configuration-properties)
+  - [4 Spring 集成](#4-spring-%E9%9B%86%E6%88%90)
+    - [(1) REST Service](#1-rest-service)
+    - [(2) REST Client](#2-rest-client)
+    - [(3) Securing REST Security](#3-securing-rest-security)
+    - [(4) 异步消息收发](#4-%E5%BC%82%E6%AD%A5%E6%B6%88%E6%81%AF%E6%94%B6%E5%8F%91)
+    - [(5) Spring Integration](#5-spring-integration)
+  - [5. Spring Batch](#5-spring-batch)
+    - [(1&2) 框架结构、执行过程、任务状态存储](#12-%E6%A1%86%E6%9E%B6%E7%BB%93%E6%9E%84%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B%E4%BB%BB%E5%8A%A1%E7%8A%B6%E6%80%81%E5%AD%98%E5%82%A8)
+    - [(3) 定义Batch Job的执行流程](#3-%E5%AE%9A%E4%B9%89batch-job%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B)
+    - [(4) 输入](#4-%E8%BE%93%E5%85%A5)
+    - [(5) 输出](#5-%E8%BE%93%E5%87%BA)
+    - [(6) Item转换](#6-item%E8%BD%AC%E6%8D%A2)
+    - [(7) 故障处理方法](#7-%E6%95%85%E9%9A%9C%E5%A4%84%E7%90%86%E6%96%B9%E6%B3%95)
+  - [6. 其他](#6-%E5%85%B6%E4%BB%96)
+    - [(1) Spring IOC Demo](#1-spring-ioc-demo)
+    - [(2) Spring Boot Demo 1](#2-spring-boot-demo-1)
+    - [(4) Spring Boot Demo 2](#4-spring-boot-demo-2)
+    - [(3) Thymeleaf参考文档](#3-thymeleaf%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3)
+  - [7. 进行中](#7-%E8%BF%9B%E8%A1%8C%E4%B8%AD)
+    - [(1) Reactive  Spring：Reactor/RSocket/Reactively](#1-reactive--springreactorrsocketreactively)
+    - [(2) Deploying Spring：Actuator/JMX/Administerning/Delpoying](#2-deploying-springactuatorjmxadministerningdelpoying)
+  - [](#)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Spring笔记
 
