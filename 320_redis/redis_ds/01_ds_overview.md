@@ -31,7 +31,7 @@
   - [4. Hash [`H`]](#4-hash-h)
     - [(1) 文档](#1-%E6%96%87%E6%A1%A3-3)
     - [(2) 说明](#2-%E8%AF%B4%E6%98%8E-3)
-    - [(3) 典型应用场景举例](#3-%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B8%BE%E4%BE%8B)
+    - [(3) 应用场景举例](#3-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B8%BE%E4%BE%8B)
     - [(4) 命令](#4-%E5%91%BD%E4%BB%A4)
       - [(a) `HSET`](#a-hset)
       - [(b) `HEXISTS`、`HGET` 、`HDEL`、`HINCRBY`、`HINCRBYFLOAT`](#b-hexistshget-hdelhincrbyhincrbyfloat)
@@ -40,7 +40,7 @@
   - [5. List [`L`]](#5-list-l)
     - [(1) 文档](#1-%E6%96%87%E6%A1%A3-4)
     - [(2) 说明](#2-%E8%AF%B4%E6%98%8E-4)
-    - [(3) 典型应用场景举例](#3-%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B8%BE%E4%BE%8B-1)
+    - [(3) 应用场景举例](#3-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B8%BE%E4%BE%8B-1)
     - [(4) 命令](#4-%E5%91%BD%E4%BB%A4-1)
       - [(a) `LPUSH`、`RPUSH`、`LPOP`、`RPOP`](#a-lpushrpushlpoprpop)
       - [(b) `LLEN`、`LRANGE`、`LINDEX`](#b-llenlrangelindex)
@@ -49,7 +49,7 @@
   - [6. Set [`S`]](#6-set-s)
     - [(1) 文档](#1-%E6%96%87%E6%A1%A3-5)
     - [(2) 说明](#2-%E8%AF%B4%E6%98%8E-5)
-    - [(3) 应用场景举例](#3-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B8%BE%E4%BE%8B)
+    - [(3) 应用场景举例](#3-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B8%BE%E4%BE%8B-2)
     - [(4) 命令](#4-%E5%91%BD%E4%BB%A4-2)
       - [(a) `SADD`、`SMEMEBERS`、`SSCAN`、`SISMEMBER`、`SREM`、`SPOP`](#a-saddsmemeberssscansismembersremspop)
       - [(b) 例子](#b-%E4%BE%8B%E5%AD%90)
@@ -59,7 +59,7 @@
   - [7. Sorted Set [`Z`]](#7-sorted-set-z)
     - [(1) 文档](#1-%E6%96%87%E6%A1%A3-6)
     - [(2) 说明](#2-%E8%AF%B4%E6%98%8E-6)
-    - [(3) 典型应用场景举例](#3-%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B8%BE%E4%BE%8B-2)
+    - [(3) 应用场景举例](#3-%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B8%BE%E4%BE%8B-3)
     - [(4) 命令和例子](#4-%E5%91%BD%E4%BB%A4%E5%92%8C%E4%BE%8B%E5%AD%90)
       - [(a) `ZADD`](#a-zadd)
       - [(b) `ZRANGE`、 `ZREVRANGE`](#b-zrange-zrevrange)
@@ -447,7 +447,7 @@ Redis的Hash
 
 可以动态地向hash添加和删除field
 
-### (3) 典型应用场景举例
+### (3) 应用场景举例
 
 1 . 在Rate Limiter中记录各个end point在当前时间周期剩余的访问量余额
 
@@ -525,11 +525,10 @@ Encoding的使用与String类型相同
 > redis:6379> # `availibity:*``：Glob Style Wildcard通配符语法
 > redis:6379> hscan event:judo 0 match availibity:* 
 > 1）"0"
-> 2) 1) "availability:gold"
->    2) "7990"
->    1) "availibity:silver"
->    2) "2000"
-> 
+> 2) 	1) "availability:gold"
+>    	2) "7990"
+>    	1) "availibity:silver"
+>    	2) "2000"
 > ~~~
 
 ### (5) Redis JSON
@@ -554,7 +553,7 @@ Encoding的使用与String类型相同
 >
 > 5. 需要强调Redis List是使用双向链表实现的，对链表遍历的越深，时间开销越大
 
-### (3) 典型应用场景举例
+### (3) 应用场景举例
 
 1 . 信息流中最近的帖子，聊天软件中最近的消息
 
@@ -611,11 +610,6 @@ Encoding的使用与String类型相同
 > "jane:4"
 > redis:6379> lpop waitlist:basketball-means-qual
 > "brain:2"
-> redis:6379> 
-> redis:6379> 
-> redis:6379> 
-> redis:6379> 
-> redis:6379> 
 > ~~~
 
 ## 6. Set [`S`]
@@ -706,9 +700,6 @@ Encoding的使用与String类型相同
 > redis:6379> spop venues 2
 > 1) "Nippon Budokan"
 > 2) "Olympic Stadium"
-> redis:6379> 
-> redis:6379> 
-> redis:6379> 
 > ~~~
 
 #### (c) `SDIFF`、`SINTER`、`SUNION`
@@ -752,7 +743,7 @@ Encoding的使用与String类型相同
 >     * sorted set只支持将计算结果存储在另一个sorted set中，而不能直接返回
 >     * sorted set只能计算交集、并集，不能计算差集
 
-### (3) 典型应用场景举例
+### (3) 应用场景举例
 
 > 应用范围例如：priority queues、low-latency leaderboards、secondary indexing等
 
