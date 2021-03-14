@@ -6,7 +6,7 @@
   - [1.1 课程Demo项目](#11-%E8%AF%BE%E7%A8%8Bdemo%E9%A1%B9%E7%9B%AE)
     - [(1) 项目功能](#1-%E9%A1%B9%E7%9B%AE%E5%8A%9F%E8%83%BD)
     - [(2) 本地开发环境Redis安装](#2-%E6%9C%AC%E5%9C%B0%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83redis%E5%AE%89%E8%A3%85)
-    - [(3) 运行程序冰箱Redis中加载数据](#3-%E8%BF%90%E8%A1%8C%E7%A8%8B%E5%BA%8F%E5%86%B0%E7%AE%B1redis%E4%B8%AD%E5%8A%A0%E8%BD%BD%E6%95%B0%E6%8D%AE)
+    - [(3) 运行程序并向Redis中加载数据](#3-%E8%BF%90%E8%A1%8C%E7%A8%8B%E5%BA%8F%E5%B9%B6%E5%90%91redis%E4%B8%AD%E5%8A%A0%E8%BD%BD%E6%95%B0%E6%8D%AE)
     - [(4) 其他](#4-%E5%85%B6%E4%BB%96)
       - [(a) docker web IDE](#a-docker-web-ide)
       - [(b) RedisTimeSeries的环境设置（第4章使用）](#b-redistimeseries%E7%9A%84%E7%8E%AF%E5%A2%83%E8%AE%BE%E7%BD%AE%E7%AC%AC4%E7%AB%A0%E4%BD%BF%E7%94%A8)
@@ -15,7 +15,7 @@
   - [(2) Thread Safe](#2-thread-safe)
 - [3. Redis Clients介绍](#3-redis-clients%E4%BB%8B%E7%BB%8D)
 - [4. Jedis介绍](#4-jedis%E4%BB%8B%E7%BB%8D)
-  - [4.1 `Jedis` classg](#41-jedis-class)
+  - [4.1 `Jedis` class](#41-jedis-class)
   - [4.2 `JedisPool`以及`JedisPoolConfig` class](#42-jedispool%E4%BB%A5%E5%8F%8Ajedispoolconfig-class)
   - [4.3 `JedisSentinelPool`以及`JedisCluster`](#43-jedissentinelpool%E4%BB%A5%E5%8F%8Ajediscluster)
   - [4.4 选择哪个类来连接Redis](#44-%E9%80%89%E6%8B%A9%E5%93%AA%E4%B8%AA%E7%B1%BB%E6%9D%A5%E8%BF%9E%E6%8E%A5redis)
@@ -156,7 +156,7 @@
 >   ...
 > ~~~
 
-#### (3) 运行程序冰箱Redis中加载数据
+#### (3) 运行程序并向Redis中加载数据
 
 在本地安装Redis并，fork并clone代码镜像到本地进行开发和调试
 
