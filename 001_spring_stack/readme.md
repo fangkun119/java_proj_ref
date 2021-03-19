@@ -32,10 +32,9 @@
     - [(2) Spring Boot Demo 1](#2-spring-boot-demo-1)
     - [(4) Spring Boot Demo 2](#4-spring-boot-demo-2)
     - [(3) Thymeleaf参考文档](#3-thymeleaf%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3)
-  - [7. 进行中](#7-%E8%BF%9B%E8%A1%8C%E4%B8%AD)
+  - [7. TODO](#7-todo)
     - [(1) Reactive  Spring：Reactor/RSocket/Reactively](#1-reactive--springreactorrsocketreactively)
     - [(2) Deploying Spring：Actuator/JMX/Administerning/Delpoying](#2-deploying-springactuatorjmxadministerningdelpoying)
-  - [](#)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -459,7 +458,7 @@
 
 > [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/002_spring_boot/note/02_thymeleaf.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/002_spring_boot/note/02_thymeleaf.md)
 
-## 7. 进行中
+## 7. TODO
 
 ### (1) Reactive  Spring：Reactor/RSocket/Reactively
 
@@ -488,8 +487,3 @@
 > CH18 Monitoring Spring with JMX：对应[第5版CH18](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-17?origin=product-toc)
 >
 > CH19 Delpoying Spring：对应[第5版CH19](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-19?origin=product-toc)
-
-
-
-## 
-
