@@ -19,19 +19,21 @@
         - [`insertMetric`方法](#insertmetric%E6%96%B9%E6%B3%95)
   - [3. Site粒度天级别统计](#3-site%E7%B2%92%E5%BA%A6%E5%A4%A9%E7%BA%A7%E5%88%AB%E7%BB%9F%E8%AE%A1)
     - [3.1 Use Case](#31-use-case)
-    - [3.2 Java代码](#32-java%E4%BB%A3%E7%A0%81)
+    - [3.2 Domain Object和DAO接口](#32-domain-object%E5%92%8Cdao%E6%8E%A5%E5%8F%A3)
       - [(1) Domain Object](#1-domain-object)
       - [(2) DAO接口](#2-dao%E6%8E%A5%E5%8F%A3)
-      - [(3) DAO实现：有问题的版本](#3-dao%E5%AE%9E%E7%8E%B0%E6%9C%89%E9%97%AE%E9%A2%98%E7%9A%84%E7%89%88%E6%9C%AC)
-    - [3.3 原子性：使用`lua脚本`实现类似“存储过程”的功能](#33-%E5%8E%9F%E5%AD%90%E6%80%A7%E4%BD%BF%E7%94%A8lua%E8%84%9A%E6%9C%AC%E5%AE%9E%E7%8E%B0%E7%B1%BB%E4%BC%BC%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%E7%9A%84%E5%8A%9F%E8%83%BD)
-      - [(1) Lua文档](#1-lua%E6%96%87%E6%A1%A3)
-      - [(2) lua脚本例子](#2-lua%E8%84%9A%E6%9C%AC%E4%BE%8B%E5%AD%90)
-      - [(3) 例子](#3-%E4%BE%8B%E5%AD%90)
-    - [3.4 多命令封装：使用`Jedis Pipeline`](#34-%E5%A4%9A%E5%91%BD%E4%BB%A4%E5%B0%81%E8%A3%85%E4%BD%BF%E7%94%A8jedis-pipeline)
-      - [(1) 文档](#1-%E6%96%87%E6%A1%A3)
-      - [(2) 例子](#2-%E4%BE%8B%E5%AD%90)
-    - [3.5 事务：让`Jedis Pipeline`在原子操作中执行](#35-%E4%BA%8B%E5%8A%A1%E8%AE%A9jedis-pipeline%E5%9C%A8%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C%E4%B8%AD%E6%89%A7%E8%A1%8C)
-      - [(1) 例子](#1-%E4%BE%8B%E5%AD%90)
+    - [3.3 DAO实现：有问题的版本](#33-dao%E5%AE%9E%E7%8E%B0%E6%9C%89%E9%97%AE%E9%A2%98%E7%9A%84%E7%89%88%E6%9C%AC)
+    - [3.4 解决问题用到的技术](#34-%E8%A7%A3%E5%86%B3%E9%97%AE%E9%A2%98%E7%94%A8%E5%88%B0%E7%9A%84%E6%8A%80%E6%9C%AF)
+      - [(1) `Lua脚本`：实现类似“存储过程”的功能](#1-lua%E8%84%9A%E6%9C%AC%E5%AE%9E%E7%8E%B0%E7%B1%BB%E4%BC%BC%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%E7%9A%84%E5%8A%9F%E8%83%BD)
+        - [(a) Lua文档](#a-lua%E6%96%87%E6%A1%A3)
+        - [(b) Lua脚本](#b-lua%E8%84%9A%E6%9C%AC)
+        - [(c) 例子](#c-%E4%BE%8B%E5%AD%90)
+      - [(2) `Jedis Pipeline`：多命令非原子封装](#2-jedis-pipeline%E5%A4%9A%E5%91%BD%E4%BB%A4%E9%9D%9E%E5%8E%9F%E5%AD%90%E5%B0%81%E8%A3%85)
+        - [(a) 文档](#a-%E6%96%87%E6%A1%A3)
+        - [(b) 例子](#b-%E4%BE%8B%E5%AD%90)
+      - [(3) `Jedis Transaction` ：多命令原子封装，支持回滚](#3-jedis-transaction-%E5%A4%9A%E5%91%BD%E4%BB%A4%E5%8E%9F%E5%AD%90%E5%B0%81%E8%A3%85%E6%94%AF%E6%8C%81%E5%9B%9E%E6%BB%9A)
+      - [(4) 处理Jedis Transaction或Pipeline抛出的异常](#4-%E5%A4%84%E7%90%86jedis-transaction%E6%88%96pipeline%E6%8A%9B%E5%87%BA%E7%9A%84%E5%BC%82%E5%B8%B8)
+    - [3.5 DAO实现：正确版本、综合上述技术](#35-dao%E5%AE%9E%E7%8E%B0%E6%AD%A3%E7%A1%AE%E7%89%88%E6%9C%AC%E7%BB%BC%E5%90%88%E4%B8%8A%E8%BF%B0%E6%8A%80%E6%9C%AF)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -283,7 +285,7 @@ Sorted Set内存储的数据（以temperature为例）：
 >
 > 实现这些将会用到Lua脚本和Redis事务
 
-### 3.2 Java代码
+### 3.2 Domain Object和DAO接口
 
 #### (1) Domain Object
 
@@ -306,13 +308,13 @@ Sorted Set内存储的数据（以temperature为例）：
 >
 > ~~~java
 > public interface SiteStatsDao {
->     SiteStats findById(long siteId);
->     SiteStats findById(long siteId, ZonedDateTime day);
->     void update(MeterReading reading);
+>    	SiteStats findById(long siteId);
+>    	SiteStats findById(long siteId, ZonedDateTime day);
+>    	void update(MeterReading reading);
 > }
 > ~~~
 
-#### (3) DAO实现：有问题的版本
+### 3.3 DAO实现：有问题的版本
 
 问题：
 
@@ -334,7 +336,7 @@ Sorted Set内存储的数据（以temperature为例）：
 > 		this.compareAndUpdateScript = new CompareAndUpdateScript(jedisPool);
 > 	}
 > 
->     // 查询：返回指定siteId在当前日期的Site Stat信息
+>    	// 查询：返回指定siteId在当前日期的Site Stat信息
 > 	@Override
 > 	public SiteStats findById(long siteId) {
 > 		return findById(siteId, ZonedDateTime.now());
@@ -404,15 +406,17 @@ Sorted Set内存储的数据（以temperature为例）：
 > } 
 > ~~~
 
-### 3.3 原子性：使用`lua脚本`实现类似“存储过程”的功能
+### 3.4 解决问题用到的技术
+
+#### (1) `Lua脚本`：实现类似“存储过程”的功能
 
 > 可以使用LUA脚本编写Redis数据处理逻辑，然后由Jedis在一个原子操作中执行，提供类似“存储过程”的功能
 
-#### (1) Lua文档
+##### (a) Lua文档
 
 > [ Lua Scripting docs at Redis.io](https://redis.io/commands/eval)
 
-#### (2) lua脚本例子
+##### (b) Lua脚本
 
 > [/src/main/resources/lua/updateIfLowest.lua](https://github.com/fangkun119/ru102j/blob/master/src/main/resources/lua/updateIfLowest.lua)
 >
@@ -434,7 +438,7 @@ Sorted Set内存储的数据（以temperature为例）：
 > end
 > ~~~
 
-#### (3) 例子
+##### (c) 例子
 
 步骤如下：
 
@@ -478,7 +482,7 @@ Sorted Set内存储的数据（以temperature为例）：
 
 测试：[/src/test/java/com/redislabs/university/RU102J/examples/UpdateIfLowestScriptTest.java](https://github.com/fangkun119/ru102j/blob/master/src/test/java/com/redislabs/university/RU102J/examples/UpdateIfLowestScriptTest.java)
 
-### 3.4 多命令封装：使用`Jedis Pipeline`
+#### (2) `Jedis Pipeline`：多命令非原子封装
 
 Jedis Pipeline以串行的方式封装所有command，然后统一发送给redis执行，具有如下优点：
 
@@ -487,11 +491,11 @@ Jedis Pipeline以串行的方式封装所有command，然后统一发送给redis
 
 但是只使用Jedis Pipeline，不能保证事务属性，事务属性将在下一小节介绍
 
-#### (1) 文档
+##### (a) 文档
 
 > [Pipelining docs at Redis.io](https://redis.io/topics/pipelining)
 
-#### (2) 例子
+##### (b) 例子
 
 > [/src/test/java/com/redislabs/university/RU102J/examples/MultiKeyTest.java](https://github.com/fangkun119/ru102j/blob/master/src/test/java/com/redislabs/university/RU102J/examples/MultiKeyTest.java)
 >
@@ -505,7 +509,7 @@ Jedis Pipeline以串行的方式封装所有command，然后统一发送给redis
 > 	Response<Long> expireResponse = p.expire(statusKey, 1000);
 > 	Response<Long> saddResponse = p.sadd(availableKey, String.valueOf(siteId));
 > 	// 发送命令给Redis
->     // sync: 不保证三条命令执行具有原子性
+>    	// sync: 不保证三条命令执行具有原子性
 > 	p.sync();
 > 	// 检查结果
 > 	assertThat(hsetResponse.get(), is(1L));
@@ -514,29 +518,27 @@ Jedis Pipeline以串行的方式封装所有command，然后统一发送给redis
 > }
 > ~~~
 
-### 3.5 事务：让`Jedis Pipeline`在原子操作中执行
+#### (3) `Jedis Transaction` ：多命令原子封装，支持回滚
 
 > jedis Pipeline要加上原子属性，才能执行事务
 >
 > * 事务属性保证命令执行，不会收到其他“线程”/“客户端”命令的干扰
 > * 但是事务在执行时，会block其他命令
-
-#### (1) 例子
-
+>
 > 方法：
 >
 > ```java
 > @Test
 > public void testTransaction() {
 > 	Long siteId = 1L;
+>     // 将pipelined替换为multi
 > 	Transaction t = jedis.multi();
 > 
 > 	Response<Long> hsetResponse = t.hset(statusKey, "available", "true");
 > 	Response<Long> expireResponse = t.expire(statusKey, 1000);
 > 	Response<Long> saddResponse = t.sadd(availableKey, String.valueOf(siteId));
 > 
->     // 将sync替换为exec
-> 	// exec：保证三条命令执行具有原子性
+> 	// 将sync替换为exec，保证三条命令执行具有原子性，但不会失败回滚
 > 	t.exec();
 > 
 > 	assertThat(hsetResponse.get(), is(1L));
@@ -544,3 +546,148 @@ Jedis Pipeline以串行的方式封装所有command，然后统一发送给redis
 > 	assertThat(saddResponse.get(), is(1L));
 > }
 > ```
+
+#### (4) 处理Jedis Transaction或Pipeline抛出的异常
+
+原子操作内的某条命令抛出异常
+
+例子1：Transaction
+
+> ~~~java
+> public void runTransaction() {
+> 	// 数据类型
+> 	jedis.set("b", "bar"); 
+> 	jedis.set("a", "foo"); // Redis Key "b"存储数据的是编码为Text的String    
+> 	jedis.set("c", "baz");
+> 
+>    	// 创建pipeline
+>    	Transaction t = jedis.multi();
+> 
+>    	// 设置pipeline执行的redis命令
+> 	Response<String> r1 = t.set("b", "1");
+> 	Response<Long>   r2 = t.incr("a");  // Text无法加1
+> 	Response<String> r3 = t.set("c", "100");
+> 
+>    	// 执行pipeline，在一个原子操作中，但失败时不会自动回滚，需要调用discard方法
+> 	t.exec();
+> 	
+> 	// 获取执行结果
+> 	r1.get(); // 会执行成功，返回“OK”
+> 	r2.get(); // 抛JedisDataException异常
+> 	r3.get(); // 会执行成功，返回”OK“
+> }
+> ~~~
+
+例子2：Pipeline
+
+> ~~~java
+> public void compare() {
+> 	// 初始化pipeline
+> 	Pipeline p = jedis.pipelined(); 
+>    	// 设置pipeline执行的redis命令
+> 	Response<Long> resp = p.zcard("set"); // 访问key
+> 	if (resp.get() < 1000) { // 此时pipeline还没有执行下面的zadd命令，key也没有创建，访问不存在的key会抛出异常
+> 		String element = "foo" + String.valueOf(Math.random());
+> 		p.zadd("set", Math.random(), element); // 创建key，类型为Sorted Set，并向其中加入数据
+> 	}
+>     // 执行pipeline中的操作
+>     p.sync();
+> }
+> ~~~
+
+### 3.5 DAO实现：正确版本、综合上述技术
+
+DAO实现：[/src/main/java/com/redislabs/university/RU102J/dao/SiteStatsDaoRedisImpl.java](https://github.com/fangkun119/ru102j/blob/master/src/main/java/com/redislabs/university/RU102J/dao/SiteStatsDaoRedisImpl.java)
+
+> ~~~java
+> private void updateOptimized(Jedis jedis, String key, MeterReading reading) {
+> 	String reportingTime = ZonedDateTime.now(ZoneOffset.UTC).toString();
+> 	// 创建事务
+> 	Transaction t = jedis.multi();
+> 
+> 	// 添加事务中要执行的操作
+> 	List<Response<? extends Object>> respList = new ArrayList<>();
+> 	respList.add( t.hset(key, SiteStats.reportingTimeField, reportingTime));
+> 	respList.add( t.hincrBy(key, SiteStats.countField, 1));
+> 	respList.add( t.expire(key, weekSeconds));
+> 	respList.add( compareAndUpdateScript.updateIfGreater(t, key, SiteStats.maxWhField, reading.getWhGenerated()));
+> 	respList.add( compareAndUpdateScript.updateIfLess(t, key, SiteStats.minWhField, reading.getWhGenerated()));
+> 	respList.add( compareAndUpdateScript.updateIfGreater(t, key, SiteStats.maxCapacityField, getCurrentCapacity(reading)));
+> 
+> 	// 执行事务
+> 	t.exec();
+> 
+> 	// 如果需要检查结果，并处理回滚
+> 	// if (hasError(respList)) {
+> 	//		t.discard();
+> 	// }
+> }
+> 
+> private boolean hasError(List<Response<? extends Object>> respList) {
+> 	try {
+> 		for (Response<? extends Object> resp : respList) {
+> 			if (null == resp) {
+> 				return true;
+> 			}
+> 			resp.get();
+> 		}
+> 	} catch (JedisDataException e) {
+> 		return true;
+> 	}
+> 	return false;
+> };
+> ~~~
+
+Lua脚本：[/src/main/java/com/redislabs/university/RU102J/script/CompareAndUpdateScript.java](https://github.com/fangkun119/ru102j/blob/master/src/main/java/com/redislabs/university/RU102J/script/CompareAndUpdateScript.java)
+
+> ~~~java
+> public class CompareAndUpdateScript {
+> 	private final String sha;
+> 	public static String script = "" +
+> 		"local key = KEYS[1] " +
+> 		"local field = ARGV[1] " +
+> 		"local value = ARGV[2] " +
+> 		"local op = ARGV[3] " +
+> 		"local current = redis.call('hget', key, field) " +
+> 		"if (current == false or current == nil) then " +
+> 		"  redis.call('hset', key, field, value)" +
+> 		"elseif op == '>' then" +
+> 		"  if tonumber(value) > tonumber(current) then" +
+> 		"    redis.call('hset', key, field, value)" +
+> 		"  end " +
+> 		"elseif op == '<' then" +
+> 		"  if tonumber(value) < tonumber(current) then" +
+> 		"    redis.call('hset', key, field, value)" +
+> 		"  end " +
+> 		"end ";
+> 
+> 	public CompareAndUpdateScript(JedisPool jedisPool) {
+> 		try (Jedis jedis = jedisPool.getResource()) {
+>             // 应该改用工厂函数创建CompareAndUpdateScript对象，在初始化阶段检查SHA值
+> 			this.sha = jedis.scriptLoad(script);
+> 		}
+> 	}
+> 
+> 	public Response<Object> updateIfGreater(Transaction jedis, String key, String field, Double value) {
+> 		return update(jedis, key, field, value, ScriptOperation.GREATERTHAN);
+> 	}
+> 
+> 	public Response<Object> updateIfLess(Transaction jedis, String key, String field, Double value) {
+> 		return update(jedis, key, field, value, ScriptOperation.LESSTHAN);
+> 	}
+> 
+> 	private Response<Object> update(Transaction jedis, String key, String field, Double value, ScriptOperation op) {
+> 		if (sha != null) {
+> 			List<String> keys = Collections.singletonList(key);
+> 			List<String> args = Arrays.asList(field, String.valueOf(value), op.getSymbol());
+> 			return jedis.evalsha(sha, keys, args);
+> 		} else {
+> 			// 应该改用工厂函数创建CompareAndUpdateScript对象，在初始化阶段检查SHA值
+> 			return null;
+> 		}
+> 	}
+> }
+> ~~~
+
+
+
