@@ -153,7 +153,7 @@
 >	}
 > 	
 >	// 其他方法
-> 	...
+> 	// ...
 > }
 > ~~~
 >
@@ -525,7 +525,7 @@ Jedis Pipeline以串行的方式封装所有command，然后统一发送给redis
 > @Test
 > public void testTransaction() {
 > 	Long siteId = 1L;
->     // 将pipelined替换为multi
+> 	// 将pipelined替换为multi
 > 	Transaction t = jedis.multi();
 > 
 > 	Response<Long> hsetResponse = t.hset(statusKey, "available", "true");
