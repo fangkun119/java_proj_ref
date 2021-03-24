@@ -229,7 +229,7 @@ Sorted Set内存储的数据（以temperature为例）：
 >			measurements.add(new Measurement(siteId, unit, dateTime, mm.getMeasurement()));
 >		}
 > 	}
->    // 再次倒序，使其变为按时间从小到大排
+>    	// 再次倒序，使其变为按时间从小到大排
 >	Collections.reverse(measurements);
 >	return measurements;
 > }
@@ -392,19 +392,13 @@ Sorted Set内存储的数据（以temperature为例）：
 > 		}
 > 		// 设置这个key(siteid,date)所存储hash的过期时间：一周后过期
 > 		jedis.expire(key, weekSeconds);
->     }
+>    	}
 > 
->     // Challenge #3
->     private void updateOptimized(Jedis jedis, String key, MeterReading reading) {
->         // START Challenge #3
->         // END Challenge #3
->     }
-> 
->     private Double getCurrentCapacity(MeterReading reading) {
->         return reading.getWhGenerated() - reading.getWhUsed();
->     }
-> } 
-> ~~~
+>    	private Double getCurrentCapacity(MeterReading reading) {
+>    		return reading.getWhGenerated() - reading.getWhUsed();
+>    	}
+>    } 
+>    ~~~
 
 ### 3.4 解决问题用到的技术
 
@@ -431,10 +425,10 @@ Sorted Set内存储的数据（以temperature为例）：
 > -- 其中tonumber用来把String转换成数字以用于比较
 > local current = redis.call('GET', key)
 > if (current == false) or (tonumber(new) < tonumber(current)) then
->   redis.call('SET', key, new)
->   return 1
+>   	redis.call('SET', key, new)
+>   	return 1
 > else
->   return 0
+>   	return 0
 > end
 > ~~~
 
@@ -590,8 +584,8 @@ Jedis Pipeline以串行的方式封装所有command，然后统一发送给redis
 > 		String element = "foo" + String.valueOf(Math.random());
 > 		p.zadd("set", Math.random(), element); // 创建key，类型为Sorted Set，并向其中加入数据
 > 	}
->     // 执行pipeline中的操作
->     p.sync();
+>    	// 执行pipeline中的操作
+>    	p.sync();
 > }
 > ~~~
 
@@ -663,7 +657,7 @@ Lua脚本：[/src/main/java/com/redislabs/university/RU102J/script/CompareAndUpd
 > 
 > 	public CompareAndUpdateScript(JedisPool jedisPool) {
 > 		try (Jedis jedis = jedisPool.getResource()) {
->             // 应该改用工厂函数创建CompareAndUpdateScript对象，在初始化阶段检查SHA值
+>    			// 应该改用工厂函数创建CompareAndUpdateScript对象，在初始化阶段检查SHA值
 > 			this.sha = jedis.scriptLoad(script);
 > 		}
 > 	}
