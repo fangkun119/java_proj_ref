@@ -512,22 +512,27 @@ Jedis Pipeline以串行的方式封装所有command，然后统一发送给redis
 > }
 > ~~~
 
-#### (3) `Jedis Transaction` ：多命令原子封装，支持回滚
+#### (3) `Jedis Transaction` ：多命令原子封装
 
-> jedis Pipeline要加上原子属性，才能执行事务
+相比`Jedis Pipeline`，原子属性使`Jedis Transaction`
+
+> 能够保证命令执行，不会受到其他“线程”/“客户端”命令的干扰
+
+但另一方面
+
+> 事务执行时，会block其他命令
 >
-> * 事务属性保证命令执行，不会收到其他“线程”/“客户端”命令的干扰
-> * 但是事务在执行时，会block其他命令
->
-> 方法：
->
+> Redis不支持事务回滚（为了设计简单、保证高性能），如下面的代码
+
+代码
+
 > ```java
-> @Test
+>@Test
 > public void testTransaction() {
 > 	Long siteId = 1L;
-> 	// 将pipelined替换为multi
+>	// 将pipelined替换为multi
 > 	Transaction t = jedis.multi();
-> 
+>
 > 	Response<Long> hsetResponse = t.hset(statusKey, "available", "true");
 > 	Response<Long> expireResponse = t.expire(statusKey, 1000);
 > 	Response<Long> saddResponse = t.sadd(availableKey, String.valueOf(siteId));
@@ -599,7 +604,7 @@ DAO实现：[/src/main/java/com/redislabs/university/RU102J/dao/SiteStatsDaoRedi
 > 	// 创建事务
 > 	Transaction t = jedis.multi();
 > 
-> 	// 添加事务中要执行的操作
+> 	// 添加事务中要执行的命令
 > 	List<Response<? extends Object>> respList = new ArrayList<>();
 > 	respList.add( t.hset(key, SiteStats.reportingTimeField, reportingTime));
 > 	respList.add( t.hincrBy(key, SiteStats.countField, 1));
@@ -611,10 +616,12 @@ DAO实现：[/src/main/java/com/redislabs/university/RU102J/dao/SiteStatsDaoRedi
 > 	// 执行事务
 > 	t.exec();
 > 
-> 	// 如果需要检查结果，并处理回滚
-> 	// if (hasError(respList)) {
-> 	//		t.discard();
-> 	// }
+> 	// 使用下面的方法可以检测是否有命令执行错误
+> 	if (hasError(respList)) {
+> 		// 但是需要手写错误处理逻辑
+> 		// Redis不支持事务回滚，discard()方法只能撤销还没有exec()的命令
+> 		...
+> 	}
 > }
 > 
 > private boolean hasError(List<Response<? extends Object>> respList) {
