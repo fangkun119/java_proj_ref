@@ -613,14 +613,14 @@ DAO实现：[/src/main/java/com/redislabs/university/RU102J/dao/SiteStatsDaoRedi
 > 	respList.add( compareAndUpdateScript.updateIfLess(t, key, SiteStats.minWhField, reading.getWhGenerated()));
 > 	respList.add( compareAndUpdateScript.updateIfGreater(t, key, SiteStats.maxCapacityField, getCurrentCapacity(reading)));
 > 
-> 	// 执行事务
+> 	// 执行事务：
 > 	t.exec();
 > 
-> 	// 使用下面的方法可以检测是否有命令执行错误
+> 	// 检测是否有命令执行错误
 > 	if (hasError(respList)) {
 > 		// 但是需要手写错误处理逻辑
 > 		// Redis不支持事务回滚，discard()方法只能撤销还没有exec()的命令
-> 		...
+> 		// ...
 > 	}
 > }
 > 
