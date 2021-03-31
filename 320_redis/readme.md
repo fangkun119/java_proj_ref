@@ -1,3 +1,22 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [1. Redis数据结构](#1-redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
+  - [(1) 基础数据结构](#1-%E5%9F%BA%E7%A1%80%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
+  - [(2) 集合操作](#2-%E9%9B%86%E5%90%88%E6%93%8D%E4%BD%9C)
+  - [(3) 事务和object存储](#3-%E4%BA%8B%E5%8A%A1%E5%92%8Cobject%E5%AD%98%E5%82%A8)
+  - [(4) Bit数据和消息订阅发布](#4-bit%E6%95%B0%E6%8D%AE%E5%92%8C%E6%B6%88%E6%81%AF%E8%AE%A2%E9%98%85%E5%8F%91%E5%B8%83)
+  - [(5) 地理位置存储和Lua Script](#5-%E5%9C%B0%E7%90%86%E4%BD%8D%E7%BD%AE%E5%AD%98%E5%82%A8%E5%92%8Clua-script)
+- [2. Redis Java编程](#2-redis-java%E7%BC%96%E7%A8%8B)
+  - [(1) Redis客户端；DAO编写](#1-redis%E5%AE%A2%E6%88%B7%E7%AB%AFdao%E7%BC%96%E5%86%99)
+  - [(2) Jedis Pipeline；Jedis Transaction](#2-jedis-pipelinejedis-transaction)
+  - [(3) 地理位置信息（Geospetial）； Redis Stream介绍](#3-%E5%9C%B0%E7%90%86%E4%BD%8D%E7%BD%AE%E4%BF%A1%E6%81%AFgeospetial-redis-stream%E4%BB%8B%E7%BB%8D)
+  - [(4) RateLimiter；时间序列；连接管理；Exception处理；性能；Debug方法；Redis协议介绍](#4-ratelimiter%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E8%BF%9E%E6%8E%A5%E7%AE%A1%E7%90%86exception%E5%A4%84%E7%90%86%E6%80%A7%E8%83%BDdebug%E6%96%B9%E6%B3%95redis%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D)
+- [3. Redis设计与实现（todo）](#3-redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0todo)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## 1. Redis数据结构
 
 ### (1) 基础数据结构
