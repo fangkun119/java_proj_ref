@@ -46,9 +46,9 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# BITMAP及消息发布订阅
+# BIT MAP及消息发布订阅
 
-## 1. BITMAP
+## 1. BIT MAP
 
 ### 1.1 说明
 

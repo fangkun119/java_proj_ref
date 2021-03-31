@@ -466,7 +466,7 @@ Use Cases:
 > print(redis.georadiusbymember(geo_key, "Makuhari Messe", 20, "km", withdist=True))
 > ~~~
 
-## 3. 存储过程（Lua Script）
+## 3. Lua Script
 
 ### 3.1 介绍
 

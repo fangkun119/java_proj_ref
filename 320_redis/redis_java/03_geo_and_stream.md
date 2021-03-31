@@ -219,9 +219,9 @@ Global Capacity Leader Board：查询所有site中电量最低、最高的几个
 >
 > ~~~java
 > public interface SiteDao {
->     void insert(Site site);
->     Site findById(long id);
->     Set<Site> findAll();
+>    	void insert(Site site);
+>    	Site findById(long id);
+>    	Set<Site> findAll();
 > }
 > ~~~
 >
@@ -453,9 +453,7 @@ ZSCORE的时间复杂度：`O(1)`
 
 ### 4.1 介绍
 
-> Redis Stream用于系统间的集成
-
-#### (2) Redis Stream
+#### (1) Redis Stream
 
 > Redis Stream是一种实现为append-only log的数据结构（不是消息队列）
 >
@@ -463,7 +461,7 @@ ZSCORE的时间复杂度：`O(1)`
 >
 > 使用Redis Stream需要对它有深入的理解，本节focus在Demo项目中用到的部分：`在系统中显示最近的meter redaing事件`
 
-#### (3) 命令 ：`XADD`、`XRANGE`、`XREVRANGE`、……
+#### (2) 命令 ：`XADD`、`XRANGE`、`XREVRANGE`、……
 
 `XADD key [NOMKSTREAM] [MAXLEN|MINID [=|~] threshold [LIMIT count]] *|ID field value`
 
