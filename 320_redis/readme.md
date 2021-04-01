@@ -133,9 +133,11 @@
 > 6. Debugging：Tips及方法
 > 7. Redis协议：介绍、例子、数据包查看方法
 
-## 3. Redis设计与实现（todo）
+## 3. 其他资料
 
-> [http://redisbook.com/index.html](http://redisbook.com/index.html)
->
-> TODO
+Redis设计与实现：[http://redisbook.com/index.html](http://redisbook.com/index.html) （todo）
+
+Redis性能问题排查：[https://mp.weixin.qq.com/s/-Bidj3Kw4m1U7mHz82SDUQ](https://mp.weixin.qq.com/s/-Bidj3Kw4m1U7mHz82SDUQ)
+
+
 
