@@ -291,7 +291,7 @@ Faceted Search：借助反向索引（inverted index）使用多个filter和crit
 
 > 在这个例子中，Domain Object具有三个属性：(1) disabled access (2) venue (3) medal event
 >
-> Redis不支持符合索引也不支持二级索引，它使用Facted Search来支持Attributed Search
+> Redis不支持复合索引也不支持二级索引，它使用反向索引加filter来实现
 
 接下来介绍Faceted Search如何用在这个case上
 
@@ -479,9 +479,7 @@ Python代码：[https://github.com/fangkun119/ru101/blob/main/redisu/ru101/uc01-
 
 > 方法2为每个`<attribute, value>`创建一个set，存入`attribute=value`的所有key。收到查询请求时、才去各个set查询并进行intersection运算。
 
-方法3预先将所有查询要用到的`<attribute, value>`组合所对应的key都存储到set中
-
-这个方法的时间复杂度仅受限于查询后返回结果的数据量，但是当object属性更新或者要支持新的查询结果时，都需要同步地更新这些索引
+方法3预先将所有查询要用到的查询条件（`<attribute, value>`组合）所对应的key都存储到set中。这个方法的时间复杂度仅受限于查询后返回结果的数据量，但是当object属性更新或者要支持新的查询结果时，都需要同步地更新这些索引
 
 > ~~~bash
 > 127.0.0.1:6379> sadd hfs:c32d9001b44dc00cc97829c0d62f12f9 123-ABC-723 737-DEF-911

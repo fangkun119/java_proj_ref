@@ -666,12 +666,12 @@ Lua性能高效功能强大，但是也要注意脚本内容，不当的脚本�
 
 > 执行Lua脚本，与普通Redis命令一样，会单独执行。执行期间其他命令被阻塞在队列中
 >
-> 但是特殊之处在于，对于Lua脚本Redis有`max execution threshold`的执行限制（默认5秒钟），超时时脚本执行会被暂时中断，切换给其他的redis命令。造成非原子执行转态、有可能导致数据不一致
+> 但是特殊之处在于，对于Lua脚本Redis有`max execution threshold`的执行限制（默认5秒钟），超时时脚本执行会被暂时中断，切换给其他的redis命令。
 
-##### (b) 应对办法
+##### (b) Redis提供的解决方法
 
-> 1. 监控long running script并报警
-> 2. 让Redis在这类情况下，接收来自其他客户端的命令，但是不执行、而是返回BUSY response（Admin Commands除外）
+> 1. 监控`long running script`并报警
+> 2. 让Redis在Lua Script超时中断时，只执行管理命令（Administration Commands），不执行数据访问命令（例如Get命令等）。数据访问命令会返回Busy Response给调用它的客户端。
 > 3. 对于脚本只包含读操作，执行超时的时候，可以使用`SCRIPT KILL`命令来结束这条命令
 > 4. 如果脚本中有写命令，唯一的办法是使用`SHUTDOWN NOSAVE`，这条命令会关闭Redis，丢弃当前正在执行脚本的所有写入数据，以及上一次flush之后所有新的写入数据
 
