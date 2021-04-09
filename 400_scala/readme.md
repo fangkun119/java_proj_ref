@@ -297,6 +297,176 @@
 
 > d
 
-### 8. 其他
+## 8. 其他
 
 > d
+
+### 补充内容1： 多参数列表（柯里化）
+
+> 文档：[https://docs.scala-lang.org/zh-cn/tour/multiple-parameter-lists.html](https://docs.scala-lang.org/zh-cn/tour/multiple-parameter-lists.html)
+>
+> 方法可以定义多个参数列表
+>
+> * 当使用较少的参数列表调用多参数列表的方法时，会产生一个新的函数
+> * 这个新的函数接收剩余的参数列表作为其参数
+>
+> 例如：
+>
+> 在Scala collection traits `TraversableOnce` 中定义的 `foldLeft`，方法签名为
+>
+> ~~~scala
+> def foldLeft[B](z: B)(op: (B, A) => B): B
+> ~~~
+>
+> 下面是使用该方法的例子
+>
+> ~~~scala
+> val numbers = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+> 
+> // 多参数列表方法的调用，代码更加清晰
+> val res = numbers.foldLeft(0)((m, n) => m + n)
+> print(res) // 55
+> 
+> // 可以使用scala简化代码
+> numbers.foldLeft(0)(_ + _)
+> 
+> // 可以固定一部分参数，使其变成一个新的函数
+> val numberFunc = numbers.foldLeft(List[Int]())_
+> val squares = numberFunc((xs, x) => xs:+ x*x) // List(1, 4, 9, 16, 25, 36, 49, 64, 81, 100)
+> val cubes = numberFunc((xs, x) => xs:+ x*x*x) // List(1, 8, 27, 64, 125, 216, 343, 512, 729, 1000)
+> ~~~
+>
+> 如果要指定参数列表中的某些参数为隐式（implicit），应该使用多参数列表。例如
+>
+> ~~~scala
+> def execute(arg: Int)(implicit ec: ExecutionContext) = ...
+> ~~~
+
+### 补充内容2：`implicit`
+
+#### (1) implicit parameters：容许查找隐式值来转换参数
+
+> 文档：[https://docs.scala-lang.org/zh-cn/tour/implicit-parameters.html](https://docs.scala-lang.org/zh-cn/tour/implicit-parameters.html)
+>
+> 带有implicit关键字的参数，被称为`隐式参数`，当没有方法要求传参时，会尝试查找可以获得正确类型的隐式值来自动传入这些参数。查询位置包括：
+>
+> 1. 查找可以直接访问的隐式定义和隐式参数
+> 2. 在伴生对象中查找与隐式候选类型相关的有implicit标记的成员
+>
+> 详细参考：[https://docs.scala-lang.org/tutorials/FAQ/finding-implicits.html](https://docs.scala-lang.org/tutorials/FAQ/finding-implicits.html)
+>
+> 例如
+>
+> ~~~scala
+> abstract class Monoid[A] {
+>   def add(x: A, y: A): A
+>   def unit: A
+> }
+> 
+> object implicitTest {
+> 	// 定义两个可以隐式使用的对象，类型分别是Monoid[String]和Monoid[Int]
+> 	implicit val stringMonoid: Monoid[String] 
+>     	= new Monoid[String] {
+> 			def add(x: String, y: String): String = x concat y
+> 			def unit: String = ""
+> 		}
+> 	implicit val intMonoid: Monoid[Int]
+>     	= new Monoid[Int] {
+> 			def add(x: Int, y: Int): Int = x + y
+> 			def unit: Int = 0
+> 		}
+> 	// 隐式参数：implicit m:Monoid[A]
+> 	// implicit表示，如果能够找到隐式的Monoid[A]应用在隐式参数m上
+> 	// 那么在调用sum方法时，只需要为xs:List[A]传参
+> 	def sum[A] (xs: List[A]) (implicit m: Monoid[A]): A =
+> 		if (xs.isEmpty) m.unit
+> 		else m.add(xs.head, sum(xs.tail))
+> 	// 测试
+> 	def main(args: Array[String]): Unit = {
+> 		// 使用了intMoid和stringMonoid对象当做隐式参数
+> 		println(sum(List(1, 2, 3)))       // uses IntMonoid implicitly
+> 		println(sum(List("a", "b", "c"))) // uses StringMonoid implicitly
+> 	}
+> }
+> ~~~
+
+#### (2) implicit classes：主构造函数可用于隐式转换
+
+> 参考：[https://docs.scala-lang.org/zh-cn/overviews/core/implicit-classes.html](https://docs.scala-lang.org/zh-cn/overviews/core/implicit-classes.html)
+>
+> 在对应的作用域内，带有implicit关键字的主构造函数可以用于隐式转换。定义implicit class有如下限制条件：
+>
+> 1. 只能在别的trait/class/object内部定义
+> 2. 构造函数只能携带一个非隐式参数
+> 3. 在同一个作用域内、隐式类命名必须唯一（不能与任何类、方法、成员、对象、隐式类重名），这也意味这它不可以是case class
+>
+> 例子
+>
+> ~~~scala
+> object Helpers {
+> 	// 可以将Int隐式转换成IntWithTimes对象，该对象有一个times操作符可以调用
+> 	implicit class IntWithTimes(x: Int) {
+> 		def times[A](f: => A): Unit = {
+> 			def loop(current: Int): Unit = {
+>         		if(current > 0) {
+> 					f
+> 					loop(current - 1)
+> 				}
+>  	  			loop(x)
+> 			}
+> 		}
+>   	}
+> }
+> ~~~
+>
+> ~~~bash
+> scala> import Helpers._
+> import Helpers._
+> 
+> scala> 5 times println("HI") # 5被隐式转换成了IntWithTimes对象
+> HI
+> HI
+> HI
+> HI
+> HI
+> ~~~
+
+#### (3) implicit functions：引入到上下文中可以让指定类型进行隐式转换的函数
+
+> 参考：[https://docs.scala-lang.org/zh-cn/tour/implicit-conversions.html](https://docs.scala-lang.org/zh-cn/tour/implicit-conversions.html)
+>
+> 定义一个用于将类型`S`（表示Start）到类型`T`（表示Target）的类型装换函数，它在两种情况下会被用到
+
+情况1：表达式`e`需要类型`T`、而传给它的是类型`S`
+
+> scala会查找符合`S => T`的`implicit function`
+
+情况2：访问类型为`S`的对象`e`的成员`e.m`，但是被访问的`m`并没有在类型`S`中声明
+
+> scala会查找符合`S => T`（`T`包含成员`m`）的`implicit function`
+
+例子如下
+
+> ~~~scala
+> import scala.language.implicitConversions
+> 
+> // 隐式方法list2ordered：它将 List[A] 转换为 Ordered[List[A]]
+> implicit def list2ordered[A]
+> 	(x: List[A]) 
+> 	// 它有一个隐式参数：代表着还会寻找另外一个隐式方法来讲A转换为Ordered[A]
+> 	// 在scala.Predef.intWrapper中有符合”Int => Ordered[Int]“的方法提供
+> 	(implicit elem2ordered: A => Ordered[A])
+> : Ordered[List[A]] = {
+> 	new Ordered[List[A]] { 
+> 		//replace with a more useful implementation
+> 		def compare(that: List[A]): Int = 1
+>   	}
+> }
+> ~~~
+>
+> 将`List[A] => Ordered[List[A]]`和`Int => Ordered[Int]`两个隐式转换方法import到上下文中，就可以对`List[Int]`进行比较，例如
+>
+> ~~~scala
+> List(1,2,3) <= List(4,5)
+> ~~~
+
