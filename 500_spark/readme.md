@@ -209,7 +209,17 @@
 >
 > 2. 使用`LogisticRegression`进行二分类
 >
->     (1) 将文件数据转换为特征（2）缺失值处理（3）对类别特征进行one-hot编码（4） 训练集验证集拆分、使用训练集训练、使用验证集验证（5）ROC和PR曲线（6）交叉验证
+>     (1) 将文件数据转换为特征
+>
+>     (2) 缺失值处理
+>
+>     (3) 对类别特征进行one-hot编码
+>
+>     (4) 训练集验证集拆分、使用训练集训练、使用验证集验证
+>
+>     (5) ROC和PR曲线
+>
+>     (6) 交叉验证
 >
 > 3. 多分类：(1) 使用`OneVsRest`的方法及例子；(2) 使用Softmax方法的链接
 >
@@ -219,10 +229,29 @@
 
 ## CH09 图计算
 
-> 笔记：[ch09_graph_x.md](https://github.com/fangkun119/spark_in_action_first_edition/blob/master/notes/ch09_graph_x.md) （TODO）
+> 笔记：[ch09_graph_x.md](https://github.com/fangkun119/spark_in_action_first_edition/blob/master/notes/ch09_graph_x.md) 
 >
+> 代码：[ch09-listings.scala](https://github.com/fangkun119/spark_in_action_first_edition/blob/master/ch09/scala/ch09-listings.scala)
 
-## 其他
+主要内容：
+
+> 1. GraphX API：
+>
+>     (1) 图对象创建`Graph`
+>
+>     (2) 图对象的Transforming：`mapEdges`、 `mapVertices`、 `mapTriplets`、 `aggregatingMessages`、`arrgegatingMessages`、 `subgraph`、 `mask`、 `filter`
+>
+> 2. Spark GraphX内置图算法举例：
+>
+>     (1) 最短路径算法
+>
+>     (2) Page Rank算法
+>
+>     (3) Connected Components算法
+>
+>     (4) Strongly Connected Components算法 
+>
+> 3. 实现图算法：以实现A*算法为例
 
 CH09 - CH11:  Spark运维
 
