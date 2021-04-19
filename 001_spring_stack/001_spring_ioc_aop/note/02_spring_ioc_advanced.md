@@ -102,7 +102,7 @@ Spring 3.2开始可以在`方法`上使用@Profile注解（3.1及之前版本只
 
 ### 4.1 四种Bean Scope及设置方法
 
-> ![image-20210302195148901](/Users/fangkun/Library/Application Support/typora-user-images/image-20210302195148901.jpg" width="1024" /></div>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_ioc/001_spring_bean_scope.jpg" width="1024" /></div>
 
 ### 4.2 Session Bean注入到Singleton Bean时，如何保持Session特性
 
