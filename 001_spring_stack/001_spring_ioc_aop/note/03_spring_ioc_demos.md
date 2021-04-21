@@ -473,8 +473,7 @@
 #### (4) 代码
 
 > * [../spring_demos/07_bean_autowire_01_by_xml/src/main/resources/applicationContext.xml](../spring_demos/07_bean_autowire_01_by_xml/src/main/resources/applicationContext.xml)
->* 
-> * [../spring_demos/07_bean_autowire_01_by_xml/src/main/java/com/javaref/spring/TestGetBean.java](../spring_demos/07_bean_autowire_01_by_xml/src/main/java/com/javaref/spring/TestGetBean.java)
+>* [../spring_demos/07_bean_autowire_01_by_xml/src/main/java/com/javaref/spring/TestGetBean.java](../spring_demos/07_bean_autowire_01_by_xml/src/main/java/com/javaref/spring/TestGetBean.java)
 
 ### 3.2 基于注解的自动装配
 
