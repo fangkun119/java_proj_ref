@@ -145,9 +145,9 @@
 > <bean id="person1" name="human,star" class="com.javaref.spring.Person">
 > 	<!-- 可以给bean提供多个name，除了id，这些name也可以用于被java代码获取bean的对象 -->
 > 	<!-- 三种指定属性值的方式：(1)value标签 (2)value属性 (3)引用另一个bean -->
-> 		<property name="name"><value>Jerry</value></property>
-> 		<property name="age" value="18" />
-> 		<property name="food" ref="food" />
+> 	<property name="name"><value>Jerry</value></property>
+> 	<property name="age" value="18" />
+> 	<property name="food" ref="food" />
 > </bean>
 > <bean id="food" class="com.javaref.spring.Food"></bean>
 >  ~~~
@@ -473,8 +473,8 @@
 #### (4) 代码
 
 > * [../spring_demos/07_bean_autowire_01_by_xml/src/main/resources/applicationContext.xml](../spring_demos/07_bean_autowire_01_by_xml/src/main/resources/applicationContext.xml)
->
-> * [../spring_demos/07_bean_autowire_02_by_annotation/src/main/java/com/javaref/spring/TestGetBean.java](../spring_demos/07_bean_autowire_02_by_annotation/src/main/java/com/javaref/spring/TestGetBean.java)
+>* 
+> * [../spring_demos/07_bean_autowire_01_by_xml/src/main/java/com/javaref/spring/TestGetBean.java](../spring_demos/07_bean_autowire_01_by_xml/src/main/java/com/javaref/spring/TestGetBean.java)
 
 ### 3.2 基于注解的自动装配
 
