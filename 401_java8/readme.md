@@ -66,7 +66,7 @@
 
 ## 3. Lambda表达式的应用
 
-完整笔记：[https://github.com/fangkun119/java8note/blob/master/note/ch05_date_time.md](https://github.com/fangkun119/java8note/blob/master/note/ch05_date_time.md)
+完整笔记：[https://github.com/fangkun119/java8note/blob/master/note/ch03_use_lambda.md](https://github.com/fangkun119/java8note/blob/master/note/ch03_use_lambda.md)
 
 内容
 
