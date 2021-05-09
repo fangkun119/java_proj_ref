@@ -184,7 +184,7 @@ Step 3：使用Redisson客户端实现分布式锁
 
 > `redissonLock.lock()`背后的操作
 >
-> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/upload/sysdesign_understand_redisson_lock.png" width="800" /></div>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/sysdesign/sysdesign_understand_redisson_lock.jpg" width="800" /></div>
 
 lock操作
 
