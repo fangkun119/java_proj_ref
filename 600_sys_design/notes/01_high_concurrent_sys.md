@@ -53,7 +53,7 @@
 
 ### (4) 使用Redis实现分布式锁
 
-> 
+> [03_redis_distributed_lock.md](03_redis_distributed_lock.md)
 
 ## 03 使用Redis拦截DB请求
 
@@ -83,7 +83,7 @@
 
 > 可考虑使用消息队列削峰填谷，需要考虑消息队列投递失败的情况
 
-## 04 流量控制
+## 98 流量控制
 
 > (1) 前端资源静态化（CDN）
 >
@@ -96,3 +96,24 @@
 > (5) 限流机制（Rate Limiter：防止恶意刷屏或爬虫）
 >
 > (6) 黑名单机制
+
+## 99 工具
+
+### (1) 开发环境并发压测
+
+用Ngix代理多个后台服务，使用JMeter压测Ngix
+
+`Ngix`：
+
+`JMeter`：Test Plan → Thread Group → HTTP Request → Aggregate Report
+
+> Thread Group
+>
+> * Number of Threads：线程数
+> * Ramp Up Period：多长时间内发完请求，模拟高并发可以配为0
+> * Loop Count：循环压几次
+>
+> HTTP Request
+>
+> Aggregate Report
+
