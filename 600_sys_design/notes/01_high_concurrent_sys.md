@@ -4,8 +4,9 @@
 
 > 以实际环境压测为准，下面是大致参考
 >
-> * MySQL：1000 QPS
-> * Redis：100000 QPS
+> * MySQL等普通的关系型数据库：1000 QPS
+> * MongoDB等硬盘性NoSQL：10000 QPS
+> * Redis等内存型数据库：100000 QPS
 
 ## 02 并发请求处理
 
@@ -54,6 +55,14 @@
 ### (4) 使用Redis实现分布式锁
 
 > [03_redis_distributed_lock.md](03_redis_distributed_lock.md)
+
+### (5) 使用Redis进行缓存（cache aside）
+
+> [03_redis_distributed_lock.md](03_redis_distributed_lock.md)
+>
+> * 08 Redis缓存与数据库双写不一致问题
+> * 09 分布式操作原子性保证
+> * 10 读多写多场景
 
 ## 03 使用Redis拦截DB请求
 

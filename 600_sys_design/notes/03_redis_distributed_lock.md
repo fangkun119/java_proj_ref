@@ -397,8 +397,24 @@ lock操作
 >
 > 在后续的购买和下单环节使用DB时会再次进行检查以保证一致性
 
-### (2) 不使用缓存
+### (2) 数据分片（Partitioning）
 
-### (3) 中间件Canal
+### (3) 使用cache through模式
+
+对比Cache Aside和Cache Through，其中箭头是数据流动方向
+
+Cache Aside: 
+
+> `Client ↔ { DB , Cache }`
+
+Cache Through:
+
+> `Client ← Cache ← DB`
+>
+> 写操作通过消息队列控制负载、直接写入DB，再通过DB刷新到Cache中
+
+### (4) 不使用缓存
+
+### (5) 中间件Canal
 
 > todo
