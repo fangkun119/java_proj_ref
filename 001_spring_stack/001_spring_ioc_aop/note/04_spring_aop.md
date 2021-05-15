@@ -5,9 +5,11 @@
 - [Spring AOP](#spring-aop)
   - [1. 基础原理](#1-%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86)
     - [1.1 AOP原理](#11-aop%E5%8E%9F%E7%90%86)
+      - [(1) AOP](#1-aop)
+      - [(2) AOP术语](#2-aop%E6%9C%AF%E8%AF%AD)
     - [1.2 Spring AOP](#12-spring-aop)
-      - [(1) 和传统基于代理的AOP对比](#1-%E5%92%8C%E4%BC%A0%E7%BB%9F%E5%9F%BA%E4%BA%8E%E4%BB%A3%E7%90%86%E7%9A%84aop%E5%AF%B9%E6%AF%94)
-      - [(2) 对比Spring AOP和AspectJ](#2-%E5%AF%B9%E6%AF%94spring-aop%E5%92%8Caspectj)
+      - [(2) 四种AOP配置方案](#2-%E5%9B%9B%E7%A7%8Daop%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88)
+      - [(3) 与AspectJ对比](#3-%E4%B8%8Easpectj%E5%AF%B9%E6%AF%94)
   - [2 使用`@AspectJ`注解定义Spring AOP切面](#2-%E4%BD%BF%E7%94%A8aspectj%E6%B3%A8%E8%A7%A3%E5%AE%9A%E4%B9%89spring-aop%E5%88%87%E9%9D%A2)
     - [2.1 编写切入点](#21-%E7%BC%96%E5%86%99%E5%88%87%E5%85%A5%E7%82%B9)
       - [(1) 方法](#1-%E6%96%B9%E6%B3%95)
@@ -68,13 +70,13 @@
 >
 > 2. AOP完成这个任务的过程叫做`织入（waving）`，Spring AOP采用的实现方式是通过`动态代理`在`运行期`织入
 >
-> 3. 如果想使用AOP、则需要进行配置，包括如下方面：
+> 3. 创建`切面`需要进行配置，包括如下方面：
 >
 >     (1) 确定`切点（cut-point）`：通过"类名方法名"/"正则表达式"/”运行时动态选择”等方式，在方法调用、异常抛出、字段修改等各种备选的`连接点`中进行选择
 >
 >     (2) 在切点上设置一个`通知（advice）`：在这个连接点上执行什么操作（即切面中所定义的方法）以及何时执行（包括before、after、after-returning、after-throwing、around）
 >
-> 关于Spring AOP实现时所用到的动态代理，参考：
+> 关于Spring AOP实现时所用到的动态代理，参考：[05_java_proxy.md](05_java_proxy.md)
 
 ### 1.2 Spring AOP
 
