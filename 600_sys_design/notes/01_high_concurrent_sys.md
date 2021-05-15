@@ -1,3 +1,27 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [01 常见数据库并发量](#01-%E5%B8%B8%E8%A7%81%E6%95%B0%E6%8D%AE%E5%BA%93%E5%B9%B6%E5%8F%91%E9%87%8F)
+- [02 并发请求处理](#02-%E5%B9%B6%E5%8F%91%E8%AF%B7%E6%B1%82%E5%A4%84%E7%90%86)
+  - [(1) 使用数据库事务处理并发请求](#1-%E4%BD%BF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86%E5%B9%B6%E5%8F%91%E8%AF%B7%E6%B1%82)
+  - [(2) 借助UPDATE语句自带行锁](#2-%E5%80%9F%E5%8A%A9update%E8%AF%AD%E5%8F%A5%E8%87%AA%E5%B8%A6%E8%A1%8C%E9%94%81)
+  - [(3) 分布式事务](#3-%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1)
+  - [(4) 使用Redis实现分布式锁](#4-%E4%BD%BF%E7%94%A8redis%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
+  - [(5) 使用Redis进行缓存（cache aside）](#5-%E4%BD%BF%E7%94%A8redis%E8%BF%9B%E8%A1%8C%E7%BC%93%E5%AD%98cache-aside)
+- [03 使用Redis拦截DB请求](#03-%E4%BD%BF%E7%94%A8redis%E6%8B%A6%E6%88%AAdb%E8%AF%B7%E6%B1%82)
+  - [(1) 负载分担](#1-%E8%B4%9F%E8%BD%BD%E5%88%86%E6%8B%85)
+  - [(2) 防止过量请求集中到达DB](#2-%E9%98%B2%E6%AD%A2%E8%BF%87%E9%87%8F%E8%AF%B7%E6%B1%82%E9%9B%86%E4%B8%AD%E5%88%B0%E8%BE%BEdb)
+    - [(a) 拦截过量请求](#a-%E6%8B%A6%E6%88%AA%E8%BF%87%E9%87%8F%E8%AF%B7%E6%B1%82)
+      - [数据预热](#%E6%95%B0%E6%8D%AE%E9%A2%84%E7%83%AD)
+      - [原子操作（Lua脚本）](#%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9Clua%E8%84%9A%E6%9C%AC)
+    - [(b) 控制请求频次](#b-%E6%8E%A7%E5%88%B6%E8%AF%B7%E6%B1%82%E9%A2%91%E6%AC%A1)
+- [98 流量控制](#98-%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6)
+- [99 工具](#99-%E5%B7%A5%E5%85%B7)
+  - [(1) 开发环境并发压测](#1-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E5%B9%B6%E5%8F%91%E5%8E%8B%E6%B5%8B)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 [TOC]
 
 ## 01 常见数据库并发量
@@ -34,23 +58,11 @@
 > UPDATE `stock_info` SET stock = stock - 1 WHERE commodity_id = 189 AND seckill_id = 28 AND stock > 0;
 > ~~~
 
-### (3) 用三阶段提交实现分布式事务
+### (3) 分布式事务
 
-> 角色：事务协调器，事务参与方（backing service）
+> 2PC（两阶段提交）；3PC（三阶段提交）；TCC（Try-Confirm-Cancel）；消息事务（最终一致性）； Sega事务；Seata事务
 >
-> 阶段一：协调器询问参与方是否可以提交，需得到全部的ACK确认
->
-> 阶段二：协调器请求参与方进行预执行
->
-> * 参与方在本地事务中执行操作，并记录undo和redo日志
-> * 参与方向协调器汇报执行结果：成功或失败
->
-> 阶段三：协调器确认事务
->
-> * 如果有参与方失败：协调器告诉参与方回滚
-> * 如果参与方全部成功：
->     * 协调器通知所有参与方COMMIT本地事务
->     * 如果有一个参与方提交失败，协调器要求参与方全部回滚
+> 参考：[11_distributed_transaction_approach.md](11_distributed_transaction_approach.md)
 
 ### (4) 使用Redis实现分布式锁
 

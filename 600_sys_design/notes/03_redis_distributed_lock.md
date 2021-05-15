@@ -25,6 +25,7 @@
     - [(2) Zookeeper：默认满足CP、一致性优先](#2-zookeeper%E9%BB%98%E8%AE%A4%E6%BB%A1%E8%B6%B3cp%E4%B8%80%E8%87%B4%E6%80%A7%E4%BC%98%E5%85%88)
     - [(3) 使用Redis还是Zookeeper](#3-%E4%BD%BF%E7%94%A8redis%E8%BF%98%E6%98%AFzookeeper)
     - [(4) 兼顾并发量和一致性的一种方法：Redlock（不是很推荐）](#4-%E5%85%BC%E9%A1%BE%E5%B9%B6%E5%8F%91%E9%87%8F%E5%92%8C%E4%B8%80%E8%87%B4%E6%80%A7%E7%9A%84%E4%B8%80%E7%A7%8D%E6%96%B9%E6%B3%95redlock%E4%B8%8D%E6%98%AF%E5%BE%88%E6%8E%A8%E8%8D%90)
+    - [(6) 参考](#6-%E5%8F%82%E8%80%83)
   - [07 解决锁阻塞带来的性能问题：分段锁](#07-%E8%A7%A3%E5%86%B3%E9%94%81%E9%98%BB%E5%A1%9E%E5%B8%A6%E6%9D%A5%E7%9A%84%E6%80%A7%E8%83%BD%E9%97%AE%E9%A2%98%E5%88%86%E6%AE%B5%E9%94%81)
   - [08 Redis缓存与数据库（Cache Aside）双写不一致问题](#08-redis%E7%BC%93%E5%AD%98%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%BA%93cache-aside%E5%8F%8C%E5%86%99%E4%B8%8D%E4%B8%80%E8%87%B4%E9%97%AE%E9%A2%98)
     - [(1) `写DB → 写缓存`的问题](#1-%E5%86%99db-%E2%86%92-%E5%86%99%E7%BC%93%E5%AD%98%E7%9A%84%E9%97%AE%E9%A2%98)
@@ -35,8 +36,10 @@
     - [(3) 保证原子性：分布式读写锁以及不足之处](#3-%E4%BF%9D%E8%AF%81%E5%8E%9F%E5%AD%90%E6%80%A7%E5%88%86%E5%B8%83%E5%BC%8F%E8%AF%BB%E5%86%99%E9%94%81%E4%BB%A5%E5%8F%8A%E4%B8%8D%E8%B6%B3%E4%B9%8B%E5%A4%84)
   - [10 读多写多场景](#10-%E8%AF%BB%E5%A4%9A%E5%86%99%E5%A4%9A%E5%9C%BA%E6%99%AF)
     - [(1) 借助为缓存设置TTL来改进"延迟双删"](#1-%E5%80%9F%E5%8A%A9%E4%B8%BA%E7%BC%93%E5%AD%98%E8%AE%BE%E7%BD%AEttl%E6%9D%A5%E6%94%B9%E8%BF%9B%E5%BB%B6%E8%BF%9F%E5%8F%8C%E5%88%A0)
-    - [(2) 不使用缓存](#2-%E4%B8%8D%E4%BD%BF%E7%94%A8%E7%BC%93%E5%AD%98)
-    - [(3) 中间件Canal](#3-%E4%B8%AD%E9%97%B4%E4%BB%B6canal)
+    - [(2) 数据分片（Partitioning）](#2-%E6%95%B0%E6%8D%AE%E5%88%86%E7%89%87partitioning)
+    - [(3) 使用cache through模式](#3-%E4%BD%BF%E7%94%A8cache-through%E6%A8%A1%E5%BC%8F)
+    - [(4) 不使用缓存](#4-%E4%B8%8D%E4%BD%BF%E7%94%A8%E7%BC%93%E5%AD%98)
+    - [(5) 中间件Canal](#5-%E4%B8%AD%E9%97%B4%E4%BB%B6canal)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -251,6 +254,10 @@ lock操作
 >
 > 这个方法并不推荐，还有其他一些细节问题有待商榷
 
+### (6) 参考
+
+> [https://zhuanlan.zhihu.com/p/152240168](https://zhuanlan.zhihu.com/p/152240168)
+
 ## 07 解决锁阻塞带来的性能问题：分段锁
 
 > 分布式锁与高并发是相违背的，因为它将并发请求串行化了，提升并发能力的方式与ConcurrentHashMap的设计类似，采用分段锁
@@ -411,7 +418,7 @@ Cache Through:
 
 > `Client ← Cache ← DB`
 >
-> 写操作通过消息队列控制负载、直接写入DB，再通过DB刷新到Cache中
+> 写操作通过消息队列控制负载、直接写入DB，再通过DB刷新到Cache（例如Redis）中
 
 ### (4) 不使用缓存
 
