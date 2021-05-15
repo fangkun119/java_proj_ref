@@ -53,7 +53,7 @@
 
 #### (2) AOP术语
 
-> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/upload/001_spring_aop_terminology.png" width="300" /></div>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_aop/001_spring_aop_terminology.jpg" width="300" /></div>
 >
 > | 属于                  | 用途                                                         |
 > | --------------------- | ------------------------------------------------------------ |
