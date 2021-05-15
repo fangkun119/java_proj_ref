@@ -44,20 +44,50 @@
 
 ### 1.1 AOP原理
 
+#### (1) AOP
+
 > * 用来让横切面与业务解耦，应用场景如日志、声明式事务、安全、缓存等
 > * 面向切片的编程，虽然仍然在一个地方定义通用功能（如日志），但在何处用何种方式使用这些功能，则是用声明的方式（而不是修改业务代码的方式）来定义的、不会侵入到业务代码
 
+#### (2) AOP术语
+
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/upload/001_spring_aop_terminology.png" width="300" /></div>
+>
+> | 属于                  | 用途                                                         |
+> | --------------------- | ------------------------------------------------------------ |
+> | 通知  advice          | 定义切面`切什么`及`何时`执行，包括：before、after、after-returning、after-throwing、around |
+> | 连接点  joining-point | 能够`插入切面的点（时机）`，例如：方法调用、异常抛出、修改字段 …… |
+> | 切点     cut-point    | `选中的连接点`，用来织入切面，定义切点的方法包括：类名方法名、正则表达式、运行时动态选择 |
+> | 切面  aspect          | 将advice切入到cut-point，并设定执行的操作，这样就定义好了一个切面(aspect) |
+> | 引入  introduce       | 不修改某个类，而是用切面让某个类具有新的方法（行为）、属性（状态）：例如切入一个Logger |
+> | 织入  waving          | 把切面织入到目标对象的过程，有以下三种：（1）编译期织入：借助特殊编译器，如AspectJ织入编译器 （2）加载期织入：借助特殊ClassLoader，如AspectJ5的LTW （3） 运行期织入：借助容器创建动态代理，如Spring AOP |
+>
+> 总结一下：
+>
+> 1. AOP：通过创建`切面（aspect）`，以不修改目标类的方式将附加的功能`引入（introduce）`到一个类中
+>
+> 2. AOP完成这个任务的过程叫做`织入（waving）`，Spring AOP采用的实现方式是通过`动态代理`在`运行期`织入
+>
+> 3. 如果想使用AOP、则需要进行配置，包括如下方面：
+>
+>     (1) 确定`切点（cut-point）`：通过"类名方法名"/"正则表达式"/”运行时动态选择”等方式，在方法调用、异常抛出、字段修改等各种备选的`连接点`中进行选择
+>
+>     (2) 在切点上设置一个`通知（advice）`：在这个连接点上执行什么操作（即切面中所定义的方法）以及何时执行（包括before、after、after-returning、after-throwing、around）
+>
+> 关于Spring AOP实现时所用到的动态代理，参考：
+
 ### 1.2 Spring AOP
 
-#### (1) 和传统基于代理的AOP对比
+#### (2) 四种AOP配置方案
 
 > | 特性              | 说明                                                         |
 > | ----------------- | ------------------------------------------------------------ |
-> | 纯POJO切面        | 使用`POJO + XML`配置，POJO只是提供满足切点时所要调用的方法   |
-> | @AspectJ注解切面  | 并不是AspectJ、只是借鉴了AspectJ以提供基于注解的界面。其编程模型与AspectJ完全一致，但让然是基于代理的切面，因此切点也就只能局限在方法上。 |
-> | 注入式AspectJ切面 | Spring基于代理注解搞不定的事情，如构造器或属性拦截，将通知注入到的真正的Aspect驱动的切面中 |
+> | Spring经典AOP     | 老式的AOP编写方法，需要编写ProxyFactory Bean等，笨重复杂，以及被下面的`纯POJO切面`和`@AspectJ注解切面`所替代 |
+> | 纯POJO切面        | 对经典AOP的封装，使用`POJO + XML`配置，POJO只需提供满足切点时所要调用的方法 |
+> | @AspectJ注解切面  | 对经典AOP的封装，使用`POJO + @AspectJ`注解。它并不是真的AspectJ，只是借鉴了AspectJ提供的注解并遵循相同的编码方式。但是底层仍然是Spring经典AOP，通过动态代理实现，因此切点仅仅局限在方法上。 |
+> | 注入式AspectJ切面 | 真正的AspectJ切面，用来解决Spring AOP搞不定的事情。例如如构造器或属性拦截等。 |
 
-#### (2) 对比Spring AOP和AspectJ
+#### (3) 与AspectJ对比
 
 > <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_aop/sprint_aop_vs_aspectj.jpg" width="1024" /></div>
 
@@ -213,3 +243,4 @@
 ## 4. 注入AspectJ驱动的切面
 
 > <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_aop/spring_aop_use_aspectj.jpg" width="1024" /></div>
+
