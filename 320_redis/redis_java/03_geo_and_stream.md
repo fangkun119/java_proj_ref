@@ -75,7 +75,7 @@
 
 #### (a) `CapacityDao`
 
->[/src/main/java/com/redislabs/university/RU102J/dao/CapacityDao.java](https://github.com/fangkun119/ru102j/blob/master/src/main/java/com/redislabs/university/RU102J/dao/CapacityDao.java)
+>代码：[/src/main/java/com/redislabs/university/RU102J/dao/CapacityDao.java](https://github.com/fangkun119/ru102j/blob/master/src/main/java/com/redislabs/university/RU102J/dao/CapacityDao.java)
 >
 >~~~java
 >public interface CapacityDao {
@@ -87,7 +87,7 @@
 
 #### (b) `CapacityDaoRedisImpl`
 
-> [/src/main/java/com/redislabs/university/RU102J/dao/CapacityDaoRedisImpl.java](https://github.com/fangkun119/ru102j/blob/master/src/main/java/com/redislabs/university/RU102J/dao/CapacityDaoRedisImpl.java)
+> 代码：[/src/main/java/com/redislabs/university/RU102J/dao/CapacityDaoRedisImpl.java](https://github.com/fangkun119/ru102j/blob/master/src/main/java/com/redislabs/university/RU102J/dao/CapacityDaoRedisImpl.java)
 
 更新各个site的电量
 
