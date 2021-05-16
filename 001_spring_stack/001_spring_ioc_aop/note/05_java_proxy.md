@@ -24,7 +24,7 @@
 
 ### (1) 类图
 
-> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/upload/001_spring_aop_proxy_pattern.png" width="500" /></div>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_aop/001_spring_aop_proxy_pattern.jpg" width="500" /></div>
 
 ### (2) 例子
 
@@ -93,7 +93,7 @@
 
 ### (2) 类图
 
-> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/upload/001_spring_aop_dyn_proxy.png" width="700" /></div>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/001_spring_aop/001_spring_aop_dyn_proxy.jpg" width="700" /></div>
 >
 > 为每一种功能类型的代理，编写一个InvocationHandler：共N种
 >
