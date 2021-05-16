@@ -168,7 +168,7 @@
 
 同样以商品购买为例，事务执行过程如下
 
-> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/upload/sysdesign_disttrx_base_seqdiagram.png" width="500" /></div>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/sysdesign/sysdesign_disttrx_base_seqdiagram.jpg" width="500" /></div>
 >
 > 1. 订单系统向消息队列发送预备扣减库存的消息，消息队列保存消息并返回ACK（不会立即发往库存系统），而订单系统则可以得到消息队列的`回调接口`
 > 2. 订单系统（收到消息队列的ACK之后）执行本地事务（下单操作）
@@ -198,11 +198,13 @@
 
 > 华为的servicecomb
 
-## 6. Seata（AT模式）
+## 6. Seata
 
 > 从两阶段提交演变而来的分布式事务解决方案，提供了`AT`，`TCC`，`SAGA`，`XA`等事务模式，下面是`AT`模式的介绍
 
-### (1) AT模式事务执行过程
+### (1) AT模式
+
+#### (a) 事务执行过程
 
 角色：
 
@@ -216,21 +218,21 @@
 
 > 每个应用分布式事务的业务库中，都需要创建这张表，用来将业务数据在更新前后祖泽成回滚日志
 
-事务执行过程
+执行过程
 
 > 阶段1：执行各分支事务并记录Redo和Undo日志
 >
-> * RM获取本地锁，执行分支事务，包括：
->     * 执行分支事务内的操作
->     * 将分支事务之前前、执行后的数据镜像，阻止成Redo和Undo日志，写入UNDO_LOG表中
->     * 向TC注册，为要修改的记录申请全局锁（一段时间拿不到会触发事务本地回滚）
-> * RM释放本地锁
+> * RM执行分支事务，包括：
+>     * RM`获取本地锁`（启动本地事务）
+>     * 将分支事务之前前/执行后的数据镜像，生成成Redo和Undo日志，写入UNDO_LOG表中
+>     * 向TC注册，为要修改的记录`申请全局锁`（一段时间拿不到会触发事务本地回滚）
+>     * `RM释放本地锁`（提交本地事务）
 >
 > 阶段2：根据各分支事务的决议做提交或回滚
 >
 > * 如果决议是全局提交，TC向各个RM发送提交请求，而RM执行如下操作
->     * RM将请求放入异步任务队列、并立刻返回Success Response给TC
->     * RM的异步任务，批量将队列请求中Branch ID对应的UNDO LOG删除
+>     * RM将请求放入异步任务队列，并立刻返回Success Response给TC
+>     * RM的异步任务，批量将队列请求中Branch ID对应的UNDO_LOG删除
 >     * 释放全局锁
 > * 如果决议是全局回滚：TC向各个RM发送回滚命令
 >     * RM重新获得本地锁（如果拿不到则继续重试）
@@ -238,9 +240,69 @@
 >     * RM释放本地锁
 >     * 释放全局锁
 
-### (2) 详细信息参考
+#### (b) 写隔离
+
+> 阶段1的本地事务，提交前要先（在一定重试范围之内）拿到全局锁，否则会放弃本地事务。以写事务Trx1、Trx2修改相同的资源（相同的本地锁）为例
+>
+> * 都成功的情况下：
+>     * 都先（在本地事务中）执行所有分支事务的写操作，执行成功，并生成Redo和Undo日志
+>     * 先获得本地锁的先提交（全局锁在本地锁解锁之前获取），以异步的方式删除UNDO_LOG表中对应的日志
+> * Trx1失败时、Trx2正在执行的情况：
+>     * 都先（在本地事务中）执行所有分支事务的写操作，并生成Redo和Undo日志。Trx1只有部分成功，Trx2全部成功。
+>     * 如果Trx2先拿到本地锁
+>         * Trx2也会先拿到全局锁（全局锁在本地锁解锁之前获取）
+>         * Trx2会先执行本地事务并且先提交全局事务
+>         * Trx1要等待Trx2释放全局锁之后才能执行补偿操作进行回滚
+>         * 上述过程实现了写隔离、执行顺序是Trx2 → Trx1（失败放弃）
+>     * 如果Trx1先拿到本地锁
+>         * Trx1也会先拿到全局锁并释放本地锁
+>         * Trx2得到本地锁开始执行分支事务
+>         * Trx1获得全局锁，开始回滚，因为回滚要重新获得本地锁因此Trx1陷入重试状态
+>         * Trx2试图获得全局锁提交事务，但全局锁被Trx1占用无法提交，等待超时之后Trx2本地回滚分支事务，释放本地锁
+>         * Trx1重新获得本地锁，使用UNDO LOG进行回滚，随后释放全局锁
+>         * 上述过程实现了写隔离、执行顺序是Trx1（失败放弃）→Trx2（等待全局锁超时放弃）
+
+#### (b) 读隔离
+
+读隔离级别
+
+> 前提条件：数据库本地执行的分支事务的隔离级别是Read Committed或以上
+>
+> 默认全局事务隔离级别：Read Uncommitted
+>
+> 通过Seata的SELECT FOR UPDATE语句的代理的隔离级别：Read Committed（会消耗性能）
+
+原理：Trx1使用SELECT FOR UPDATE读数据，Trx2更新了同一行数据
+
+> Trx1先获得本地锁的情况
+>
+> * Trx1读取数据；Trx2阻塞在本地锁上
+> * Trx1获取全局锁开始提交、同时释放本地锁；Trx2更新数据
+> * TC的决议是全局提交、因此全局事务成功，Trx1的UNDO LOG被删除
+> * 上述过程实现了Read Comitted，顺序是：Trx1（读到之前的数据）→ Trx2写入新数据
+>
+> Trx2先获得本地锁，并且事务成功的情况
+>
+> * Trx2写数据；Trx1阻塞在本地锁上
+> * Trx2获取全局锁开始提交，提交本地事务、释放本地锁；Trx1获取本地锁读取到Trx2刚刚写入的事务
+> * Trx1尝试获取全局锁、但全局锁被Trx2占有，因此Trx1陷入重试
+> * Trx2提交完毕，释放全局锁；Trx1获取全局锁，完成全局事务并释放全局锁
+> * 上说过程实现了Read Comitted，顺序是：Trx2（更新数据）→ Trx1（读到Trx2提交的数据）
+>
+> Trx2先获得本地锁，但是事务失败发生回滚
+>
+> * 本质上，SELECT FOR UPDATE语句代理，使SELECT的分布式处理方式与上面`(a)`当中的写操作相同。
+> * 在这种情况下，Trx2会回滚，而Trx1也会失败
+
+### (2) TCC模式
+
+### (3) SEGA模式
+
+### (4) 详细信息参考
 
 > [http://seata.io/zh-cn/docs/overview/what-is-seata.html](http://seata.io/zh-cn/docs/overview/what-is-seata.html)
+>
+> [https://github.com/seata/seata-samples](https://github.com/seata/seata-samples)
 
 ## 附录：CAP和BASE
 
