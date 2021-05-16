@@ -1,6 +1,6 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
 
 - [01 常见数据库并发量](#01-%E5%B8%B8%E8%A7%81%E6%95%B0%E6%8D%AE%E5%BA%93%E5%B9%B6%E5%8F%91%E9%87%8F)
 - [02 并发请求处理](#02-%E5%B9%B6%E5%8F%91%E8%AF%B7%E6%B1%82%E5%A4%84%E7%90%86)
@@ -21,8 +21,6 @@
   - [(1) 开发环境并发压测](#1-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E5%B9%B6%E5%8F%91%E5%8E%8B%E6%B5%8B)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-[TOC]
 
 ## 01 常见数据库并发量
 
@@ -103,6 +101,70 @@
 #### (b) 控制请求频次
 
 > 可考虑使用消息队列削峰填谷，需要考虑消息队列投递失败的情况
+
+## 04 数据库本地事务
+
+### (1) ACID
+
+`A`：原子性（Atomicity）
+
+> 一组操作：要么同时成功；要么同时失败
+
+`C`：一致性（Consistency）
+
+> 事务执行前、执行后，数据库都必须处于一致性状态。
+>
+> `原子性`/`隔离性`/`持久性`都是为了实现`一致性`而服务。例如只具有`原子性`而不具备`隔离性`，一个事务的执行结果，同样会受另一个事务的影响，两个事务操作顺序编排的差异会产生不同的最终结果。
+
+`I`：隔离性（Isolation）
+
+> 在并发环境中，不同的事务同时操作相同的数据时，每个事务都有各自完整的数据空间
+>
+> 四个数据库事务隔离级别：
+>
+> * Read Committed：
+> * Read UnConmitted：
+> * Reapeatble Read：
+> * 的
+
+`D`：持久性（Durability）
+
+> 只要事务成功结束，它读数据库所做的更新必须永久保存下来。即使发生系统崩溃，重新启动数据库，也仍然能恢复到事务成功结束时的状态
+
+### (2) InnoDB对于本地事务的实现
+
+参与方：
+
+> * 应用程序（AP：Application Threads）
+> * 资源管理器（RM：Resource Manager）
+
+原理：通过日志和锁来实现
+
+> 持久性：通过Redo Log持久化来实现
+>
+> 原子性、一致性：通过Undo log来实现
+>
+> 隔离性：通过数据库锁机制实现
+
+过程：
+
+> 1. 开始会话
+>
+> 2. 开始事务
+>
+> 3. 执行操作（写入Redo Log，Undo Log）
+>
+>     操作1
+>
+>     操作2
+>
+>     ...
+>
+>     操作n
+>
+> 4. 提交事务或回滚事务（加锁，应用Redo Log或Undo Log）
+>
+> 5. 结束会话
 
 ## 98 流量控制
 
