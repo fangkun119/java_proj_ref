@@ -1,4 +1,39 @@
-[TOC]
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [分布式事务解决方案](#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88)
+  - [1. 基于XA规范的分布式事务：2PC、3PC](#1-%E5%9F%BA%E4%BA%8Exa%E8%A7%84%E8%8C%83%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A12pc3pc)
+    - [(1) 2PC：两阶段提交](#1-2pc%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4)
+      - [(a) 事务执行过程](#a-%E4%BA%8B%E5%8A%A1%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B)
+      - [(b) 优缺点](#b-%E4%BC%98%E7%BC%BA%E7%82%B9)
+    - [(2) 3PC：三阶段提交](#2-3pc%E4%B8%89%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4)
+      - [(a) 事务执行过程](#a-%E4%BA%8B%E5%8A%A1%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B-1)
+    - [(3) 优缺点](#3-%E4%BC%98%E7%BC%BA%E7%82%B9)
+  - [2. 基于业务层的方案：TCC（Try-Confirm-Cancel）](#2-%E5%9F%BA%E4%BA%8E%E4%B8%9A%E5%8A%A1%E5%B1%82%E7%9A%84%E6%96%B9%E6%A1%88tcctry-confirm-cancel)
+    - [(1) 背景](#1-%E8%83%8C%E6%99%AF)
+    - [(2) 事务执行过程](#2-%E4%BA%8B%E5%8A%A1%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B)
+    - [(3) 适用范围](#3-%E9%80%82%E7%94%A8%E8%8C%83%E5%9B%B4)
+    - [(4) 参考实现：ByteTCC](#4-%E5%8F%82%E8%80%83%E5%AE%9E%E7%8E%B0bytetcc)
+  - [4. 应用消息队列 + 消息表：实现最终一致性（BASE）](#4-%E5%BA%94%E7%94%A8%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97--%E6%B6%88%E6%81%AF%E8%A1%A8%E5%AE%9E%E7%8E%B0%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7base)
+    - [(1) 本地消息表](#1-%E6%9C%AC%E5%9C%B0%E6%B6%88%E6%81%AF%E8%A1%A8)
+    - [(2) 参考实现：RocketMQ](#2-%E5%8F%82%E8%80%83%E5%AE%9E%E7%8E%B0rocketmq)
+  - [5. SAGA](#5-saga)
+    - [(1) 原理](#1-%E5%8E%9F%E7%90%86)
+    - [(2) 参考实现：servicecomb](#2-%E5%8F%82%E8%80%83%E5%AE%9E%E7%8E%B0servicecomb)
+  - [6. Seata](#6-seata)
+    - [(1) AT模式](#1-at%E6%A8%A1%E5%BC%8F)
+      - [(a) 事务执行过程](#a-%E4%BA%8B%E5%8A%A1%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B-2)
+      - [(b) 写隔离](#b-%E5%86%99%E9%9A%94%E7%A6%BB)
+      - [(b) 读隔离](#b-%E8%AF%BB%E9%9A%94%E7%A6%BB)
+    - [(2) TCC模式](#2-tcc%E6%A8%A1%E5%BC%8F)
+    - [(3) SEGA模式](#3-sega%E6%A8%A1%E5%BC%8F)
+    - [(4) 详细信息参考](#4-%E8%AF%A6%E7%BB%86%E4%BF%A1%E6%81%AF%E5%8F%82%E8%80%83)
+  - [附录：CAP和BASE](#%E9%99%84%E5%BD%95cap%E5%92%8Cbase)
+    - [(1) CAP](#1-cap)
+    - [(2) BASE](#2-base)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # 分布式事务解决方案
 
