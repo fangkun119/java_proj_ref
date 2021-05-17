@@ -243,19 +243,17 @@
 
 ### (1) 原理
 
-> 将长事务拆分为多个本地短事务，由Sega事务协调器处理。
->
-> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/upload/sysdesign_disttrx_sega.png" width="300" /></div>
+> 将长事务拆分为多个本地短事务，由Saga事务协调器处理。
 >
 > 每个短事务都有两种操作：T（事务操作），C（补偿操作：失败回滚时使用）
 >
 > * 正常情况：按正向顺序执行事务操作 T<sub>1</sub>，T<sub>2</sub>，……，T<sub>n</sub>
-> * 异常情况：按反向顺序执行补偿操作进行回滚：T<sub>1</sub>，T<sub>2</sub>，……，T<sub>j</sub>，C<sub>j</sub>，C<sub>2</sub>，……，C<sub>1</sub>
->
+>* 异常情况：按反向顺序执行补偿操作进行回滚：T<sub>1</sub>，T<sub>2</sub>，……，T<sub>j</sub>，C<sub>j</sub>，C<sub>2</sub>，……，C<sub>1</sub>
+> 
 > 原版的Sega模式中，没有进行事务隔离，因此会被其他事务影响。解决如下：
 >
 > * 华为对Sega的实现中，在业务层加入了Session以及锁机制，来保证串行化操作资源
-> * 也可以在业务逻辑的设计层面，引入类似资金冻结这样的步骤，来隔离这部分接下来要用的资源
+>* 也可以在业务逻辑的设计层面，引入类似资金冻结这样的步骤，来隔离这部分接下来要用的资源
 
 ### (2) 参考实现：servicecomb
 
@@ -361,25 +359,23 @@
 
 > 上面的AT模式，其实是Seata为TCC提供的一种实现
 >
-> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/upload/sysdesign_seata_tcc.png" width="800" /></div>
->
-> TCC分为两阶段：阶段1是Prepare行为；阶段二是Commit或RollBack行为
+> TCC分为两阶段：阶段1是Prepare行为；阶段2是Commit或RollBack行为
 >
 > 有两种行为模式：
 >
 > * AT模式：Automatic Branch Transaction Mode
-> * MT模式：Manual Branch Transaction Mode
->
+>* MT模式：Manual Branch Transaction Mode
+> 
 > AT模式：
 >
 > - 一阶段 prepare 行为：在本地事务中，一并提交业务数据更新和相应回滚日志记录。
-> - 二阶段 commit 行为：马上成功结束，**自动** 异步批量清理回滚日志。
+>- 二阶段 commit 行为：马上成功结束，**自动** 异步批量清理回滚日志。
 > - 二阶段 rollback 行为：通过回滚日志，**自动** 生成补偿操作，完成数据回滚。
->
+> 
 > MT模式：
 >
 > - 一阶段 prepare 行为：调用 **自定义** 的 prepare 逻辑。
-> - 二阶段 commit 行为：调用 **自定义** 的 commit 逻辑。
+>- 二阶段 commit 行为：调用 **自定义** 的 commit 逻辑。
 > - 二阶段 rollback 行为：调用 **自定义** 的 rollback 逻辑。
 
 ### (3) SEGA模式
