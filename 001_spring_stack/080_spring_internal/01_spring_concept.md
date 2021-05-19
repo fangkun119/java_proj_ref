@@ -1,8 +1,38 @@
-[TOC]
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [Spring Framework底层原理](#spring-framework%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86)
+  - [01 Bean的创建过程](#01-bean%E7%9A%84%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B)
+    - [(1) 例子代码](#1-%E4%BE%8B%E5%AD%90%E4%BB%A3%E7%A0%81)
+    - [(2) Bean生命周期各阶段](#2-bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E5%90%84%E9%98%B6%E6%AE%B5)
+      - [(a) Bean创建过程](#a-bean%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B)
+      - [(b) 与源码对应关系](#b-%E4%B8%8E%E6%BA%90%E7%A0%81%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB)
+        - [无参构造方法反射](#%E6%97%A0%E5%8F%82%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95%E5%8F%8D%E5%B0%84)
+        - [属性注入，初始化](#%E5%B1%9E%E6%80%A7%E6%B3%A8%E5%85%A5%E5%88%9D%E5%A7%8B%E5%8C%96)
+        - [初始化：Bean初始化前、Bean初始化、Bean初始化后](#%E5%88%9D%E5%A7%8B%E5%8C%96bean%E5%88%9D%E5%A7%8B%E5%8C%96%E5%89%8Dbean%E5%88%9D%E5%A7%8B%E5%8C%96bean%E5%88%9D%E5%A7%8B%E5%8C%96%E5%90%8E)
+  - [02 AOP](#02-aop)
+    - [(1) 例子代码](#1-%E4%BE%8B%E5%AD%90%E4%BB%A3%E7%A0%81-1)
+    - [(2) AOP原理](#2-aop%E5%8E%9F%E7%90%86)
+      - [(a) AOP处理时机](#a-aop%E5%A4%84%E7%90%86%E6%97%B6%E6%9C%BA)
+      - [(b) 步骤](#b-%E6%AD%A5%E9%AA%A4)
+        - [步骤1：Spring判断UserService是否需要AOP](#%E6%AD%A5%E9%AA%A41spring%E5%88%A4%E6%96%ADuserservice%E6%98%AF%E5%90%A6%E9%9C%80%E8%A6%81aop)
+        - [步骤2：找到所有的切面Bean](#%E6%AD%A5%E9%AA%A42%E6%89%BE%E5%88%B0%E6%89%80%E6%9C%89%E7%9A%84%E5%88%87%E9%9D%A2bean)
+        - [步骤3：遍历切面Bean的所有方法的注解填入的表达式，是否与UserService的某个方法匹配](#%E6%AD%A5%E9%AA%A43%E9%81%8D%E5%8E%86%E5%88%87%E9%9D%A2bean%E7%9A%84%E6%89%80%E6%9C%89%E6%96%B9%E6%B3%95%E7%9A%84%E6%B3%A8%E8%A7%A3%E5%A1%AB%E5%85%A5%E7%9A%84%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%98%AF%E5%90%A6%E4%B8%8Euserservice%E7%9A%84%E6%9F%90%E4%B8%AA%E6%96%B9%E6%B3%95%E5%8C%B9%E9%85%8D)
+      - [(c) 步骤3详解](#c-%E6%AD%A5%E9%AA%A43%E8%AF%A6%E8%A7%A3)
+      - [(d) CGLib动态代理生成方式](#d-cglib%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E7%94%9F%E6%88%90%E6%96%B9%E5%BC%8F)
+  - [03 Spring事务](#03-spring%E4%BA%8B%E5%8A%A1)
+    - [(1) 事务传播例子：Propagation.NEVER及错误用法](#1-%E4%BA%8B%E5%8A%A1%E4%BC%A0%E6%92%AD%E4%BE%8B%E5%AD%90propagationnever%E5%8F%8A%E9%94%99%E8%AF%AF%E7%94%A8%E6%B3%95)
+    - [(2) @Transactional原理](#2-transactional%E5%8E%9F%E7%90%86)
+    - [(3) 问题修复](#3-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D)
+    - [(4) 事务传播例子：`Propagation.REQUIRES_NEW`](#4-%E4%BA%8B%E5%8A%A1%E4%BC%A0%E6%92%AD%E4%BE%8B%E5%AD%90propagationrequires_new)
+  - [04 BeanPostProcessor](#04-beanpostprocessor)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Spring Framework底层原理
 
-## 01 Bean生命周期
+## 01 Bean的创建过程
 
 ### (1) 例子代码
 
@@ -156,15 +186,15 @@
 > // Bean初始化前：会调用使用@PostConstruct注解的方法
 > Obejct wrappedBean = bean;
 > if (mbd == null || !mbd.isSynthetic()) {
->     wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
+>    	wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 > }
 > // Bean初始化：会调用实现InitializingBean接口的afterPropertiesSet方法
 > try {
->     invokeInitMethods(beanName, wrappedBean, mbd);
+>    	invokeInitMethods(beanName, wrappedBean, mbd);
 > } catch (Throwable ex) { ... }
 > // Bean初始化后：AOP代理在这里生成
 > if (mbd == null || !mbd.isSynthetic()) {
->     wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
+>    	wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 > }
 > ~~~
 >
@@ -174,18 +204,18 @@
 > // 如果实现了InitializingBean接口，会调用它的afterPropertiesSet方法
 > boolean isInitializingBean = (bean instanceof InitializingBean);
 > if (isInitializingBean && (mbd == null || !mbd.isExternallyManagedInitMethod("afterPropertiesSet"))) {
->     ...
+>    	...
 > 	((InitializingBean) bean).afterPropertiesSet(); // 调用afterPropertiesSet方法
 > }
 > ...
 > // 如果在xml配置中指定了init-method，也会调用
 > if (mbd != null && bean.getClass() != NullBean.class) {
->     String initMethodName = mbd.getInitMethodName();
->     if (StringUtils.hasLength(initMethodName) && 
->        		!(isInitializingBean && "afterPropertiesSet".equals(initMeghodName))) &&
+>    	String initMethodName = mbd.getInitMethodName();
+>    	if (StringUtils.hasLength(initMethodName) && 
+>        	!(isInitializingBean && "afterPropertiesSet".equals(initMeghodName))) &&
 >         	!mbd.isExternallyManagedInitMethod(initMethodName)) {
->         invokeCustomInitMethod(beanName, bean, mbd);
->     }
+>    		invokeCustomInitMethod(beanName, bean, mbd);
+>    	}
 > }
 > ~~~
 
@@ -337,28 +367,35 @@
 
 ## 03 Spring事务
 
-### (1) 例子代码及问题
+### (1) 事务传播例子：Propagation.NEVER及错误用法
 
 > 配置
 >
 > ~~~java
 > @EnableTransactionManagement 	// 开启事务
-> @Configuration					// 
+> @Configuration					// 必须添加@Configuration类
 > @ComponentScan(...)				// 从哪个包里扫描Bean
 > class AppConfig {
+> 	// @Configuration注解使得Spring可以拦截dataSource()调用，为Proxy和JdbcTemplate注入同一个Singleton Bean
+> 	// 原理：添加@Configuration注解之后，当调用方法（例如dataSource())时，会先查找是否有名为dataSource的Bean
+> 	// * 有：会传入这个bean
+> 	// * 无：直接调用方法
+> 
 > 	// 事务管理Bean
 > 	@Bean
 > 	public PlatformTransactionManager transactionManager() {
 > 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
-> 		transactionManager.setDataSource(dataSource());
+> 		// 这里注入：代理类里面用来创建事务建立数据库连接所用到的dataSource
+> 		transactionManager.setDataSource(dataSource()); 
 > 		return transactionManager;
 > 	}
 > 
 > 	@Bean
 > 	public JdbcTemplate jdbcTemplate() {
+> 		// 这里注入：用来执行业务SQL的dataSource
 > 		return new JdbcTemplate(dataSource());
 > 	}
->     
+> 
 > 	@Bean
 > 	public DataSource dataSource() {
 > 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -409,7 +446,7 @@
 
 ### (2) @Transactional原理
 
-> 开启@EnableTransactionManagement之后，Spring会为包含@Transactional方法的类生成代理，形式如下
+> 为配置类@Configuration和@EnableTransactionManagement、配置TransactionManager Bean之后，Spring会开启事务功能、为包含@Transactional方法的类生成代理，形式如下
 >
 > ~~~java
 > class UserServiceProxy extends UserService {
@@ -432,8 +469,9 @@
 >         ...
 >     }
 > }
-> 
 > ~~~
+>
+> 其中@Configuration和@EnableTransactionManagement注解都需要添加，原因见上面的代码注释
 
 ### (3) 问题修复
 
@@ -444,7 +482,7 @@
 >
 > UserService的代码修改为
 >
-> ~~~java
+> ~~~ java
 > @Component
 > public calss UserService {
 > 	@Autowired
@@ -472,4 +510,55 @@
 > 	}
 > }
 > ~~~
+
+### (4) 事务传播例子：`Propagation.REQUIRES_NEW`
+
+> `Propagation.REQUIRES_NEW`：被注解的方法，如果在另一个事务中运行，会被放在一个嵌套其中的新的事务里执行
+>
+> ~~~java
+> @Component
+> public calss UserService {
+> 	@Autowired
+> 	private JdbcTemplate jdbcTemplate;
+>     
+> 	// 自己注入自己，这样得到的userService是一个代理对象，而不是原生对象
+> 	@Autowired
+>     private UserService userService;
+> 
+> 	@Transactional
+> 	public void testTrx() {
+> 		jdbcTemplate.execute("insert t1 values(1,1,1,1,1)");
+> 		userService.willThrowException();
+> 	}
+>     
+> 	// 注解的用途是：不容许事务传播，即如果它在一个事务中运行，那么会抛异常
+> 	@Transactional(propagation = Propagation.REQUIRES_NEW)
+> 	public void willThrowException() {
+> 		...
+> 		throw new 
+> 	}
+> }
+> ~~~
+>
+> 放在Spring事务实现的角度上来理解，调用上面代码中的`testTrx()`方法，两个方法都会被认为抛异常，虽然是两个事务，但是都不会提交
+
+## 04 BeanPostProcessor
+
+BeanPostProcessor是一个接口，有很多实现类，被用在Bean创建过程中的各个环节
+
+> 以之前的UserService Bean为例，创建过程如下
+>
+> → UserService.class
+>
+> → 使用`推断构造方法`来反射创建对象
+>
+> → 属性注入：使用`AutowiredAnnotationBeanPostProcessor`
+>
+> → 初始化 
+>
+> * Bean初始化前：使用BeanPostProcessor
+>
+> * Bean初始化：使用BeanPostProcessor
+>
+> * Bean初始化后：使用`AnnotationAwareAsectJAutoProxyCreator`
 
