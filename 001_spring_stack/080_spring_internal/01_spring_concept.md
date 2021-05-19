@@ -337,7 +337,7 @@
 
 ## 03 Spring事务
 
-### (1) 例子代码
+### (1) 例子代码及问题
 
 > 配置
 >
@@ -379,12 +379,20 @@
 > 	private JdbcTemplate jdbcTemplate;
 > 
 > 	@Transactional
-> 	public void runDemo() {
+> 	public void testTrx() {
 > 		jdbcTemplate.execute("insert t1 values(1,1,1,1,1)");
-> 		throw enw NullPointerException();
+> 		// 原本期望会抛异常，而实际运行时，Propagation注解失效没有抛异常
+> 		// * 因为调用的是原生对象的方法，而不是AOP代理的方法
+> 		// * 具体可参考上一小节AOP的原理，或下面的说明
+> 		expectExceptionButNotThrow();
+> 	}
+>     
+> 	// 注解的用途是：不容许事务传播，即如果它在一个事务中运行，那么会抛异常
+> 	@Transactional(propagation = Propagation.NEVER)
+> 	public void expectExceptionButNotThrow() {
+> 		...
 > 	}
 > }
-> 
 > ~~~
 >
 > Test Driver
@@ -394,9 +402,74 @@
 > 	public static void main(String[] args) {
 > 		AnnotationConfigApplictionContext appConext = new AnnotationConfigApplictionContext();
 > 		UserService userService = appContext.getBean("userService", UserService.class);
-> 		userService.runDemo();       				// 执行UserService Bean的方法
+> 		userService.testTrx();  // 执行UserService Bean的方法
 > 	}
 > }
 > ~~~
 
-### 
+### (2) @Transactional原理
+
+> 开启@EnableTransactionManagement之后，Spring会为包含@Transactional方法的类生成代理，形式如下
+>
+> ~~~java
+> class UserServiceProxy extends UserService {
+>     UserService userService;
+> 
+>     public void testTrx() {
+>         // 1. 建立数据库连接
+>         ...
+>         // 2. 关闭auto commit
+> 		conn.setAutoCommit(false);
+>         // 3. 执行被代理的方法
+>         userService.testTrx();
+>         // 4. 提交事务（如果上一步没有抛异常）
+>         conn.commit();
+>     }
+> 
+>     public void expectExceptionButNotThrow() {
+>         ...
+>         userService.expectExceptionButNotThrow();
+>         ...
+>     }
+> }
+> 
+> ~~~
+
+### (3) 问题修复
+
+> 如何让`(1)小节`中的`@Transactional(propagation = Propagation.NEVER)`注解起作用
+>
+> * 需要让代码调用代理对象的方法，而不是原生对象的方法
+> * 通过自己注入自己可以做到这一点
+>
+> UserService的代码修改为
+>
+> ~~~java
+> @Component
+> public calss UserService {
+> 	@Autowired
+> 	private JdbcTemplate jdbcTemplate;
+>     
+> 	// 自己注入自己，这样得到的userService是一个代理对象，而不是原生对象
+> 	@Autowired
+>     private UserService userService;
+> 
+> 	@Transactional
+> 	public void testTrx() {
+> 		jdbcTemplate.execute("insert t1 values(1,1,1,1,1)");
+> 
+> 		// 直接调用会调用原生对象的方法，导致willThrowException方法的注解失效
+> 		// willThrowException();
+> 		
+> 		// 需要通过注入的代理对象（就是它自己）来调用
+> 		userService.willThrowException();
+> 	}
+>     
+> 	// 注解的用途是：不容许事务传播，即如果它在一个事务中运行，那么会抛异常
+> 	@Transactional(propagation = Propagation.NEVER)
+> 	public void willThrowException() {
+> 		...
+> 	}
+> }
+> ~~~
+
