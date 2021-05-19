@@ -30,27 +30,62 @@
 > ~~~java
 > @Component
 > public class UserService implements InitializingBean {
->     @Autowired
->     private OrderService orderService;
->     
->     @Autowired
->     private ConfigMapper cfgMapper;
->         
->     private User defaultUser;
->     public User getDefaultUser {
->         return defaultuser;
->     }
+> 	/*******************************************************
+> 	* 属性
+> 	*******************************************************/
+> 	// 在对象构造阶段注入
+> 	private ProfileService profileService;
 > 
+> 	// 在属性注入阶段赋值
+> 	@Autowired
+> 	private ConfigMapper cfgMapper;
+> 	@Autowired
+> 	private OrderService orderService;
+> 
+> 	// 在Bean初始化阶段为它赋值
+> 	private User defaultUser;
+>     
+> 	/*******************************************************
+> 	* 对象构造
+> 	*******************************************************/    
+> 	// 默认调用无参构造方法创建对象，除非有其他构造方法被@Autowired注解
+> 	public UserService() {}; 
+> 
+> 	// 使用@Autowired注解来改用下面的有参构造方法来创建对象
+> 	// 变量profileService注入
+> 	// * 优先byType: 根据类型ProfileService.class来查找Bean，如果只有一个则直接注入
+> 	// * 随后byName: 如过找到多个，根据名称profService来匹配并注入，无法匹配时报错
+> 	// 单例Bean不等同于单例模式，同一个类型可以定义多个单例Bean
+> 	// * 使用不同的bean name能拿到不同的Bean以及不同的对象
+> 	// * 使用相同的bean name拿到的才是相同的对象
+> 	@Autowired
+> 	public UserService(ProfileService profService) {
+> 		this.profileService = profService;
+> 	}
+> 
+>     /*******************************************************
+>     * Bean初始化前
+>     *******************************************************/
 >     @PostConstruct
 >     public void init() {
 > 		this.defaultUser = cfgMapper.getDefaultUser();
 >     }
 > 
+>     /*******************************************************
+>     * Bean初始化
+>     *******************************************************/    
 >     @Override
 >     public void afterPropertiesSet() throws Exception {
 >         // 该方法来自InitializingBean接口，在属性注入完成后执行
 >         // 也可以在这里设置defaultUser
 >         // this.defaultUser = cfgMapper.getDefaultUser();
+>     }
+> 
+>     /*******************************************************
+>     * 其他方法
+>     *******************************************************/ 
+>     public User getDefaultUser {
+>         return defaultuser;
 >     }
 > }
 > ~~~
@@ -63,7 +98,10 @@
 
 > UserService.class
 >
-> → 无参构造方法反射：创建UserService对象 
+> → 使用`推断构造方法`来反射创建UserService对象
+>
+> * 默认：只调用无参构造方法（没有无参构造方法时会报错）
+> * 使用@Autowired注解1个有参构造方法：调用这个被注解的方法（用@Autowired注解多个有参构造方法也会报错，Spring需要知道该调用哪个）并进行构造参数注入（见上面代码中的注解）
 >
 > → 属性注入
 >
@@ -108,7 +146,7 @@
 > }
 > ~~~
 
-##### 初始化（Bean初始化前、Bean初始化、Bean初始化后）
+##### 初始化：Bean初始化前、Bean初始化、Bean初始化后
 
 > AbstractAutowireCapableBeanFactory.initializeBean方法
 >
