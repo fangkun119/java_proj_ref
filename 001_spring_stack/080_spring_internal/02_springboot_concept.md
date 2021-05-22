@@ -24,6 +24,8 @@
 
 ### (2) 用Spring MVC模拟实现Spring Boot
 
+#### (a) 方法
+
 官方文档[Spring Web MVC → DispatcherServlet](https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-servlet)中列出以下代码
 
 > ~~~java
@@ -33,9 +35,9 @@
 > 		// Load Spring web application configuration
 > 		AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
 > 		context.register(AppConfig.class);
->         context.refresh();
+> 		context.refresh();
 > 
->         // 创建和注册Dispatch Servlet的步骤被移到了步骤4的代码中
+> 		// 创建和注册Dispatch Servlet的步骤被移到了步骤4的代码中
 > 		// DispatcherServlet servlet = new DispatcherServlet(context);
 > 		// ServletRegistration.Dynamic registration = servletContext.addServlet("app", servlet);
 > 		// registration.setLoadOnStartup(1);
@@ -46,7 +48,9 @@
 
 在上述代码基础上进行改动，可以用Spring MVC模拟Spring Boot，实现了一个零配置的Web Application
 
-(1) 主类以及Controller
+#### (b) 代码
+
+##### 主类以及Controller
 
 > 主类
 >
@@ -106,7 +110,7 @@
 > * [spring-webmvc 5.2.7.RELEASE](https://mvnrepository.com/artifact/org.springframework/spring-webmvc/5.2.7.RELEASE)
 > * `org.apache.tomcat Tomcat8.0 8.0`
 
-(2) 内置Tomcat
+##### 内置Tomcat
 
 > 接口：WebServerFactory
 >
@@ -134,7 +138,7 @@
 > }
 > ~~~
 
-(4) 把DispatchServlet加载到Tomcat容器中
+##### 把DispatchServlet加载到Tomcat容器中
 
 > 实现ApplicationContextAware接口，以便让这个类有能力够通过Spring Context (ApplicationContext) 获得DispatcherServlet Bean
 >
@@ -192,7 +196,7 @@
 > }
 > ~~~
 
-代码说明：
+#### (c) 代码说明
 
 1 老式应用中的三处配置如何被替代
 
@@ -206,7 +210,7 @@
 
 > 如`DispatcherServlet`的[官方文档](https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-servlet)中描述，实现`org.springframework.web.WebApplicationInitializer`接口的类，会被Servlet容器自动扫描并执行。而Tomcat能够调用到Spring（非Tomcat）的接口，是因为使用了SPI技术。
 
-## SPI在Spring Boot代码中的应用
+## 02 Tomcat启动：SPI在Spring Boot代码中的应用
 
 > 如上一节末尾，借助SPI可以让Tomcat调用Spring的接口
 >
@@ -281,4 +285,402 @@ Spring如何让Tomcat能够调用不属于它的WebApplicationInitializer类
 >     ~~~
 >
 > * SpringServletContainerInitializer的onStartUp会遍历所有注入的实现类，调用他们的onStartUp方法
+
+## 03 Spring Boot自动配置Spring MVC的源代码
+
+### (1) Demo代码
+
+主类
+
+> ~~~java
+> @SpringBootConfiguration
+> @ComponentScan("填入要扫描的包路径")
+> public class Demo {
+>     public static void main(String[] args) throws Exception {
+>         SpringApplication.run(Demo.class, args);
+>     }
+> }
+> ~~~
+
+Controller
+
+> ~~~java
+> @RestController
+> public class HelloController {
+>     @RequestMapping("/test")
+>     public String test() {
+>         return "hello world";
+>     }
+> }
+> ~~~
+
+依赖
+
+> | groupId                  | artifactId                | Version       |
+> | ------------------------ | ------------------------- | ------------- |
+> | org.springframework      | spring-webmvc:            | 5.2.7-RELEASE |
+> | org.apache.tomcat        | Tomcat8.0                 | 8.0           |
+> | org.springframework.boot | spring-boot               | 2.3.1-RELEASE |
+> | org.springframework.boot | spring-boot-autoconfigure | 2.3.1-RELEASE |
+>
+> spring-boot-autoconfigure用于自动装配
+
+### (2) Spring Boot启动源代码
+
+#### (a) 如何启动Tomcat
+
+→ `SpringApplication.run(...)` 
+
+> ~~~java
+> public static ConfigurableApplicationContext run(Class<?>[] primarySource, String[] args) {
+> 	return new SpringApplication(primarySources).run(args);
+> }
+> ~~~
+
+→ `SpringApplication.run(...)`
+
+> ~~~java
+> ConfigurableApplicationContext context = null;
+> ...
+> try {
+>     ...
+> 	// 创建IOC容器，根据参数的不同，创建不同的容器（SERVLET，REACTIVE）
+> 	context = createApplicationContext(); 
+>     ...
+> 	// 依赖注入
+> 	prepareContext(context, environment, listeners, applicationArguments, printedBanner); 
+>     // 下面步骤中会启动Tomcat
+>     // * 通过调用ServletWebServerApplicationContext的onRefresh方法
+>     refreshContext(context); 
+> }
+> ~~~
+>
+> → ServletWebServerApplicationContext.onRefresh
+>
+> → ServletWebServerApplicationContext.createWebServer
+>
+> ~~~java
+> private void createWebServer() {
+>     ...
+> 	ServletWebServerFactory factory = getWebServerFactory();
+> 	this.webServer = factory.getWebServer(getSelfInitializer());
+> }
+> ~~~
+>
+> > → TomcatServletWebServerFactory.getWebServer
+> >
+> > ~~~java
+> > @Override
+> > public WebServer getWebServer(ServletContextInitializer... initializers) {
+> > 	...
+> > 	Tomcat tomcat = new Tomcat();
+> > 	...
+> > 	return getTomcatWebServer(tomcat);
+> > }
+> > 
+> > protected TomcatWebServer getTomcatWebServer(Tomcat tomcat) {
+> >     return new TomcatWebServer(tomcat, getPort() >= 0, getShudown());
+> > }
+> > ~~~
+> >
+> > > → TomcatWebServer
+> > >
+> > > ~~~java
+> > > public TomcatWebServer(Tomcat tomcat, boolean autoStart, Shutdown shutdown) {
+> > >     ...
+> > > 	initialize();
+> > > }
+> > > 
+> > > private void initialize throws WebServerException {
+> > > 	...
+> > > 	this.tomcat.start(); //启动Tomcat
+> > > 	...
+> > > 	startDaemonAwaitThread(); 
+> > > 	...
+> > > }
+> > > ~~~
+
+#### (b) 如何把DispatchServlet设置给Tomcat
+
+入口
+
+> 在spring-boot-autoconfigure jar包的META-INF目录中的springfactories中可以看到：
+>
+> ~~~txt
+> org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration, \
+> ~~~
+
+代码：注册DispatcherServlet到IOC容器、并让Tomcat在启动时调用
+
+> → DispatcherServletAutoConfiguration (上面模拟实现中的DemoConfig类作用于此类似)
+>
+> ~~~java
+> public class DispatcherServletAutoConfiguration {
+> 	...
+> 
+> 	@Configuration(proxBeanMethods = false)
+> 	@Conditional(DefaultDispatcherServletCondition.class)
+> 	@ConditionalOnClass(ServletRegistration.class)
+> 	@EnableConfigurationProperties(WebMvcProperties.class)
+> 	public static class DispatcherServletConfiguration {
+> 
+>         // 将DispatcherServlet加载到IOC容器中
+> 		@Bean(name = DEFAULT_DISPATCHER_SERVLET_BEAN_NAME) 
+> 		publci DispatcherServlet dispatcherServlet(WebMvcProperties webMvcProperties) {
+> 			DispatcherServlet dispatcherServlet = new DispatcherServlet();
+> 			...
+> 			return dispatcherServlet;
+>         }
+> 		...
+>     }
+>     ...
+> 	
+> 	@Configuration(proxBeanMethods = false)
+> 	@Conditional(DefaultDispatcherServletCondition.class)
+> 	@ConditionalOnClass(ServletRegistration.class)
+> 	@EnableConfigurationProperties(WebMvcProperties.class)
+>     @Import(DispatcherServletConfiguration.class)
+> 	protected static class DispatcherServletRegistrationConfiguration {
+> 
+> 		@Bean(name = DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME)
+> 		@ConditionalOnBean(value = DispatcherServlet.class, name = DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
+> 		public DispatcherServletRegistrationBean dispatcherServletRegistration(DispatcherServlet dispatcherServlet,
+> 				WebMvcProperties webMvcProperties, ObjectProvider<MultipartConfigElement> multipartConfig) {
+> 			DispatcherServletRegistrationBean registration = new ...
+> 			...
+> 			// 与让Tomcat加载IOC容器中的DispatchServlet
+> 			registration.setLoadOnStartup(webMvcProperties.getServlet().getLoadOnStartup());
+> 			...
+> 			return registration;
+>         }
+>     }
+> 	...
+> }
+> ~~~
+>
+> > → DispatcherServletRegistrationBean
+> >
+> > ~~~java
+> > public class DispatcherServletRegistrationBean extends ServletRegistrationBean<DispatcherServlet> implements DispatcherServletPath {
+> >     ...
+> > }
+> > ~~~
+> >
+> > → ServletRegistrationBean
+> >
+> > <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/upload/001_spring_080_internal_servletregistrationbean_class_diag.png" width="600" /></div>
+> >
+> > ~~~java
+> > class DynamicRegistrationBean extends RegistrationBean implements Dynamic {
+> > 	...
+> > 	// ServletContextInitializer接口的方法，负责将Servlet添加到Servlet容器中
+> >     @Override
+> > 	protected ServletRegistration.Dynamic addRegistration(String description, ServletContext servletContext) {
+> >         String name = getServletname();
+> >         return servletContext.addServlet(name, this.servlet);
+> >     }
+> >     ...
+> > }
+> > ~~~
+> >
+> > →ServletContextInitializer
+> >
+> > ~~~java
+> > @FunctionalInterface
+> > public interface ServletContextInitializer {
+> >     void onStartup(ServletContext servletContext) throws ServletException;
+> > }
+> > ~~~
+> >
+> > * 之前模拟实现小节中，使用的是ServletContainerInitializer接口，这个来自Spring接口被Tomcat以SPI的方法调用
+> > * 不仅如下，Tomcat还会通过调用ServletContainerInitializer来调用到ServletContextInitializer接口
+> >
+> > 调用原理如下：
+> >
+> > (1) 通过StandardContext类可以设置Initailizer
+> >
+> > ~~~java
+> > @SuppressWarnings("deprecation")
+> > public class StandardContext extends ContainerBase implements Context, NotificationEmitter {
+> > 	...
+> > 	@Override
+> > 	public void addServletContainerInitializer(
+> > 			ServletContainerInitializer sci, Set<Class<?>> classes) {
+> > 		// initializers是一个全局变量
+> > 		// (1) Tomcat启动时会遍历其中所有的intializer并调用onStartup方法
+> > 		// (2) 这个过程通过SPI来实现
+> > 		initializers.put(sci, classes);
+> >     }
+> > }
+> > ~~~
+> >
+> > (2) Tomcat在启动时，会遍历initializers并调用元素的onStartup方法
+> >
+> > ~~~java
+> > package org.apache.catalina.util
+> > 
+> > class LifecycleBean {
+> > 	...
+> > 
+> > 	@Override
+> > 	protected synchronized void startInternal() throws LifecycleException {
+> >     	...
+> > 		for (Map.Entry<ServletContainerInitializer, Set<Class<?>>> entry: initializers.entrySet()) {
+> > 			try {
+> > 				entry.getKey().onStartup(entry.getValue(), getServletContext());
+> > 			} catch (ServletException e) {
+> > 				...
+> > 			}
+> > 		}
+> > 	}
+> > 	...
+> > }    
+> > ~~~
+> >
+> > (3) 要通过SPI做的事情，就是让Tomcat在访问intializers时，能够找到Spring的initializers实现类
+> >
+> > (4) 具体如何调用到上面Spring的ServletContextInitializer接口
+> >
+> > → ServletWebServerApplicationContext 
+> >
+> > ~~~java
+> > class ServletWebServerApplicationContext {
+> >     ...
+> > 
+> > 	private void createWebServer() {
+> > 		...
+> > 		// 刚启动、Tomcat上下文还为null的时候
+> > 		if (webServer == null && servletContext == null) {
+> > 			...
+> > 			// 
+> > 			this.webServer = factory.getWebServer(getSelfInitializer() /*只设置了一个lambda表达式*/);
+> > 			...
+> >         }
+> > 		// Spring Boot打War包部署时
+> >         else if (serveltContext != null) {
+> >             ...
+> >         }
+> > 	}
+> > 
+> > 	private org.springframework.boot.web.servlet.ServletContextInitializer getSelfInitializer() {
+> > 		return this::selfInitialize;
+> > 	}
+> > 
+> >     private void selfInitialize(ServletContext servletContext) throws ServletException {
+> > 		...
+> > 		for (ServletContextInitializer beans : getServletContextInitializerBeans()) {
+> > 			beans.onStartup(servletContext);
+> > 		}
+> > 	}
+> > }
+> > ~~~
+> >
+> > > → ServletWebServerFactory
+> > >
+> > > ~~~java
+> > > @FunctionalInterface
+> > > public interface ServletWebServerFactory {
+> > > 	WebServer getWebServer(ServletContextInitializer... initializers);
+> > > }
+> > > ~~~
+> > >
+> > > → TomcatServletWebServerFactory
+> > >
+> > > ~~~java
+> > > class TomcatServletWebServerFactory implements ServletWebServerFactory {
+> > > 	...
+> > > 	@Override
+> > > 	public WebServer getWebServer(ServletContextInitializer... initializers) {
+> > >         ...
+> > > 		prepareContext(tomcat.getHost(), initializers);
+> > > 		return getTomcatWebServer(tomcat);
+> > >     }
+> > > 
+> > >     protected void prepareContext(Host host, ServletContextInitializer[] initializers) {
+> > >         ...
+> > > 		// TomcatEmbeddedContext 实现了上面的 StandardContext
+> > > 		TomcatEmbeddedContext context = new TomcatEmbeddedContext();
+> > > 		...
+> > > 		// 对initializers做合并处理
+> > > 		ServletContextInitializer[] initializersToUse = mergeInitializers(initializers);
+> > >         ...
+> > > 		// 将intializers配置到context中
+> > > 		configureContext(context, initializersToUse);
+> > > 		postProcessContext(context);
+> > >     }
+> > > 	
+> > > 	protected void configureContext(Context context, ServletContextInitializer[] intitializers) {
+> > >         // TomcatStarter是ServletContainerInitializer的子类
+> > > 		// 而之前模拟代码中的ServletContextInitializer是要调用的类，如何让它被调用？
+> > > 		// (1) TomcatStarter是ServletContainerInitializer的子类
+> > > 		// (2) ServletContainerInitializer会在Tomcat启动时被调用
+> > > 		// (3) 而目标类ServletContextInitializer则被包裹在ServletContainerInitializer中，因此也能一同被调用
+> > > 		TomcatStarter starter = new TomcatStarter(initializers);
+> > >         ...
+> > > 		
+> > >         // 类型是TomcatEmbeddedContext extends StandardContext
+> > > 		// 会把ServletContainerInitializer放入initializers变量中
+> > > 		// 具体见本小节顶部的介绍StandardContext的代码
+> > > 		context.addServletContainerInitializer(starter, NO_CLASSES);
+> > >     }	
+> > > }
+> > > 
+> > > ~~~
+> > >
+> > > > → TomcatEmbeddedContext
+> > > >
+> > > > ~~~java
+> > > > class TomcatEmbeddedContext extends StandardContext {
+> > > >     ...
+> > > > }
+> > > > ~~~
+> > > >
+> > > > TomcatEmbeddedContext阶乘了本小节顶部StandardContext，它是Tomcat中的容器，把ServletContainerInitializer放入initializers变量中
+> > > >
+> > > > → TomcatStarter
+> > > >
+> > > > ~~~java
+> > > > class TomcatStarter implements ServletContainerInitializer {
+> > > >     ...
+> > > > 	private final ServletContextInitializer[] initializers;
+> > > > 	TomcatStarter(ServletContextInitializer[] initializers) {
+> > > >         this.initializers = initializers;
+> > > >     }
+> > > > 
+> > > >     @Override
+> > > >     public void onStartup(Set<Class<?>> classes, ServletContext servletContext) throws ServletException {
+> > > >         try {
+> > > >             for (ServletContextInitializer(initializer: this.initializers)) {
+> > > >                 initializer.onStartup(servletContext);
+> > > >             }
+> > > >         } eatch (Exception ex) {...}
+> > > >         ...
+> > > >     }
+> > > >     
+> > > > }
+> > > > ~~~
+
+综上所述：原理如下
+
+> (1) 通过SPI让Spring的ServletContextInitializer的onStartup方法被Tomcat调用
+>
+> (2) 通过类型包裹等方式，利用上面
+>
+> * 利用Tomcat的SPI让ServletContextInitializer替代Tomcat的ServletContainerInitializer
+>
+> * 通过Spring的SPI让WebApplicationInitializer替代Tomcat的ServletContainerInitializer
+
+### (3) 设计考虑
+
+#### (a) Spring/Spring Boot通过SPI用自己的接口取代Servlet规范中的接口
+
+原因是为屏蔽中间件Tomcat，与Tomcat解耦
+
+> ServletContextInitializer是Spring的接口，避免业务代码依赖Tomcat的接口
+>
+> ServletContextInitializer的实现类都在IOC容器中、使用方便
+>
+> 可以向Tomcat中添加DispatcherServlet，同样可以向Tomcat添加Listener和Filter等
+
+
 
