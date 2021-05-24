@@ -468,7 +468,7 @@ Controller
 > >
 > > → ServletRegistrationBean
 > >
-> > <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/upload/001_spring_080_internal_servletregistrationbean_class_diag.png" width="600" /></div>
+> > <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/080_spring_concept/001_spring_080_internal_servletregistrationbean_class_diag.jpg" width="600" /></div>
 > >
 > > ~~~java
 > > class DynamicRegistrationBean extends RegistrationBean implements Dynamic {
@@ -682,5 +682,350 @@ Controller
 >
 > 可以向Tomcat中添加DispatcherServlet，同样可以向Tomcat添加Listener和Filter等
 
+## 04 自动装配原理
 
+> 自动装配的原理、就是Starter编写的原理
+
+### (1) 使用Starter解决的问题
+
+#### (a) 传统Jar包的问题
+
+> 业务方需要编写代码配置Bean（@Autowired、依赖路径等）
+>
+> 一旦Jar包发生更新，可能会影响到业务方，需要业务方重新配置
+
+#### (b) 使用starter作为依赖
+
+>业务方不再需要编写代码配置Bean
+>
+>只需要在pom中依赖这个Jar包，然后通过@Autowired来注入这个Bean
+
+### (2) Demo项目
+
+> 原本在Spring MVC项目中需要配置Spring、Spring MVC、web.xml、applicationContext.xml等
+>
+> 但是改用Spring Boot之后，只需要引入spring-boot-starter-web，即可通过注解@SpringBootApplication来免去这些配置
+
+Controller
+
+> ~~~java
+> @RestController
+> public class HelloController {
+> 	@RequestMapping("/test") 
+> 	public String test() {
+> 		return "hello world";
+> 	}
+> }
+> ~~~
+
+启动类
+
+> ~~~java
+> @SpringBootApplication
+> public class Start {
+> 	public static void main(String[] args) throws Exception {
+>         SpringApplication.run(Start.class, args);
+>     }
+> }
+> ~~~
+
+`<parent>`
+
+> | groupId                  | artifactId                 | version       |
+> | ------------------------ | -------------------------- | ------------- |
+> | org.springframework.boot | spring-boot-starter-parent | 2.3.1.RELEASE |
+
+`<dependencies>`
+
+> | groupId                          | artifactId                | comment                 |
+> | -------------------------------- | ------------------------- | ----------------------- |
+> | org.springframework.boot         | spring-boot-starter-web   | 是一个starter依赖       |
+> | org.springframework.boot         | spring-boot-autoconfigure |                         |
+> | com.myprojdemo.springbootstarter | util-spring-boot-starter  | 准备编写的starter依赖包 |
+
+说明
+
+1 . 使用不同的starter引入不同的功能支持
+
+> (1) 使用spring-boot-starter-web：spring、springmvc相关的配置都可以省去。
+>
+> (2) 同样、如果使用MyBatis的starter，可以省去mybatis、sqlsessionfactory等配置
+
+2 . 依赖版本管理
+
+> 配置在`<dependencies>`中的依赖不需要版本号，原因如下
+>
+> (1) 项目parent是spring-boot-starter-parent 2.3.1.RELEASE，而它上一层的parent是spring-boot-dependencies 2.3.1.RELEASE
+>
+> (2) 在spring-boot-dependencies 2.3.1.RELEASE中，有`<dependencyManagement>`定义了各个依赖的版本
+
+3 . Jar包冲突避免
+
+> 假如想使用ActiveMQ，只需再引入ActiveMQ的Starter，因为parent同属于spring-boot-starter-parent 2.3.1.RELEASE，因此最终定位到的`<dependencyManagement>`是同一个。而这些依赖的版本都已经预先进行过Jar包冲突处理，不会发生Jar包冲突
+
+4 . Spring Boot为何要在`spring-boot-starter-*`和`spring-boot-dependencies`之间添加一层`spring-boot-starter-parent`
+
+> 用来覆盖默认配置。例如在application.yml里面添加配置、把默认的Tomcat切换成Jetty或undertom等。在`spring-boot-starter-parent`的pom.xml中可以看到配置文件加载，作为一个中间层处理定制化的配置等。
+>
+> ~~~xml
+> <resource>
+> 	<directory>${basedir}/src/main/resources</directory>
+> 	<filtering>true</filtering>
+> 	<includes>
+> 		<include>**/application*.yml</include>
+> 		<include>**/application*.yaml</include>
+> 		<include>**/application*.properties</include>
+> 	</includes>
+> </resource>
+> ~~~
+
+### (3) 自动配置原理：@SpringBootApplication
+
+> 通过@SpringBootApplication注解来触发自动配置，其源代码和说明如下各个相关的注解源代码及注释如下
+>
+> ~~~java
+> // 元注解：用来修饰自定义注解的注解
+> @Target(ElementType.TYPE)			// 作用范围：类；方法；属性
+> @Retention(RetentionPolicy.RUNTIME)	// 生命周期：编译期生效（例如@Override注解）；运行期生效（例如@SpringBootApplication）
+> @Documented							// 开启JavaDoc注释：配合代码注释块中的@parent、@see等JavaDoc注解使用
+> @Inherited							// 自定义注解可被子类继承：例如某个类使用了@SpringBootApplication注解，他们它的子类也会自动拥有该注解
+> // 复合注解
+> @SpringBootConfiguration
+> @EnableAutoConfiguration
+> @ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
+> 		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
+> public @interface SpringBootApplication {
+> 
+> 	@AliasFor(annotation = EnableAutoConfiguration.class)
+> 	Class<?>[] exclude() default {};
+> 
+> 	@AliasFor(annotation = EnableAutoConfiguration.class)
+> 	String[] excludeName() default {};
+> 
+> 	@AliasFor(annotation = ComponentScan.class, attribute = "basePackages")
+> 	String[] scanBasePackages() default {};
+> 
+> 	@AliasFor(annotation = ComponentScan.class, attribute = "basePackageClasses")
+> 	Class<?>[] scanBasePackageClasses() default {};
+> 
+> 	@AliasFor(annotation = ComponentScan.class, attribute = "nameGenerator")
+> 	Class<? extends BeanNameGenerator> nameGenerator() default BeanNameGenerator.class;
+> 
+> 	@AliasFor(annotation = Configuration.class)
+> 	boolean proxyBeanMethods() default true;
+> }
+> ~~~
+
+#### (a) `@SpringBootConfiguration`
+
+> @SpringBootConfiguration：实际上就是@Configuration
+>
+> ```java
+> @Target(ElementType.TYPE)
+> @Retention(RetentionPolicy.RUNTIME)
+> @Documented
+> // 复合注解
+> @Configuration
+> public @interface SpringBootConfiguration {
+> 	@AliasFor(annotation = Configuration.class)
+> 	boolean proxyBeanMethods() default true;
+> }
+> ```
+>
+> @Configuration
+>
+> ~~~java
+> @Target(ElementType.TYPE)
+> @Retention(RetentionPolicy.RUNTIME)
+> @Documented
+> // 复合注解
+> @Component
+> public @interface Configuration {
+> 	@AliasFor(annotation = Component.class)
+> 	String value() default "";
+> 	// proxyBeanMethods值为true：
+> 	// * 默认使用CGLib代理该注解修饰的类
+> 	// * @Configuration修饰的类里面，调用自己的使用@Bean注解的方法，会被代理，返回注册在容器中的Bean，而不是直接调用
+> 	boolean proxyBeanMethods() default true;
+> }
+> ~~~
+
+#### (b) `@EnableAutoConfiguration`
+
+##### @EnableAutoConfiguration ← @AutoConfigurationPackage
+
+> `@EnableAutoConfiguration`
+>
+> ```java
+> @Target(ElementType.TYPE)
+> @Retention(RetentionPolicy.RUNTIME)
+> @Documented
+> @Inherited
+> // 参考下面的代码注释
+> @AutoConfigurationPackage
+> // 将AutoConfigurationImportSelector的selectImports方法返回的全路径数组对应的所有类，注入到IOC容器
+> @Import(AutoConfigurationImportSelector.class)  
+> public @interface EnableAutoConfiguration {
+>    String ENABLED_OVERRIDE_PROPERTY = "spring.boot.enableautoconfiguration";
+>    Class<?>[] exclude() default {};
+>    String[] excludeName() default {};
+> }
+> ```
+>
+> `@AutoConfigurationPackage`
+>
+> ```java
+> @Target(ElementType.TYPE)
+> @Retention(RetentionPolicy.RUNTIME)
+> @Documented
+> @Inherited
+> // 导入参数类到IOC容器
+> @Import(AutoConfigurationPackages.Registrar.class)	
+> public @interface AutoConfigurationPackage {
+>    String[] basePackages() default {};
+>    Class<?>[] basePackageClasses() default {};
+> }
+> ```
+
+##### @Import：Spring Boot自动装配的核心注解
+
+> 三种用法：
+> (1) 参数是普通类：将该类实例化并交给IOC容器管理
+> (2) 参数是ImportBeanDefinitionRegistrar的实现类：支持手工注册Bean（例如上面的AutoConfigurationPackages.Registrar）
+> (3) 参数是ImportSelector的实现类：会注册它的selectImports返回数组所表示的类到IOC容器（例如上面的AutoConfigurationImportSelector类）
+>
+> ~~~java
+> @Target(ElementType.TYPE)
+> @Retention(RetentionPolicy.RUNTIME)
+> @Documented
+> public @interface Import {
+> 	Class<?>[] value();
+> }
+> ~~~
+
+##### 辅助类：AutoConfigurationPackages和ImportSelector
+
+> AutoConfigurationPackages
+>
+> ```java
+> public abstract class AutoConfigurationPackages {
+> 	static class Registrar implements ImportBeanDefinitionRegistrar, DeterminableImports {
+> 		// Spring实例化Bean时使用的方法，实现这个方法可以手工注册Bean
+> 		@Override
+> 		public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+> 			// register的操作步骤：
+> 			// 保存扫描路径、提供给spring-data-jpa等查询用（例如查找使用@Entity、@Dao等注解的类）
+> 			register(
+> 				registry, 
+> 				// PackageImports用来获得要扫描的包：(1) 首选注解属性basePackages；（2）如果没有就使用被注解类所在包的包名
+> 				new PackageImports(metadata).getPackageNames().toArray(new String[0])
+> 			);
+> 		}
+> 
+> 		@Override
+> 		public Set<Object> determineImports(AnnotationMetadata metadata) {
+> 			return Collections.singleton(new PackageImports(metadata));
+> 		}
+>     }
+> }
+> ```
+>
+> AutoConfigurationImportSelector
+>
+> ~~~java
+> public class AutoConfigurationImportSelector implements DeferredImportSelector, BeanClassLoaderAware,
+> 		ResourceLoaderAware, BeanFactoryAware, EnvironmentAware, Ordered {
+> 	...
+> 
+> 	@Override
+> 	public String[] selectImports(AnnotationMetadata annotationMetadata) {
+> 		if (!isEnabled(annotationMetadata)) {
+> 			return NO_IMPORTS;
+> 		}
+> 		AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(annotationMetadata);
+> 		return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());
+> 	}
+> 
+> 	// 自动装配方法的核心
+> 	protected AutoConfigurationEntry getAutoConfigurationEntry(AnnotationMetadata annotationMetadata) {
+> 		// 判断注解是否开启
+>         if (!isEnabled(annotationMetadata)) {
+> 			return EMPTY_ENTRY;
+> 		}
+> 		// 获取注解属性
+> 		AnnotationAttributes attributes = getAttributes(annotationMetadata);
+> 		// 从META-INF/spring.factories配置文件中加载EnableAutoConfiguration类
+> 		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);
+> 		configurations = removeDuplicates(configurations);
+> 		Set<String> exclusions = getExclusions(annotationMetadata, attributes);
+> 		checkExcludedClasses(configurations, exclusions);
+> 		configurations.removeAll(exclusions);
+> 		configurations = getConfigurationClassFilter().filter(configurations);
+> 		fireAutoConfigurationImportEvents(configurations, exclusions);
+> 		return new AutoConfigurationEntry(configurations, exclusions);
+> 	}
+> 	...
+> }            
+> ~~~
+>
+> ImportSelector
+>
+> ```java
+> public interface ImportSelector {
+> 	// 以全路径的方式批量返回要注册的类
+> 	String[] selectImports(AnnotationMetadata importingClassMetadata);
+> 
+> 	@Nullable
+> 	default Predicate<String> getExclusionFilter() {
+> 		return null;
+> 	}
+> }
+> ```
+
+#### (c) `@ComponentScan`
+
+> ~~~java
+> package org.springframework.context.annotation;
+> ...
+> 
+> @Retention(RetentionPolicy.RUNTIME)
+> @Target(ElementType.TYPE)
+> @Documented
+> @Repeatable(ComponentScans.class)
+> public @interface ComponentScan {
+> 
+> 	@AliasFor("basePackages")
+> 	String[] value() default {};
+> 
+> 	@AliasFor("value")
+> 	String[] basePackages() default {};
+> 
+> 	Class<?>[] basePackageClasses() default {};
+> 	Class<? extends BeanNameGenerator> nameGenerator() default BeanNameGenerator.class;
+> 	Class<? extends ScopeMetadataResolver> scopeResolver() default AnnotationScopeMetadataResolver.class;
+> 	ScopedProxyMode scopedProxy() default ScopedProxyMode.DEFAULT;
+> 	String resourcePattern() default ClassPathScanningCandidateComponentProvider.DEFAULT_RESOURCE_PATTERN;
+> 	boolean useDefaultFilters() default true;
+> 	Filter[] includeFilters() default {};
+> 	Filter[] excludeFilters() default {};
+> 	boolean lazyInit() default false;
+> 
+> 	@Retention(RetentionPolicy.RUNTIME)
+> 	@Target({})
+> 	@interface Filter {
+> 
+> 		FilterType type() default FilterType.ANNOTATION;
+> 
+> 		@AliasFor("classes")
+> 		Class<?>[] value() default {};
+> 
+> 		@AliasFor("value")
+> 		Class<?>[] classes() default {};
+> 
+> 		String[] pattern() default {};
+> 	}
+> }
+> ~~~
+
+## 05 自定义Starter
 
