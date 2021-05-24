@@ -81,10 +81,10 @@
 > ~~~java
 > @RestController
 > public class HelloController {
->     @RequestMapping("/test")
->     public String test() {
->         return "hello world";
->     }
+>    	@RequestMapping("/test")
+>    	public String test() {
+>    		return "hello world";
+>    	}
 > }
 > ~~~
 >
@@ -93,9 +93,9 @@
 > ~~~java
 > @Configuration
 > public class DemoConfig {
->     @Bean
->     public DispatcherServlet dispatcherServlet() {
->         return new DispatcherServlet(context);
+>    	@Bean
+>    	public DispatcherServlet dispatcherServlet() {
+>    		return new DispatcherServlet(context);
 > 	}
 > 
 > 	@Bean
@@ -164,7 +164,7 @@
 > 		this.context = applicationContext;
 > 	}
 > 
->     // 从IOC Context中返回DispatchServlet Bean
+>    	// 从IOC Context中返回DispatchServlet Bean
 > 	public static DispatcherServlet getServlet() {
 >         // DispatcherServlet Bean在扫描到DemoConfig类时被加载到容器中
 > 		return context.getBean(DispatcherServlet.class);
@@ -296,9 +296,9 @@ Spring如何让Tomcat能够调用不属于它的WebApplicationInitializer类
 > @SpringBootConfiguration
 > @ComponentScan("填入要扫描的包路径")
 > public class Demo {
->     public static void main(String[] args) throws Exception {
->         SpringApplication.run(Demo.class, args);
->     }
+>    	public static void main(String[] args) throws Exception {
+>    		SpringApplication.run(Demo.class, args);
+>    	}
 > }
 > ~~~
 
@@ -307,10 +307,10 @@ Controller
 > ~~~java
 > @RestController
 > public class HelloController {
->     @RequestMapping("/test")
->     public String test() {
->         return "hello world";
->     }
+>    	@RequestMapping("/test")
+>    	public String test() {
+>    		return "hello world";
+>    	}
 > }
 > ~~~
 
@@ -343,15 +343,15 @@ Controller
 > ConfigurableApplicationContext context = null;
 > ...
 > try {
->     ...
+>    	...
 > 	// 创建IOC容器，根据参数的不同，创建不同的容器（SERVLET，REACTIVE）
 > 	context = createApplicationContext(); 
->     ...
+>    	...
 > 	// 依赖注入
 > 	prepareContext(context, environment, listeners, applicationArguments, printedBanner); 
->     // 下面步骤中会启动Tomcat
->     // * 通过调用ServletWebServerApplicationContext的onRefresh方法
->     refreshContext(context); 
+>     	// 下面步骤中会启动Tomcat
+>    	// * 通过调用ServletWebServerApplicationContext的onRefresh方法
+>    	refreshContext(context); 
 > }
 > ~~~
 >
@@ -361,7 +361,7 @@ Controller
 >
 > ~~~java
 > private void createWebServer() {
->     ...
+>    	...
 > 	ServletWebServerFactory factory = getWebServerFactory();
 > 	this.webServer = factory.getWebServer(getSelfInitializer());
 > }
@@ -379,7 +379,7 @@ Controller
 > > }
 > > 
 > > protected TomcatWebServer getTomcatWebServer(Tomcat tomcat) {
-> >     return new TomcatWebServer(tomcat, getPort() >= 0, getShudown());
+> >    	return new TomcatWebServer(tomcat, getPort() >= 0, getShudown());
 > > }
 > > ~~~
 > >
@@ -387,7 +387,7 @@ Controller
 > > >
 > > > ~~~java
 > > > public TomcatWebServer(Tomcat tomcat, boolean autoStart, Shutdown shutdown) {
-> > >     ...
+> > >    	...
 > > > 	initialize();
 > > > }
 > > > 
@@ -921,28 +921,30 @@ Controller
 > 				new PackageImports(metadata).getPackageNames().toArray(new String[0])
 > 			);
 > 		}
-> 
-> 		@Override
-> 		public Set<Object> determineImports(AnnotationMetadata metadata) {
-> 			return Collections.singleton(new PackageImports(metadata));
-> 		}
+> 		。。。
 >     }
 > }
 > ```
 >
-> AutoConfigurationImportSelector
+> AutoConfigurationImportSelector 和 SpringFactoriesLoader 类
 >
 > ~~~java
+> /******************************************************************************
+> * AutoConfigurationImportSelector
+> ******************************************************************************/
 > public class AutoConfigurationImportSelector implements DeferredImportSelector, BeanClassLoaderAware,
 > 		ResourceLoaderAware, BeanFactoryAware, EnvironmentAware, Ordered {
 > 	...
 > 
 > 	@Override
 > 	public String[] selectImports(AnnotationMetadata annotationMetadata) {
+> 		// 判断注解是否开启
 > 		if (!isEnabled(annotationMetadata)) {
 > 			return NO_IMPORTS;
 > 		}
+> 		// 获取META-INF/spring.factories中配置的@Configruation类
 > 		AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(annotationMetadata);
+> 		// 转成String[]返回
 > 		return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());
 > 	}
 > 
@@ -954,18 +956,55 @@ Controller
 > 		}
 > 		// 获取注解属性
 > 		AnnotationAttributes attributes = getAttributes(annotationMetadata);
-> 		// 从META-INF/spring.factories配置文件中加载EnableAutoConfiguration类
+> 		// 从META-INF/spring.factories配置文件中取到一组@Configuration类，其中包括EnableAutoConfiguration
 > 		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);
+> 		// 去重
 > 		configurations = removeDuplicates(configurations);
+> 		// 可以通过注解排除不想加载的类
 > 		Set<String> exclusions = getExclusions(annotationMetadata, attributes);
 > 		checkExcludedClasses(configurations, exclusions);
 > 		configurations.removeAll(exclusions);
+> 		// 过滤
 > 		configurations = getConfigurationClassFilter().filter(configurations);
+> 		// 把AutoConfigurationImportEvent绑定到监听器中，用来发布事件
 > 		fireAutoConfigurationImportEvents(configurations, exclusions);
+> 		// 包装并返回
 > 		return new AutoConfigurationEntry(configurations, exclusions);
 > 	}
+> 	
+> 	protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
+> 		// 
+> 		List<String> configurations = SpringFactoriesLoader.loadFactoryNames(getSpringFactoriesLoaderFactoryClass(),
+> 				getBeanClassLoader());
+> 		Assert.notEmpty(configurations, "No auto configuration classes found in META-INF/spring.factories. If you "
+> 				+ "are using a custom packaging, make sure that file is correct.");
+> 		return configurations;
+> 	}
+> }
+> 
+> /******************************************************************************
+> * SpringFactoriesLoader
+> ******************************************************************************/
+> public final class SpringFactoriesLoader {
 > 	...
-> }            
+> 	public static List<String> loadFactoryNames(Class<?> factoryType, @Nullable ClassLoader classLoader) {
+> 		...
+> 		return (List)loadSpringFactories(classLoaderToUse).getOrDefault(factoryTypeName, Collections.emptyList());
+> 	}
+> 
+> 	private static Map<String, List<String>> loadSpringFactories(ClassLoader classLoader) {
+> 		...
+> 		// 从配置文件META-INF/spring.factories中加载，文件内容包含
+> 		// ...
+> 		// # Auto Configure
+> 		// org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+> 		// ...
+> 		// 这些类每个都是一个@Configuration类，其中定义了各种Bean，都会被加载到IOC容器中
+> 		Enumeration urls = classLoader.getResources("META-INF/spring.factories");
+> 		...
+> 	}
+> 	...
+> }
 > ~~~
 >
 > ImportSelector
