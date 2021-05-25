@@ -1,8 +1,14 @@
 ### 编译
 
+> 用-U参数编译
+> 
 > ~~~bash
 > mvn -U clean install
 > ~~~
+> 
+> 或者在IDEA的maven配置中勾选"always update snapshot"
+> 
+> 参考：[https://blog.csdn.net/cobracanary/article/details/103506967](https://blog.csdn.net/cobracanary/article/details/103506967)
 
 ### 测试
 
