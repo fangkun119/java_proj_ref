@@ -1,0 +1,2 @@
+# Auto Configure：从spring-boot-autoconfigure JAR包的同名文件中拷贝并修改
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.javaprojref.springboot.autocfg.DateConfig

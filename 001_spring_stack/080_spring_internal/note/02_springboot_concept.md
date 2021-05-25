@@ -722,10 +722,10 @@ Controller
 
 > ~~~java
 > @SpringBootApplication
-> public class Start {
-> 	public static void main(String[] args) throws Exception {
->         SpringApplication.run(Start.class, args);
->     }
+> public class DemoApplication {
+> 	public static void main(String[] args) {
+> 		SpringApplication.run(DemoApplication.class, args);
+> 	}
 > }
 > ~~~
 
@@ -778,6 +778,8 @@ Controller
 > 	</includes>
 > </resource>
 > ~~~
+
+下一小节会继续修改这个项目，添加并使用一个自定义Starter
 
 ### (3) 自动配置原理：@SpringBootApplication
 
@@ -921,7 +923,7 @@ Controller
 > 				new PackageImports(metadata).getPackageNames().toArray(new String[0])
 > 			);
 > 		}
-> 		。。。
+> 		...
 >     }
 > }
 > ```
@@ -1067,4 +1069,12 @@ Controller
 > ~~~
 
 ## 05 自定义Starter
+
+### (1) Demo项目
+
+项目分成两个Idea Module，对应的artifact如下
+
+> `util-spring-boot-autoconfig`：编写业务逻辑，内容参照上一小节的Demo项目进行修改
+>
+> `utile-spring-boot-starter`：管理依赖
 
