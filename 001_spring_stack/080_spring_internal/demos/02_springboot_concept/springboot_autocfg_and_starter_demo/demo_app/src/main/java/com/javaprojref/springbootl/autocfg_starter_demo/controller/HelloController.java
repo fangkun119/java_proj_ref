@@ -1,5 +1,6 @@
 package com.javaprojref.springbootl.autocfg_starter_demo.controller;
 
+import com.javaprojref.springboot.autocfg.NamingUtil;
 import com.javaprojref.springboot.autocfg.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,16 +11,20 @@ import com.javaprojref.springboot.autocfg.DateUtil;
 public class HelloController {
     // 依赖starter会自动加载META-INF/spring.factories中所有@Configure类所配置的Bean，包括DateUtile
     @Autowired
-    public DateUtil dateUtil;
+    protected DateUtil dateUtil;
 
-    // 通过DemoApplication类中@Import(TokenConfig.class)来加载成为Bean
+    // 通过DemoApplication类的@Import(TokenConfig.class)来加载成为Bean
     @Autowired
-    public TokenUtil tokenUtil;
+    protected TokenUtil tokenUtil;
+
+    // 通过DemoApplication类的@EnableNamingUtil来加载成为Bean
+    @Autowired
+    protected NamingUtil namingUtil;
 
     @GetMapping("/test")
     public String test() {
         return String.format(
-                "Time: %s; Token: %s",
-                dateUtil.getLocalTime(), tokenUtil.getToken());
+                "Time: %s; Token: %s; Server Name: %s",
+                dateUtil.getLocalTime(), tokenUtil.getToken(), namingUtil.getServerName());
     }
 }

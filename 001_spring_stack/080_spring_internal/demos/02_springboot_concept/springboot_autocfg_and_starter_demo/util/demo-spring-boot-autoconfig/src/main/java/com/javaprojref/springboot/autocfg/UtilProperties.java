@@ -7,6 +7,7 @@ public class UtilProperties {
     private Double longitude = 120d;
     private String pattern = "yyyy-MM-dd HH:mm:ss";
     private String token = "d810-tqw8-29dp-bnp8";
+    private String serverName = "server-1012";
 
     public Double getLongitude() {
         return longitude;
@@ -30,5 +31,13 @@ public class UtilProperties {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
     }
 }
