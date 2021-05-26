@@ -1,6 +1,6 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
 
 - [Spring Boot框架原理](#spring-boot%E6%A1%86%E6%9E%B6%E5%8E%9F%E7%90%86)
   - [01 零配置原理](#01-%E9%9B%B6%E9%85%8D%E7%BD%AE%E5%8E%9F%E7%90%86)
@@ -39,11 +39,10 @@
     - [(1) Demo代码](#1-demo%E4%BB%A3%E7%A0%81-1)
     - [(1) 方法1：@Import(AutoConfigurationPackages.Registrar)](#1-%E6%96%B9%E6%B3%951importautoconfigurationpackagesregistrar)
     - [(3) 方法2：@Import(SomeImportSelector.class)](#3-%E6%96%B9%E6%B3%952importsomeimportselectorclass)
-    - [(3) 方法3：Import(XXX.class)](#3-%E6%96%B9%E6%B3%953importxxxclass)
+    - [(4) 方法3：Import(XXX.class)](#4-%E6%96%B9%E6%B3%953importxxxclass)
+    - [(5) 方法比较](#5-%E6%96%B9%E6%B3%95%E6%AF%94%E8%BE%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-[TOC]
 
 # Spring Boot框架原理
 
@@ -1102,6 +1101,17 @@ Controller
 > </dependency>
 > ~~~
 
+Module命名需要遵守命名规范
+
+> 对于Springboot自带的starter：命名规范为spring-boot-starter-xxx
+>
+> 对于自定义的starter：命名规范为xxx-spring-boot-starter
+>
+> 通常要拆成另个模块，但是也可以合并成一个
+>
+> * xxx-spring-boot-autoconfig：完成自动配置功能
+> * xxx-spring-boot-starter：管理pom.xml依赖
+
 这个Demo中编写的自定义Starter实现了三种使用方法
 
 > 方法1：借助`@Import(AutoConfigurationPackages.Registrar)`，让业务方依赖starter时自动加载META-INF/spring.factories中所有@Configuration类所配置的Bean
@@ -1248,7 +1258,7 @@ Controller
 > }
 > ~~~
 
-### (3) 方法3：Import(XXX.class)
+### (4) 方法3：Import(XXX.class)
 
 实现过程大部分与方法1相同，差异部分如下
 
@@ -1282,7 +1292,7 @@ Controller
 > }
 > ~~~
 >
-> 这个@Configuration类并没有配置在[/src/main/resources/META-INF/spring.factories](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/080_spring_internal/demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-autoconfig/src/main/resources/META-INF/spring.factories)中，因此引入starter依赖时并不会自动通过方法(1)进行加载
+> 这个@Configuration类并没有配置在[/src/main/resources/META-INF/spring.factories](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-autoconfig/src/main/resources/META-INF/spring.factories)中，因此引入starter依赖时并不会自动通过方法(1)进行加载
 >
 > 但是业务代码可以自己使用@Import注解来进行加载，例如[DemoAppApplication](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/demo_app/src/main/java/com/javaprojref/springbootl/autocfg_starter_demo/DemoAppApplication.java)中的代码
 >
@@ -1290,9 +1300,20 @@ Controller
 > @SpringBootApplication
 > @Import(TokenConfig.class) //启动时加载starter中TokenConfig（未包含在META-INF/spring.factories中）所配置的Bean
 > public class DemoAppApplication {
->     public static void main(String[] args) {
->         SpringApplication.run(DemoAppApplication.class, args);
->     }
+>    	public static void main(String[] args) {
+>    		SpringApplication.run(DemoAppApplication.class, args);
+>    	}
 > }
 > ~~~
 
+### (5) 方法比较
+
+三种方法中，最推荐方法1，最不建议方法3
+
+> 方法3让业务方调用@Import加载Bean最不建议使用、会形成强依赖
+>
+> 方法1对业务方来说使用最便捷，直接使用Bean，对代码侵入最小
+
+至于为何使用@ComponentScan
+
+> 相比方法3让业务方使用@Import，使用@ComponentScan照成的跨模块依赖更强了，相比依赖类名，@Component依赖了更容易变动的包名
