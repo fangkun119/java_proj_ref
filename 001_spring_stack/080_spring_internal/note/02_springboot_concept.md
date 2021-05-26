@@ -1,3 +1,48 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Spring Boot框架原理](#spring-boot%E6%A1%86%E6%9E%B6%E5%8E%9F%E7%90%86)
+  - [01 零配置原理](#01-%E9%9B%B6%E9%85%8D%E7%BD%AE%E5%8E%9F%E7%90%86)
+    - [(1) 老式Tomcat部署War包时常用的三个配置](#1-%E8%80%81%E5%BC%8Ftomcat%E9%83%A8%E7%BD%B2war%E5%8C%85%E6%97%B6%E5%B8%B8%E7%94%A8%E7%9A%84%E4%B8%89%E4%B8%AA%E9%85%8D%E7%BD%AE)
+    - [(2) 用Spring MVC模拟实现Spring Boot](#2-%E7%94%A8spring-mvc%E6%A8%A1%E6%8B%9F%E5%AE%9E%E7%8E%B0spring-boot)
+      - [(a) 方法](#a-%E6%96%B9%E6%B3%95)
+      - [(b) 代码](#b-%E4%BB%A3%E7%A0%81)
+        - [主类以及Controller](#%E4%B8%BB%E7%B1%BB%E4%BB%A5%E5%8F%8Acontroller)
+        - [内置Tomcat](#%E5%86%85%E7%BD%AEtomcat)
+        - [把DispatchServlet加载到Tomcat容器中](#%E6%8A%8Adispatchservlet%E5%8A%A0%E8%BD%BD%E5%88%B0tomcat%E5%AE%B9%E5%99%A8%E4%B8%AD)
+      - [(c) 代码说明](#c-%E4%BB%A3%E7%A0%81%E8%AF%B4%E6%98%8E)
+  - [02 Tomcat启动：SPI在Spring Boot代码中的应用](#02-tomcat%E5%90%AF%E5%8A%A8spi%E5%9C%A8spring-boot%E4%BB%A3%E7%A0%81%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8)
+    - [(1) SPI服务发现机制（Service Provider Interface）](#1-spi%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0%E6%9C%BA%E5%88%B6service-provider-interface)
+    - [(2) 用SPI打破JVM的双亲委派](#2-%E7%94%A8spi%E6%89%93%E7%A0%B4jvm%E7%9A%84%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE)
+    - [(3) Spring Boot使用SPI让Tomcat调用Spring的接口](#3-spring-boot%E4%BD%BF%E7%94%A8spi%E8%AE%A9tomcat%E8%B0%83%E7%94%A8spring%E7%9A%84%E6%8E%A5%E5%8F%A3)
+  - [03 Spring Boot自动配置Spring MVC的源代码](#03-spring-boot%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AEspring-mvc%E7%9A%84%E6%BA%90%E4%BB%A3%E7%A0%81)
+    - [(1) Demo代码](#1-demo%E4%BB%A3%E7%A0%81)
+    - [(2) Spring Boot启动源代码](#2-spring-boot%E5%90%AF%E5%8A%A8%E6%BA%90%E4%BB%A3%E7%A0%81)
+      - [(a) 如何启动Tomcat](#a-%E5%A6%82%E4%BD%95%E5%90%AF%E5%8A%A8tomcat)
+      - [(b) 如何把DispatchServlet设置给Tomcat](#b-%E5%A6%82%E4%BD%95%E6%8A%8Adispatchservlet%E8%AE%BE%E7%BD%AE%E7%BB%99tomcat)
+    - [(3) 设计考虑](#3-%E8%AE%BE%E8%AE%A1%E8%80%83%E8%99%91)
+      - [(a) Spring/Spring Boot通过SPI用自己的接口取代Servlet规范中的接口](#a-springspring-boot%E9%80%9A%E8%BF%87spi%E7%94%A8%E8%87%AA%E5%B7%B1%E7%9A%84%E6%8E%A5%E5%8F%A3%E5%8F%96%E4%BB%A3servlet%E8%A7%84%E8%8C%83%E4%B8%AD%E7%9A%84%E6%8E%A5%E5%8F%A3)
+  - [04 自动装配原理](#04-%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E5%8E%9F%E7%90%86)
+    - [(1) 使用Starter解决的问题](#1-%E4%BD%BF%E7%94%A8starter%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98)
+      - [(a) 传统Jar包的问题](#a-%E4%BC%A0%E7%BB%9Fjar%E5%8C%85%E7%9A%84%E9%97%AE%E9%A2%98)
+      - [(b) 使用starter作为依赖](#b-%E4%BD%BF%E7%94%A8starter%E4%BD%9C%E4%B8%BA%E4%BE%9D%E8%B5%96)
+    - [(2) Demo项目](#2-demo%E9%A1%B9%E7%9B%AE)
+    - [(3) 自动配置原理：@SpringBootApplication](#3-%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E5%8E%9F%E7%90%86springbootapplication)
+      - [(a) `@SpringBootConfiguration`](#a-springbootconfiguration)
+      - [(b) `@EnableAutoConfiguration`](#b-enableautoconfiguration)
+        - [@EnableAutoConfiguration ← @AutoConfigurationPackage](#enableautoconfiguration-%E2%86%90-autoconfigurationpackage)
+        - [@Import：Spring Boot自动装配的核心注解](#importspring-boot%E8%87%AA%E5%8A%A8%E8%A3%85%E9%85%8D%E7%9A%84%E6%A0%B8%E5%BF%83%E6%B3%A8%E8%A7%A3)
+        - [辅助类：AutoConfigurationPackages和ImportSelector](#%E8%BE%85%E5%8A%A9%E7%B1%BBautoconfigurationpackages%E5%92%8Cimportselector)
+      - [(c) `@ComponentScan`](#c-componentscan)
+  - [05 自定义Starter](#05-%E8%87%AA%E5%AE%9A%E4%B9%89starter)
+    - [(1) Demo代码](#1-demo%E4%BB%A3%E7%A0%81-1)
+    - [(1) 方法1：@Import(AutoConfigurationPackages.Registrar)](#1-%E6%96%B9%E6%B3%951importautoconfigurationpackagesregistrar)
+    - [(3) 方法2：@Import(SomeImportSelector.class)](#3-%E6%96%B9%E6%B3%952importsomeimportselectorclass)
+    - [(3) 方法3：Import(XXX.class)](#3-%E6%96%B9%E6%B3%953importxxxclass)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 [TOC]
 
 # Spring Boot框架原理
@@ -1025,56 +1070,229 @@ Controller
 
 #### (c) `@ComponentScan`
 
-> ~~~java
-> package org.springframework.context.annotation;
-> ...
-> 
-> @Retention(RetentionPolicy.RUNTIME)
-> @Target(ElementType.TYPE)
-> @Documented
-> @Repeatable(ComponentScans.class)
-> public @interface ComponentScan {
-> 
-> 	@AliasFor("basePackages")
-> 	String[] value() default {};
-> 
-> 	@AliasFor("value")
-> 	String[] basePackages() default {};
-> 
-> 	Class<?>[] basePackageClasses() default {};
-> 	Class<? extends BeanNameGenerator> nameGenerator() default BeanNameGenerator.class;
-> 	Class<? extends ScopeMetadataResolver> scopeResolver() default AnnotationScopeMetadataResolver.class;
-> 	ScopedProxyMode scopedProxy() default ScopedProxyMode.DEFAULT;
-> 	String resourcePattern() default ClassPathScanningCandidateComponentProvider.DEFAULT_RESOURCE_PATTERN;
-> 	boolean useDefaultFilters() default true;
-> 	Filter[] includeFilters() default {};
-> 	Filter[] excludeFilters() default {};
-> 	boolean lazyInit() default false;
-> 
-> 	@Retention(RetentionPolicy.RUNTIME)
-> 	@Target({})
-> 	@interface Filter {
-> 
-> 		FilterType type() default FilterType.ANNOTATION;
-> 
-> 		@AliasFor("classes")
-> 		Class<?>[] value() default {};
-> 
-> 		@AliasFor("value")
-> 		Class<?>[] classes() default {};
-> 
-> 		String[] pattern() default {};
-> 	}
-> }
-> ~~~
+> 代码：[https://github.com/spring-projects/spring-framework/blob/main/spring-context/src/main/java/org/springframework/context/annotation/ComponentScan.java](https://github.com/spring-projects/spring-framework/blob/main/spring-context/src/main/java/org/springframework/context/annotation/ComponentScan.java)
 
 ## 05 自定义Starter
 
-### (1) Demo项目
+### (1) Demo代码
 
-项目分成两个Idea Module，对应的artifact如下
+代码：[../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/)
 
-> `util-spring-boot-autoconfig`：编写业务逻辑，内容参照上一小节的Demo项目进行修改
+其中包含了3个Module
+
+> `util/demo-spring-boot-autoconfig`：使用Bean封装和配置starter中代码的业务逻辑
 >
-> `utile-spring-boot-starter`：管理依赖
+> `util/demo-spring-boot-starter`：用于依赖管理，它依赖上面的autoconfig
+>
+> ~~~xml
+> <dependency>
+> 	<groupId>com.javaprojref.springboot.autocfg_stater_demo</groupId>
+> 	<artifactId>demo-spring-boot-autoconfig</artifactId>
+> 	<version>1.0-SNAPSHOT</version>
+> </dependency>
+> ~~~
+>
+> `demo_app`：业务在[pom.xml](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/pom.xml)中只依赖starter，但是可以使用autoconfig中定义的Bean
+>
+> ~~~xml
+>  <dependency>
+> 	<groupId>com.javaprojref.springboot.autocfg_stater_demo</groupId>
+> 	<artifactId>demo-spring-boot-starter</artifactId>
+> 	<version>1.0-SNAPSHOT</version>
+> </dependency>
+> ~~~
+
+这个Demo中编写的自定义Starter实现了三种使用方法
+
+> 方法1：借助`@Import(AutoConfigurationPackages.Registrar)`，让业务方依赖starter时自动加载META-INF/spring.factories中所有@Configuration类所配置的Bean
+>
+> 方法2：借助`@Import(SomeImportSelectorImplementation.class)`，提供一个注解给业务方，业务方依赖starter后，可以使用该注解加载指定的Bean
+>
+> 方法3：业务方依赖starter之后，可以自己调用`@Import(SomeClass.class)`来把指定的类加载成Bean
+
+### (1) 方法1：@Import(AutoConfigurationPackages.Registrar)
+
+业务方依赖starter后自动以META-INF/spring.factories为起始加载所有@Configuration类中配置的Bean
+
+[util/demo-spring-boot-autoconfig](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-autoconfig)：使用Bean封装业务逻辑
+
+> 要装配成Bean的类：[java/com/javaprojref/springboot/autocfg/DateUtil.java](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-autoconfig/src/main/java/com/javaprojref/springboot/autocfg/DateUtil.java)
+>
+> ~~~java
+> public class DateUtil {
+> 	...
+>     public String getLocalTime() {
+> 		...
+> 	}
+> }
+> ~~~
+>
+> 封装装配逻辑：[java/com/javaprojref/springboot/autocfg/DateConfig.java](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-autoconfig/src/main/java/com/javaprojref/springboot/autocfg/DateConfig.java)
+>
+> ~~~java
+> @Configuration
+> @EnableConfigurationProperties(UtilProperties.class)
+> public class DateConfig {
+> 	@Bean
+> 	public DateUtil getUtil() {
+> 		return new DateUtil();
+> 	}
+> }
+> ~~~
+>
+> 将@Configuration配置在[src/resources/META-INF/spring.factories](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-autoconfig/src/main/resources/META-INF/spring.factories)文件中，Spring在处理AutoConfigurationPackages.Registrar类时，因为它实现了ImportBeanDefinitionRegistrar接口，因此会调用它的registerBeanDefinitions方法执行手工注册，该方法会读取spring.factories文件，对文件中的类进行加载
+>
+> ~~~txt
+> # Auto Configure：从spring-boot-autoconfigure JAR包的同名文件中拷贝并修改
+> org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.javaprojref.springboot.autocfg.DateConfig 
+> ~~~
+>
+> 备注：这里复用了Spring的类，也可以自己编写实现了ImportBeanDefinitionRegistrar接口的类，然后向@Import注解传入该类，来执行自定义的手工注册操作
+
+[util/demo-spring-boot-starter/](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-starter/)：用于依赖管理，只包含一个[pom.xml](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-starter/pom.xml)文件
+
+[demo_app/](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/demo_app/)：业务代码，是一个使用SpringBoot实现的Rest Service，在[pom.xml](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/demo_app/pom.xml)中添加对starter的依赖
+
+> ~~~xml
+> <dependency>
+> 	<groupId>com.javaprojref.springboot.autocfg_stater_demo</groupId>
+> 	<artifactId>demo-spring-boot-starter</artifactId>
+> 	<version>1.0-SNAPSHOT</version>
+> </dependency>
+> ~~~
+>
+> 因为`AutoConfigurationPackages.Registrar`是Spring内部的类，在启动时会被自动@Import、进而加载配置在spring.factories文件中的DateConfig类，创建DateUtil Bean。因此DateUitlBean可以直接注入
+>
+> ~~~java
+> @RestController
+> public class HelloController {
+> 	// 依赖starter会自动加载META-INF/spring.factories中所有@Configure类所配置的Bean，包括DateUtile
+> 	@Autowired
+> 	protected DateUtil dateUtil;
+> }
+> ~~~
+
+### (3) 方法2：@Import(SomeImportSelector.class)
+
+实现过程大部分与方法1相同，差异部分如下
+
+> `git commit`：[https://github.com/fangkun119/java_proj_ref/commit/574340cb1dd12388f14045fee9a611ef5d4afe4f](https://github.com/fangkun119/java_proj_ref/commit/574340cb1dd12388f14045fee9a611ef5d4afe4f)
+
+概括起来包括如下几点
+
+> 希望被装配成Bean的类：[com/javaprojref/springboot/autocfg/NamingUtil.java](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-autoconfig/src/main/java/com/javaprojref/springboot/autocfg/NamingUtil.java)
+>
+> ~~~java
+> public class NamingUtil {
+> 	@Autowired
+> 	private UtilProperties props;
+> 
+> 	public String getServerName() {
+> 		return props.getServerName();
+> 	}
+> }
+> ~~~
+>
+> 封装装配逻辑的@Configuration类：[com/javaprojref/springboot/autocfg/NamingConfig.java](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-autoconfig/src/main/java/com/javaprojref/springboot/autocfg/NamingConfig.java)
+>
+> ~~~java
+> @Configuration
+> @EnableConfigurationProperties(UtilProperties.class)
+> public class NamingConfig {
+>     @Bean
+>     NamingUtil getNamingUtil() {
+>         return new NamingUtil();
+>     }
+> }
+> ~~~
+>
+> 编写一个`ImportSelector`接口实现类来装载NamingConfig：[com/javaprojref/springboot/autocfg/NamingUtilImport.java](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-autoconfig/src/main/java/com/javaprojref/springboot/autocfg/NamingUtilImport.java)
+>
+> ~~~java
+> public class NamingUtilImport implements ImportSelector {
+> 	@Override
+> 	public String[] selectImports(AnnotationMetadata annotationMetadata) {
+> 		return new String[] {
+> 			// 在数组中（使用全路径）填入用来加载成Bean的类
+> 			// 可以用来配置了多个Bean的@Configuration类
+> 			NamingConfig.class.getName()
+> 			// 也可以是不同的类
+> 			// NamingUtil.class.getName()
+> 		};
+> 	}
+> }
+> ~~~
+>
+> 编写一个注解，用来执行对ImportSelector实现类的导入，@Import注解对实现ImportSelector接口的类特殊处理，会把selectImports方法返回的类加载成Bean
+>
+> 代码：[com/javaprojref/springboot/autocfg/EnableNamingUtil.java](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-autoconfig/src/main/java/com/javaprojref/springboot/autocfg/EnableNamingUtil.java)
+>
+> ~~~java
+> @Target(ElementType.TYPE)
+> @Retention(RetentionPolicy.RUNTIME)
+> // 使用`NamingUtilImport implements ImportSelector`来批量加载Bean
+> @Import(NamingUtilImport.class)
+> public @interface EnableNamingUtil {
+> }
+> ~~~
+>
+> 业务代码可以直接用这个@EnableNamingUtil注解来进行加载，例如[DemoAppApplication](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/demo_app/src/main/java/com/javaprojref/springbootl/autocfg_starter_demo/DemoAppApplication.java)中的代码
+>
+> ~~~java
+> @SpringBootApplication
+> @EnableNamingUtil //注解使用ImportSelector加载定义在NamingConfig中的一组Bean
+> public class DemoAppApplication {
+>     public static void main(String[] args) {
+>         SpringApplication.run(DemoAppApplication.class, args);
+>     }
+> }
+> ~~~
+
+### (3) 方法3：Import(XXX.class)
+
+实现过程大部分与方法1相同，差异部分如下
+
+> `git commit`：[https://github.com/fangkun119/java_proj_ref/commit/57677c28575066f0cda0c37bb15045568b5c7f06](https://github.com/fangkun119/java_proj_ref/commit/57677c28575066f0cda0c37bb15045568b5c7f06)
+
+概括起来包括如下几点
+
+> 希望被装配成Bean的类：[com/javaprojref/springboot/autocfg/TokenUtil.java](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-autoconfig/src/main/java/com/javaprojref/springboot/autocfg/TokenUtil.java)
+>
+> ~~~java
+> public class TokenUtil {
+> 	@Autowired
+> 	private UtilProperties props;
+> 
+> 	public String getToken() {
+> 		return props.getToken();
+> 	}
+> }
+> ~~~
+>
+> 封装装配代码的@Configuration类：[com/javaprojref/springboot/autocfg/TokenConfig.java](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-autoconfig/src/main/java/com/javaprojref/springboot/autocfg/TokenConfig.java)
+>
+> ~~~java
+> @Configuration
+> @EnableConfigurationProperties(UtilProperties.class)
+> public class TokenConfig {
+> 	@Bean
+> 	public TokenUtil accessToken() {
+> 		return new TokenUtil();
+> 	}
+> }
+> ~~~
+>
+> 这个@Configuration类并没有配置在[/src/main/resources/META-INF/spring.factories](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/080_spring_internal/demos/02_springboot_concept/springboot_autocfg_and_starter_demo/util/demo-spring-boot-autoconfig/src/main/resources/META-INF/spring.factories)中，因此引入starter依赖时并不会自动通过方法(1)进行加载
+>
+> 但是业务代码可以自己使用@Import注解来进行加载，例如[DemoAppApplication](../demos/02_springboot_concept/springboot_autocfg_and_starter_demo/demo_app/src/main/java/com/javaprojref/springbootl/autocfg_starter_demo/DemoAppApplication.java)中的代码
+>
+> ~~~java
+> @SpringBootApplication
+> @Import(TokenConfig.class) //启动时加载starter中TokenConfig（未包含在META-INF/spring.factories中）所配置的Bean
+> public class DemoAppApplication {
+>     public static void main(String[] args) {
+>         SpringApplication.run(DemoAppApplication.class, args);
+>     }
+> }
+> ~~~
 

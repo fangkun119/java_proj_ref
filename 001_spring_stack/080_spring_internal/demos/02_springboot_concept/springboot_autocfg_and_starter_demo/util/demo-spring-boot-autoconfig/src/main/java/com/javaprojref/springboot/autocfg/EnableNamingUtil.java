@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 // Java元注解
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-// 使用`NamingUtilImport implements ImportSelector`来经由一组@Configuration类来批量加载Bean
+// 使用`NamingUtilImport implements ImportSelector`来批量加载Bean
 @Import(NamingUtilImport.class)
 public @interface EnableNamingUtil {
 }
