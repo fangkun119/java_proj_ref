@@ -41,8 +41,19 @@
     - [(3) 方法2：@Import(SomeImportSelector.class)](#3-%E6%96%B9%E6%B3%952importsomeimportselectorclass)
     - [(4) 方法3：Import(XXX.class)](#4-%E6%96%B9%E6%B3%953importxxxclass)
     - [(5) 方法比较](#5-%E6%96%B9%E6%B3%95%E6%AF%94%E8%BE%83)
+  - [06 热部署底层原理](#06-%E7%83%AD%E9%83%A8%E7%BD%B2%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86)
+    - [(1) 什么是热部署](#1-%E4%BB%80%E4%B9%88%E6%98%AF%E7%83%AD%E9%83%A8%E7%BD%B2)
+    - [(3) 实现思路](#3-%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF)
+    - [(2) 相关知识](#2-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86)
+      - [(a) JVM内置的三个Class Loader](#a-jvm%E5%86%85%E7%BD%AE%E7%9A%84%E4%B8%89%E4%B8%AAclass-loader)
+      - [(b) 全盘委托](#b-%E5%85%A8%E7%9B%98%E5%A7%94%E6%89%98)
+      - [(c) JVM的启动类`Launcher`](#c-jvm%E7%9A%84%E5%90%AF%E5%8A%A8%E7%B1%BBlauncher)
+      - [(d) 双亲委派](#d-%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE)
+      - [(e) 使用SPI打破双亲委派](#e-%E4%BD%BF%E7%94%A8spi%E6%89%93%E7%A0%B4%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+[TOC]
 
 # Spring Boot框架原理
 
@@ -105,7 +116,7 @@
 > @ComponentScan("填入要扫描的包的包路径")
 > public class Demo {
 > 	public static void main(String[] args) {
->         // 需要执行的操作
+>         	// 需要执行的操作
 > 		// 1. 应用开始启动
 > 		// 2. IOC容器初始化和依赖注入，包括将DispatchServlet加载到IOC容器中
 > 		AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
@@ -113,9 +124,9 @@
 > 		context.refresh();
 > 		// 2. 创建内置Tomcat：见下面的步骤(2)
 > 		// 3. DispatcherServlet加载到IOC容器、同时加载到Tomcat上下文中：见下面的步骤(3)        
->         // 4. 启动Tomcat的Web服务
->         WebServerFactory serverFactory = context.getBean(WebServerFactory.class);
->         serverFactory.createAndStartServer();
+>         	// 4. 启动Tomcat的Web服务
+>         	WebServerFactory serverFactory = context.getBean(WebServerFactory.class);
+>         	serverFactory.createAndStartServer();
 > 	}   
 > }
 > ~~~
@@ -1317,3 +1328,377 @@ Module命名需要遵守命名规范
 至于为何使用@ComponentScan
 
 > 相比方法3让业务方使用@Import，使用@ComponentScan照成的跨模块依赖更强了，相比依赖类名，@Component依赖了更容易变动的包名
+
+## 06 热部署底层原理
+
+### (1) 什么是热部署
+
+默认情况：在IDE中修改某些Bean的java代码，编译之后必须重启Server才能生效
+
+> 相关过程如下
+>
+> * Spring Bean加载：程序启动初始化IOC扫描Bean定义时，将对应的类作为Bean加载到容器和JVM中
+> * JVM加载：JVM其实是懒加载、只在某个类被使用（例如上面的Spring Bean加载）时才会将类加载到方法区，并且正常情况下不会卸载
+
+如果想要实现热部署，需要
+
+> (1) 能够重新加载Bean
+>
+> (2) 使用自定义Class Loader让这些类可以被卸载
+
+如何使用热部署提供开发调试效率：引入如下依赖
+
+> ~~~xml
+> <dependency>
+>     <groupId>org.springframework.boot</groupId>
+>     <artifactId>spring-boot-devtools</artifactId>
+> </dependency>
+> ~~~
+
+### (3) 实现思路
+
+> 默认情况下，如果一个类已经被加载，调用API也不会重新加载
+>
+> ~~~java
+> Thread.currentTrhead().getContextClassLoader().loadClass(); // 不会重新加载
+> ~~~
+>
+> 如果new一个class loader来加载，会有安全风险，不建议
+>
+> ~~~java
+> new ClassLoader().loadClass(); // 有安全风险
+> ~~~
+
+### (2) 相关知识
+
+#### (a) JVM内置的三个Class Loader
+
+> * `BootStrapClassLoader`：JVM提供的C++编写的类加载器，加载`rt.jar`，不可修改，但可通过JVM参数手动添加其他JAR包（一般没人这么做，出于安全考虑）
+> * `ExtClassLoader`：加载`lib/ext/`路径下的包，可以向该路径添加其他Jar包
+> * `AppClassLoader`：加载classpath指定的目录下的包
+> * `自定义类加载器`
+
+#### (b) 全盘委托
+
+> ~~~txt
+> 类在被使用时才会加载，加载时又会加载它所依赖的其他类
+> * A依赖B：那么B加载时，A使用哪个ClassLoader，B就使用哪个ClassLoader
+> * A依赖B：不论B是类A某个属性的类型，还是A的代码中调用了new B()，都视为A依赖B
+> ~~~
+>
+
+#### (c) JVM的启动类`Launcher`
+
+Launcher的操作流程：把AppClassLoader设为线程上下文类加载器并加载main方法所在的类
+
+> (1) Launcher启动时会初始化ExtClassLoader和AppClassLoader，并将AppClassLoader设置为线程上下文的类加载器
+> 
+> (2) 线程上下文加载器的用途是：方便获取类加载器，也可用来打破双亲委派
+> 
+> (3) JVM在加载main方法时，用线程上下文加载器（AppClassLoader）来加载。
+>
+> 之所以从线程上下文中取出Class Loader，是希望遵循双亲委派原则（让类加载使用最接近应用的ClassLoader作为入口，自底向上申请，自顶向下委托）
+
+相关代码如下（Launcher.class反编译）
+
+> ~~~java
+> try {
+> 	// AppClassLoader
+> 	this.loader = Launcher.AppClassLoader.getAppClassLoader(var1)；
+> } catch (IOException var9) {
+>	...
+> }
+>// 将AppClassLoader设为线程上下文的类加载器
+> Thread.currentThread().setContextClassLoader(this.loader);
+>String var2 = System.getProperty("java.security.manager");
+> if (var2 != null) {
+>	if (!"".equals(var2) && !"default".equals(var2)) {
+> 		try {
+>			// 从线程上下文加载器中获取AppClassLoader来加载main方法所在的类
+> 			var3 = (SecurityManager)this.loader.loadClass(var2).newInstance();
+> 		} catch (...) {...}
+> 	}
+> }
+> ~~~
+
+#### (d) 双亲委派
+
+双亲委派的目标
+
+> * 不同的ClassLoader，加载同一个类，加载出的Class<?>实例也会不同，因此要保证加载每个类的ClassLoader都是确定的、并且不会被多次加载成多份
+> * 基础类（例如String）只能被基础的加载器（例如对应的RootClassLoader）加载，避免产生安全问题。
+
+实现目标的方法，两步加载
+
+> (1) 向上查找
+>
+> (2) 向下委托
+
+ClassLoader
+
+> 是所有类加载器的基类、JVM要求所有类加载器都必须继承这个类
+>
+> 其中有三个核心方法、JVM规范（非强制）对它们的要求是：
+>
+> * `findClass`：查找类的路径，是否位于当前ClassLoader的加载路径下
+> * `loadClass`：加载类、会调用defineClass方法
+> * `defineClass`：将.class文件加载到JVM的方法区
+
+ClassLoader代码
+
+> ~~~java
+> public abstract class ClassLoader {
+> 	...
+> 
+> 	// 通过Parent引用、持有上层加载器引用
+> 	private final ClassLoader parent;
+> 
+> 	// 查找类的路径，是否位于当前ClassLoader的加载路径下，如果再着返回对应的Class<?>类对象
+> 	// 由子类提供具体逻辑
+> 	protected Class<?> findClass(String name) throws ClassNotFoundException {
+> 		throw new ClassNotFoundException(name);
+> 	}
+> 
+> 	// 加载类
+> 	protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
+> 		synchronized (getClassLoadingLock(name) /*临界区*/ ) { 	
+> 			// 在自己（当前ClassLoader实现类）的缓存中查找是否已经被加载
+> 			Class<?> c = findLoadedClass(name);
+> 			// 缓存中没有时需要进行加载
+> 			if (c == null) {
+> 				// 向上查找，优先让上层加载器负责这个类的加载，一路向上直至BootStrapClassLoader
+> 				long t0 = System.nanoTime();
+> 				try { 
+> 					if (parent != null) {
+> 						c = parent.loadClass(name, false);
+> 					} else {
+> 						c = findBootstrapClassOrNull(name);
+> 					}
+> 				} catch (ClassNotFoundException e) {}
+> 
+> 				// 上层加载器都无法加载时，自己才进行加载
+> 				if (c == null) {
+> 					...
+> 					// 调用findClass加载并返回对应的Class<?>对象
+> 					c = findClass(name);
+> 					...
+> 				}
+> 			}
+> 			if (resolve) {
+> 				resolveClass(c);
+> 			}
+> 			return c;
+>         }
+>     }
+>     
+> 	
+>     // 将class文件加载到JVM的方法区
+> 	protected final Class<?> defineClass(String name, byte[] b, int off, int len, ProtectionDomain protectionDomain) throws ClassFormatError {
+> 		...
+>         Class<?> c = defineClass1(name, b, off, len, protectionDomain, source);
+> 		... 
+>         return c;
+>     }
+>     // 是个Native方法，JVM中使用C++编写
+>     private native Class<?> defineClass1(String name, byte[] b, int off, int len, ProtectionDomain pd, String source);
+> }
+> ~~~
+
+暴力修改loadClass方法、打破双亲委派会带来的风险
+
+> ~~~java
+> public class MyClassLoader extends ClassLoader {
+>     // 定义加载路径，是一个不在classpath中的路径
+>     private String path;
+> 
+>     public MyClassLoader(String classPath) throws IOException {
+>         path = classPath;
+>     }
+> 
+>     @Override
+>     protected Class<?> loadClass(String name, boolean resolve) throw ClassNotFoundException {
+> 		// MyClassLoader自己先尝试加载
+>         Class<?> c = findLoadedClass(name);
+> 		// 用下面代码可以打破双亲委派：但会导致各种安全问题（例如某个系统类，被两个ClassLoader加载了两份Class<?>）
+>         if (null == c) {
+>             try {
+>                 c = getData(new File(name));
+>             } catch (IOException e) {
+>                 e.printStackTrace();
+>             }
+>         }
+> 		// 如果准寻双亲委派：下面的代码，先让AppClassLoader来一路向上查询，加载不到时再自己加载
+>         if (null == c) {
+>             c = getSystemClassLoader().loadClass(name);
+>         }
+>         ...
+>     }
+> }
+> ~~~
+>
+> 下面介绍如何使用SPI来打破双亲委派
+
+#### (e) 使用SPI打破双亲委派
+
+问题背景
+
+> JDBC Driver的加载是在`java.sql.DriverManager`类中被调用的、它位于rt.jar、被BootStrapClassLoader加载。
+>
+> * 根据“全盘委托原则”，在这个类中加载任何其他类，都会沿用它的加载器、即BootStrapClassLoader
+> * 而BootStrapClassLoader并不能加载位于rt.jar以外的JDBC Driver类（因为如果用BootStrapClassLoader加载、双亲委派的向下委托阶段也只能委托到BootStrapClassLoader自己）
+>
+> 因此需要用过SPI来打破双亲委派原则，把加载器换成线程上下文中的类加载器AppClassLoader
+
+解决方法
+
+> 将逻辑封装在一个名为`ServiceLoader<Driver>`的类中
+>
+> * 它在查找`.class`文件时，会在`META-INF/services/`路径下查找
+> * 在加载这些类时，会使用给Class.forName传参的方法来把这些Driver类的加载器换成AppClassLoader
+
+对双亲委派的打破
+
+> 上述过程：在BootstrapClassLoader加载的DriverManager类里，调用了AppClassLoader去加载JDBC Driver类。即在父加载器加载的类中，调用子加载器。从而打破了双亲委派
+
+代码
+
+> DriverManager
+>
+> ~~~java
+> public class DriverManager {
+> 	...
+> 	private static void loadInitialDrivers() {
+> 		String drivers;
+> 		...
+> 		AccessController.doPrivileged(new PrivilegedAction<Void>() {
+> 			public Void run() {
+> 				// SPI_1：这个ServiceLoader是一个自定义类加载器
+> 				ServiceLoader<Driver> loadedDrivers = ServiceLoader.load(Driver.class);
+> 				// 遍历所有JDBC Driver Class进行加载
+> 				Iterator<Driver> driversIterator = loadedDrivers.iterator();
+>                 try{
+>                     while(driversIterator.hasNext() /*会调用下面的hasNextService方法*/) {
+>                         driversIterator.next() /*会调用下面的nextService方法*/;
+>                     }
+>                 } catch(Throwable t) {/* Do Nothing*/}
+>                 return null;
+>             }
+>         });
+> 		... 
+>     }
+>     ...
+> }
+> ~~~
+>
+> ServiceLoader
+>
+> ~~~java
+> public final class ServiceLoader<S> implements Iterable<S> {
+> 	...
+> 
+> 	/*******************************************
+> 	* 自定义类加载器ServiceLoader用来加载类的函数入口
+> 	********************************************/
+> 	public static <S> ServiceLoader<S> load(Class<S> service) {
+> 		// 线程上下文中的类加载器，从Launcher.java中可以看出，它就是AppClassLoader，除非有代码做了干预
+> 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+> 		// → 调用下面的静态方法，创建ServiceLoader对象并返回
+> 		return ServiceLoader.load(service, cl);
+> 	}
+> 
+> 	public static <S> ServiceLoader<S> load(Class<S> service, ClassLoader loader) {
+>         // → 调用下面的构造方法
+>         return new ServiceLoader<>(service, loader);
+>     }
+> 
+>     private ServiceLoader(Class<S> svc, ClassLoader cl) {
+> 		...
+> 		// 确保有ClassLoader：如果参数没指定则使用AppClassLoader，除非有代码做了干预
+>         loader = (cl == null) ? ClassLoader.getSystemClassLoader() : cl;
+>         ...
+> 		// → 调用下面的reload方法
+>         reload();
+>     }
+> 
+>     public void reload() {
+>         // 初始化一个懒加载的迭代器
+>         providers.clear();
+>         // → 调用下面的内部类LazyIterator，并把上面获得的loader传给它使用
+>         lookupIterator = new LazyIterator(service, loader);
+>     }
+> 
+>     private class LazyIterator implements Iterator<S> {
+>         Class<S> service;					// 当前迭代器指向的Driver Class对象
+>         ClassLoader loader;					// 从reload()方法传入的Class Loader
+>         Enumeration<URL> configs = null;	// 类路径
+>         Iterator<String> pending = null;	// 类路径缓存
+>         String nextName = null;				// 调用hasNext*时设置，调用next*时清空
+> 
+> 		private boolean hasNextService() {
+> 			// 上次调用时缓存的计算结果
+> 			if (nextName != null) {
+> 				return true;
+> 			}
+> 			// 初始化Driver类路径列表
+> 			if (configs == null) {
+> 				try {
+> 					// SPI_2：存储要加载的Driver了IDE路径，"META-INF/services/"
+> 					// 以mysql-connector-java.8.0.15的jar包为例
+>                     // * META-INF目录下内含一个java.sql.Driver文件
+>                     // * 文件内只有一行文本：com.mysql.cj.jdbc.Driver
+> 					String fullName = PREFIX + service.getName();
+> 					// 将这个目录下所有的类路径存储在configs中
+> 					if (loader == null)
+>                         configs = ClassLoader.getSystemResources(fullName);
+>                     else
+>                         configs = loader.getResources(fullName);
+>                 } catch (IOException x) {
+>                     fail(service, "Error locating configuration files", x);
+>                 }
+>             }
+> 			// 惰性加载，将下一个Driver Class读取到service变量中
+> 			// 并将类名存入pending成员变量中返回
+>             while ((pending == null) || !pending.hasNext()) {
+>                 if (!configs.hasMoreElements()) {
+>                     return false;
+>                 }
+>                 pending = parse(service, configs.nextElement());
+>             }
+> 			// 设置nextName成员变量
+>             nextName = pending.next();
+>             return true;
+>         }
+> 
+> 		private S nextService() {
+> 			// 调用上面的函数，查看是否还有Driver类没有加载
+> 			if (!hasNextService())
+> 				throw new NoSuchElementException();
+> 			// 要加载的类的类路径
+> 			String cn = nextName;
+> 			nextName = null;
+> 			// SPI_3：用上面reload()方法传入的Class Loader加载这个类
+> 			// 1. 因为调用它的ServiceLoader是被BootStrapClassLoader加载的
+> 			//    根据“全盘委托原则”，下面代码的默认加载器也是BootStrapClassLoader加载
+> 			// 2. 如果使用BootStrapClassLoader加载，它向下委派阶段也只能委派到BootStrapClassLoader，无法加载rt.jar包以外的类
+> 			// 3. 因此要通过给forName方法传参的方式，来改变默认加载器，以便能够加载JDBC Driver的类
+> 			Class<?> c = null;
+> 			try {
+> 				// 用指定的加载器加载jdbc driver类
+> 				c = Class.forName(cn, false, loader);
+> 			} catch (ClassNotFoundException x) {
+> 				fail(service, "Provider " + cn + " not found");
+> 			}
+>             // 其他操作：检查加载的类是否是JDBC Driver并放入缓存
+>             
+>         }
+> 
+>         ...
+>     }
+> 
+> 	// 存储JDBC Driver类的路径
+> 	private static final String PREFIX = "META-INF/services/";
+> }
+> ~~~
+
+
+
