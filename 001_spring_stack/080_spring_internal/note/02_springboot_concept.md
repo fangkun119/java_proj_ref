@@ -43,17 +43,19 @@
     - [(5) 方法比较](#5-%E6%96%B9%E6%B3%95%E6%AF%94%E8%BE%83)
   - [06 热部署底层原理](#06-%E7%83%AD%E9%83%A8%E7%BD%B2%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86)
     - [(1) 什么是热部署](#1-%E4%BB%80%E4%B9%88%E6%98%AF%E7%83%AD%E9%83%A8%E7%BD%B2)
-    - [(3) 实现思路](#3-%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF)
     - [(2) 相关知识](#2-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86)
       - [(a) JVM内置的三个Class Loader](#a-jvm%E5%86%85%E7%BD%AE%E7%9A%84%E4%B8%89%E4%B8%AAclass-loader)
       - [(b) 全盘委托](#b-%E5%85%A8%E7%9B%98%E5%A7%94%E6%89%98)
       - [(c) JVM的启动类`Launcher`](#c-jvm%E7%9A%84%E5%90%AF%E5%8A%A8%E7%B1%BBlauncher)
       - [(d) 双亲委派](#d-%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE)
       - [(e) 使用SPI打破双亲委派](#e-%E4%BD%BF%E7%94%A8spi%E6%89%93%E7%A0%B4%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE)
+    - [(3) 实现思路](#3-%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF)
+      - [(a) 自定义ClassLoader：使类可以被重新加载](#a-%E8%87%AA%E5%AE%9A%E4%B9%89classloader%E4%BD%BF%E7%B1%BB%E5%8F%AF%E4%BB%A5%E8%A2%AB%E9%87%8D%E6%96%B0%E5%8A%A0%E8%BD%BD)
+      - [(b) 类文件监听：检测类被重新编译的事件](#b-%E7%B1%BB%E6%96%87%E4%BB%B6%E7%9B%91%E5%90%AC%E6%A3%80%E6%B5%8B%E7%B1%BB%E8%A2%AB%E9%87%8D%E6%96%B0%E7%BC%96%E8%AF%91%E7%9A%84%E4%BA%8B%E4%BB%B6)
+    - [(3) 原理演示代码](#3-%E5%8E%9F%E7%90%86%E6%BC%94%E7%A4%BA%E4%BB%A3%E7%A0%81)
+    - [(4) Spring Boot热加载源码](#4-spring-boot%E7%83%AD%E5%8A%A0%E8%BD%BD%E6%BA%90%E7%A0%81)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-[TOC]
 
 # Spring Boot框架原理
 
