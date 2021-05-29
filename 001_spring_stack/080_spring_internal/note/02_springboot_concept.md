@@ -1220,10 +1220,10 @@ Module命名需要遵守命名规范
 > @Configuration
 > @EnableConfigurationProperties(UtilProperties.class)
 > public class NamingConfig {
->     @Bean
->     NamingUtil getNamingUtil() {
->         return new NamingUtil();
->     }
+>    	@Bean
+>    	NamingUtil getNamingUtil() {
+>    		return new NamingUtil();
+>    	}
 > }
 > ~~~
 >
@@ -1263,9 +1263,9 @@ Module命名需要遵守命名规范
 > @SpringBootApplication
 > @EnableNamingUtil //注解使用ImportSelector加载定义在NamingConfig中的一组Bean
 > public class DemoAppApplication {
->     public static void main(String[] args) {
->         SpringApplication.run(DemoAppApplication.class, args);
->     }
+>    	public static void main(String[] args) {
+>    		SpringApplication.run(DemoAppApplication.class, args);
+>    	}
 > }
 > ~~~
 
@@ -1350,23 +1350,9 @@ Module命名需要遵守命名规范
 
 > ~~~xml
 > <dependency>
->     <groupId>org.springframework.boot</groupId>
->     <artifactId>spring-boot-devtools</artifactId>
+>    	<groupId>org.springframework.boot</groupId>
+>    	<artifactId>spring-boot-devtools</artifactId>
 > </dependency>
-> ~~~
-
-### (3) 实现思路
-
-> 默认情况下，如果一个类已经被加载，调用API也不会重新加载
->
-> ~~~java
-> Thread.currentTrhead().getContextClassLoader().loadClass(); // 不会重新加载
-> ~~~
->
-> 如果new一个class loader来加载，会有安全风险，不建议
->
-> ~~~java
-> new ClassLoader().loadClass(); // 有安全风险
 > ~~~
 
 ### (2) 相关知识
@@ -1385,7 +1371,6 @@ Module命名需要遵守命名规范
 > * A依赖B：那么B加载时，A使用哪个ClassLoader，B就使用哪个ClassLoader
 > * A依赖B：不论B是类A某个属性的类型，还是A的代码中调用了new B()，都视为A依赖B
 > ~~~
->
 
 #### (c) JVM的启动类`Launcher`
 
@@ -1508,31 +1493,31 @@ ClassLoader代码
 
 > ~~~java
 > public class MyClassLoader extends ClassLoader {
->     // 定义加载路径，是一个不在classpath中的路径
->     private String path;
+>    	// 定义加载路径，是一个不在classpath中的路径
+>    	private String path;
 > 
->     public MyClassLoader(String classPath) throws IOException {
->         path = classPath;
->     }
+>    	public MyClassLoader(String classPath) throws IOException {
+>    		path = classPath;
+>    	}
 > 
->     @Override
->     protected Class<?> loadClass(String name, boolean resolve) throw ClassNotFoundException {
+>    	@Override
+>    	protected Class<?> loadClass(String name, boolean resolve) throw ClassNotFoundException {
 > 		// MyClassLoader自己先尝试加载
->         Class<?> c = findLoadedClass(name);
+>    		Class<?> c = findLoadedClass(name);
 > 		// 用下面代码可以打破双亲委派：但会导致各种安全问题（例如某个系统类，被两个ClassLoader加载了两份Class<?>）
->         if (null == c) {
->             try {
->                 c = getData(new File(name));
->             } catch (IOException e) {
->                 e.printStackTrace();
->             }
->         }
+>    		if (null == c) {
+>    			try {
+>    				c = getData(new File(name));
+>    			} catch (IOException e) {
+>    				e.printStackTrace();
+>    			}
+>    		}
 > 		// 如果准寻双亲委派：下面的代码，先让AppClassLoader来一路向上查询，加载不到时再自己加载
->         if (null == c) {
->             c = getSystemClassLoader().loadClass(name);
->         }
->         ...
->     }
+>    		if (null == c) {
+>    			c = getSystemClassLoader().loadClass(name);
+>    		}
+>    		...
+>    	}
 > }
 > ~~~
 >
@@ -1576,17 +1561,17 @@ ClassLoader代码
 > 				ServiceLoader<Driver> loadedDrivers = ServiceLoader.load(Driver.class);
 > 				// 遍历所有JDBC Driver Class进行加载
 > 				Iterator<Driver> driversIterator = loadedDrivers.iterator();
->                 try{
->                     while(driversIterator.hasNext() /*会调用下面的hasNextService方法*/) {
->                         driversIterator.next() /*会调用下面的nextService方法*/;
->                     }
->                 } catch(Throwable t) {/* Do Nothing*/}
->                 return null;
->             }
->         });
+>    				try{
+>    					while(driversIterator.hasNext() /*会调用下面的hasNextService方法*/) {
+>    						driversIterator.next() /*会调用下面的nextService方法*/;
+>    					}
+>    				} catch(Throwable t) {/* Do Nothing*/}
+>    				return null;
+>    			}
+>    		});
 > 		... 
->     }
->     ...
+>    	}
+>    	...
 > }
 > ~~~
 >
@@ -1700,5 +1685,246 @@ ClassLoader代码
 > }
 > ~~~
 
+### (3) 实现思路
 
+#### (a) 自定义ClassLoader：使类可以被重新加载
 
+> 默认情况下，如果一个类已经被加载，调用API也不会重新加载
+>
+> ~~~java
+> Thread.currentTrhead().getContextClassLoader().loadClass(); // 不会重新加载
+> ~~~
+>
+> 如果自己写一个Class Loader类，在重新加载时，new一个新的class loader，不走双亲委派来加载，来重新加载类，可行吗？
+>
+> ~~~java
+> new MyClassLoader().loadClass(); 
+> ~~~
+>
+> 是可以的（但是要说明有一定风险）
+
+代码演示
+
+> ~~~java
+> public class Demo {
+>     public static void ,ain(String[] args) throws Exception {
+> 		String root = MyClassLoader.class.getResource("/").getPath();
+> 		MyClassLoader loader = MyClassLoader(root);
+> 
+>         Class c1 = loader.loadClass("com.javaref.springboot.hotreloaddemo.controller.HelloController", false /*resolve*/);
+> 		System.out.println(c1.hashCode());
+> 
+> 		Class c2 = loader.loadClass("com.javaref.springboot.hotreloaddemo.controller.HelloController", false /*resolve*/);
+> 		System.out.println(c2.hashCode());
+>         
+> 		// 要完成卸载
+> 		loader   = null;
+> 		c1       = null;
+> 
+> 		// AppClassLoader不能new，只有自定义类加载器才可以
+> 		loader   = new MyClassLoader(root);
+> 		c1		 = loader.loadClass("com.javaref.springboot.hotreloaddemo.controller.HelloController", false /*resolve*/);
+> 		System.out.println(c1.hashCode());
+> 	}
+> }
+> ~~~
+
+#### (b) 类文件监听：检测类被重新编译的事件
+
+> 监听某个路径下的文件
+>
+> 通过循环比对，比较文件的hashcode或修改日期等发现文件被修改时，使用一个新的自定义类加载器进行加载
+
+代码演示
+
+> 编译依赖
+>
+> ~~~xml
+> <dependency>
+> 	<groupId>commons-io</groupId>
+> 	<artifactId>commons-io</artifactId>
+> 	<version>2.6</version>
+> </dependency>
+> ~~~
+>
+> 代码
+>
+> ~~~java
+> @Component
+> public class MyFileListener extends FileAlterationListenerAdaptor {
+> 	private static ApplicationContext context;
+> 
+> 	@Override
+> 	public void onFileChange(File file) {
+> 		System.out.println("文件被修改" + file.getAbsolutePath());
+>         new Thread(() -> {
+>             try {
+>                 String root = MyClassLoader.class.getResource("/").getPath().replaceAll("20%", " ");
+>                 MyClassLoader loader = new MyClassLoader(root);
+>                 
+>                 Class c1 = loader.loadClass("com.javaref.springboot.hotreloaddemo.Demo");
+>                 c1.getDeclaredMethod("start").invoke(c1.newInstance());
+>             } catch (Exception e) {
+>                 e.printStackTrace();
+>             }
+>         })
+>     }
+> }
+> ~~~
+
+### (3) 原理演示代码
+
+> HotReloadClassLoader
+>
+> ~~~java
+> public class HotReloadClassLoader extends ClassLoader {
+> 	// 要扫描的目录
+> 	public String rootPath;
+> 	// 要热加载的所有类的类名
+> 	public List<String> classes;
+> 
+> 	public HotReloadClassLoader
+>         (String rootPath, String... classPaths) throws Exception {
+> 		this.rootPath = rootPath;
+> 		this.classes  = new ArrayList<String>();
+> 		// 构造时扫描自定义路径、加载所有要加载的类，并将类的全名放入List<String> classes中
+> 		for (String classPath : classPaths) {
+> 			scanClassPath(new File(classPath));
+> 		}
+> 	}
+> 
+> 	private void scanClassPath(File file) throws Exception {
+> 		// 递归所有子目录，将扫到的类存入列表
+> 		// 只包括项目中要热加载的类，不包含其他的类
+> 		if (file.isDirectory()) {
+> 			for (File listFile : file.listFiles()) {
+> 				scanClassPath(listFile);
+> 			}
+> 		} else {
+> 			String fileName = file.getName();
+> 			String filePath = file.getPath();
+> 			String suffix = fileName.substring(fileName.lastIndexOf("."));
+> 			if ("class".equals(suffix)) {
+> 				InputStream is = new FileInputStream(file);
+> 				byte[] bytes = new byte[(int)file.length()];
+> 				is.read(bytes);
+> 				String className = fileNameToClassName(filePath);
+> 				// 调用defineClass进行加载
+> 				defineClass(className, bytes, 0, bytes.length);
+> 				// 把类全名放入List<String> classes中
+> 				classes.add(className);
+> 			}
+> 		}
+> 	}
+> 
+>     private String fileNameToClassName(String filePath) {
+> 		String className = filePath.replace(rootPath, "").replaceAll("\\\\", ".");
+>         className = className.subString(1, className.lastIndexOf("."));
+>         return className;
+>     }
+> 
+>     @Override
+>     public Class<?> loadClass(String name) throws ClassNotFoundException {
+> 		// 使用双亲委派进行加载，其中目标扫描路径下的类应当都已经在构造函数中被加载了
+>         // 因此下面的else分支会抛异常
+>         Class<?> loadClass = findLoadedClass(name);
+>         if (null == loadClass) {
+>             if (!classes.contains(name)) {
+>                 loadClass = getSystemClassLoader().loadClass(name);
+>             } else {
+> 				throw new ClassNotFoundException("class load faile: " + name);
+> 			}
+> 		}
+> 		return loadClass;
+> 	}
+>     
+>     public static void main(String[] args) throws Exception {
+>         DemoApplication.run();
+>     }
+> }
+> ~~~
+>
+> FileListener
+>
+> ~~~java
+> public class FileListener extends FileAlterationListenerAdaptor {
+>     @Override
+>     public void onFileChange(File file) {
+>         try {
+> 			// 创建新的Class Loader
+>             HotReloadClassLoader hotReloadClassLoader = new HotReloadClassLoader(DemoApplication.rootPath, DemoApplication.packagePath);
+>             // 执行回收操作
+> 			DemoApplication.stop();
+>             // 让程序热加载测试类Test
+>             DemoApplication.start0(hotReloadClassLoader);
+>         } catch (Exceptin e) {
+>             e.printStackTrace();
+>         }
+>     }
+> }
+> ~~~
+>
+> DemoApplication
+>
+> ~~~java
+> public class DemoApplication {
+>     public static String rootPath;
+>     public static String packagePath = "com\\javaprojref\\springboot\\hotreloaddemo:";
+> 
+>     public static void run() throws Exception {
+>         String rootPath = HotReloadClassLoader.class.getResource("/").getPath().replaceAll("%20", " ");
+>         rootPath = new File(rootPath).getPath();
+>         DemoApplication.rootPath = rootPath;
+>         HotReloadClassLoader classLoader = new HotReloadClassLoader(rootPath, rootPath + packagePath);
+> 
+>         startFileListener(rootPath);
+>         start0(classLoader);
+>     }
+>     
+>     public static void stop() {
+>         System.out.println("application stop");
+>         System.gc(); // 通知JVM需要GC
+>         System.runFinalization(); // 通知JVM消除对象引用
+>     }
+>     
+>     public static void startFileListener(String rootPath) throws Exception {
+>         // 启动监听器
+>         FileAlterationObserver fileAlterationObserver = new FileAlterationObserver(rootPath);
+>         fileAlterationObserver.addListener(new FileListener());
+>         FileAlterationObserver fileAlterationMonitor = new FileAlterationMonitor(1000);
+>         fileAlterationMonitor.addObserver(fileAlterationObserver);
+>         fileAlterationMonitor.start();
+>     }
+>     
+>     public static void start0(HotReloadClassLoader hotReloadClassLoader) throws Exception {
+>         // 通过反射来加载Restarter是为了规避全盘委托机制
+>         // * 如果new Restarter()会因为全盘委托机制、被AppClassLoader加载
+>         // * 所以要用反射来指定hotReloadClassLoader
+>         // 这里使用了SPI，即在AppClassLoader加载的类中调用下层的自定义ClassLoader
+>         Class<?> clazz = hotReloadClassLoader.loadClass("com.javaprojref.springboot.hotreloaddemo.Restarter");
+>         clazz.getDeclaredMethod("start").invoke(clazz.newInstance());
+>     }
+> }
+> ~~~
+>
+> Restarter
+>
+> ~~~java
+> public class Restarter {
+>     public static void start() {
+>         System.out.println("Applation started");
+>         new Test().test();
+>     }
+> }
+> 
+> public class Test {
+>     public void test() {
+>         System.out.println("class loader: " + this.getClass().getClassLoader());
+>         System.out.println("version 01"); // 可以修改version值重新编译，来查看hot reload是否生效
+>     }
+> }
+> ~~~
+
+### (4) Spring Boot热加载源码
+
+> 略
