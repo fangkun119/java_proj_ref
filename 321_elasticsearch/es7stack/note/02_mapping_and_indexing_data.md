@@ -1,6 +1,6 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
 
 - [CH02 数据索引](#ch02-%E6%95%B0%E6%8D%AE%E7%B4%A2%E5%BC%95)
   - [1 本章内容](#1-%E6%9C%AC%E7%AB%A0%E5%86%85%E5%AE%B9)
@@ -30,8 +30,6 @@
     - [(3) `Parent / Child Relationship`：索引查询](#3-parent--child-relationship%E7%B4%A2%E5%BC%95%E6%9F%A5%E8%AF%A2)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-[TOC]
 
 # CH02 数据索引
 
