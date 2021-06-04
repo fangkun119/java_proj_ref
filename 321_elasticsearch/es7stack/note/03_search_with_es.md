@@ -1,4 +1,41 @@
-[TOC]
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [CH03 使用Elasticsearch搜索](#ch03-%E4%BD%BF%E7%94%A8elasticsearch%E6%90%9C%E7%B4%A2)
+  - [01 本章内容](#01-%E6%9C%AC%E7%AB%A0%E5%86%85%E5%AE%B9)
+  - [02 使用“Query Lite Interface”进行搜索](#02-%E4%BD%BF%E7%94%A8query-lite-interface%E8%BF%9B%E8%A1%8C%E6%90%9C%E7%B4%A2)
+  - [03 使用JSON进行搜索](#03-%E4%BD%BF%E7%94%A8json%E8%BF%9B%E8%A1%8C%E6%90%9C%E7%B4%A2)
+    - [(1) 使用JSON作为Request Body进行搜索](#1-%E4%BD%BF%E7%94%A8json%E4%BD%9C%E4%B8%BArequest-body%E8%BF%9B%E8%A1%8C%E6%90%9C%E7%B4%A2)
+    - [(2) `Query`和`Filters`](#2-query%E5%92%8Cfilters)
+    - [(3) Filters介绍](#3-filters%E4%BB%8B%E7%BB%8D)
+    - [(4) Queries介绍](#4-queries%E4%BB%8B%E7%BB%8D)
+    - [(5) Query和Filter的区别](#5-query%E5%92%8Cfilter%E7%9A%84%E5%8C%BA%E5%88%AB)
+    - [(5) 组合Query和Filter](#5-%E7%BB%84%E5%90%88query%E5%92%8Cfilter)
+  - [04 短语搜索（Phrase Search）](#04-%E7%9F%AD%E8%AF%AD%E6%90%9C%E7%B4%A2phrase-search)
+    - [(1) `match_phrase`](#1-match_phrase)
+    - [(2) 对比`match`和`match_phrase`](#2-%E5%AF%B9%E6%AF%94match%E5%92%8Cmatch_phrase)
+  - [05 各类搜索功能举例](#05-%E5%90%84%E7%B1%BB%E6%90%9C%E7%B4%A2%E5%8A%9F%E8%83%BD%E4%B8%BE%E4%BE%8B)
+    - [(1) Query Lite的错误和正确用法](#1-query-lite%E7%9A%84%E9%94%99%E8%AF%AF%E5%92%8C%E6%AD%A3%E7%A1%AE%E7%94%A8%E6%B3%95)
+    - [(2) 使用JSON作为查询请求](#2-%E4%BD%BF%E7%94%A8json%E4%BD%9C%E4%B8%BA%E6%9F%A5%E8%AF%A2%E8%AF%B7%E6%B1%82)
+  - [06 分页（pagination）](#06-%E5%88%86%E9%A1%B5pagination)
+  - [07 排序](#07-%E6%8E%92%E5%BA%8F)
+  - [08 过滤器（Filters）的使用例子](#08-%E8%BF%87%E6%BB%A4%E5%99%A8filters%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BE%8B%E5%AD%90)
+  - [09 使用模糊查询（Fuzzy Queries）让查询能够兼容拼写错误](#09-%E4%BD%BF%E7%94%A8%E6%A8%A1%E7%B3%8A%E6%9F%A5%E8%AF%A2fuzzy-queries%E8%AE%A9%E6%9F%A5%E8%AF%A2%E8%83%BD%E5%A4%9F%E5%85%BC%E5%AE%B9%E6%8B%BC%E5%86%99%E9%94%99%E8%AF%AF)
+  - [10 字符串字段部分匹配（Partial Matching）](#10-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%AD%97%E6%AE%B5%E9%83%A8%E5%88%86%E5%8C%B9%E9%85%8Dpartial-matching)
+    - [(1) 字符串前缀查询](#1-%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%89%8D%E7%BC%80%E6%9F%A5%E8%AF%A2)
+    - [(2) 字符串通配符匹配](#2-%E5%AD%97%E7%AC%A6%E4%B8%B2%E9%80%9A%E9%85%8D%E7%AC%A6%E5%8C%B9%E9%85%8D)
+    - [(3) 正则表达式匹配](#3-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%8C%B9%E9%85%8D)
+    - [(4) 例子](#4-%E4%BE%8B%E5%AD%90)
+  - [11 "Search as you type"](#11-search-as-you-type)
+  - [12 N-Grams](#12-n-grams)
+    - [(1) N-Grams索引](#1-n-grams%E7%B4%A2%E5%BC%95)
+    - [(2) Edge N-Gram索引](#2-edge-n-gram%E7%B4%A2%E5%BC%95)
+    - [(3) Autocomplete Analyzer](#3-autocomplete-analyzer)
+    - [(4) Completion Suggesters](#4-completion-suggesters)
+    - [(5) 例子](#5-%E4%BE%8B%E5%AD%90)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # CH03 使用Elasticsearch搜索
 
@@ -439,14 +476,315 @@ Query关注文档与查询字句的匹配**程度**，Filter是关注文档与�
 >
 > 长度大于5的字符串：fuzziness=2
 
-## 10 部分匹配（Partial Matching）
+## 10 字符串字段部分匹配（Partial Matching）
 
-> d
+> 需要字段类型是'text'
+
+### (1) 字符串前缀查询
+
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_prefix_matching_on_string.jpg" width="400" /></div>
+
+### (2) 字符串通配符匹配
+
+> 例如下面的`1*`
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_wildcard_query.jpg" width="400" /></div>
+
+### (3) 正则表达式匹配
+
+> 也支持正则表达式查询、具体可查询文档
+
+### (4) 例子
+
+> 首先删除并重建索引，将year字段的类型改为字符串，并重新导入数据
+>
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ curl -H 'Content-Type:application/json' -XDELETE '127.0.0.1:9200/movies'
+> {"acknowledged":true}
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ curl -H 'Content-Type:application/json' -XPUT '127.0.0.1:9200/movies' -d '
+>   {
+>       "mappings": {
+>         "properties": {
+>           "year": {"type":"text"}
+>         }
+>       }
+>   }'
+> {"acknowledged":true,"shards_acknowledged":true,"index":"movies"}
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $  curl -H 'Content-Type:application/json' -XPUT 127.0.0.1:9200/_bulk --data-binary @movies.json
+> {"took":128,"errors":false,"items":[{"create":{"_index":"movies","_type":"_doc","_id":"135569","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":0,"_primary_term":1,"status":201}},{"create":{"_index":"movies","_type":"_doc","_id":"122886","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1,"_primary_term":1,"status":201}},{"create":{"_index":"movies","_type":"_doc","_id":"109487","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":2,"_primary_term":1,"status":201}},{"create":{"_index":"movies","_type":"_doc","_id":"58559","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":3,"_primary_term":1,"status":201}},{"create":{"_index":"movies","_type":"_doc","_id":"1924","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":4,"_primary_term":1,"status":201}}]}
+> ~~~
+>
+> 执行部分匹配查询
+>
+> ~~~bash
+> __________________________________________________________________
+> $ # 前缀查询
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ curl -H 'Content-Type:application/json' -XGET '127.0.0.1:9200/movies/_search?pretty' -d '
+> {
+>   "query": {
+>     "prefix": {
+>       "year":"201"
+>     }
+>   }
+> }' | grep -E 'title|year'
+>           "title" : "Star Trek Beyond",
+>           "year" : 2016,
+>           "title" : "Star Wars: Episode VII - The Force Awakens",
+>           "year" : 2015,
+>           "title" : "Interstellar",
+>           "year" : 2014,          
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 通配符查询
+> $ curl -H 'Content-Type:application/json' -XGET '127.0.0.1:9200/movies/_search?pretty' -d '
+> {
+>   "query": {
+>     "wildcard": {
+>       "year":"1*"
+>     }
+>   }
+> }' | grep -E 'title|year'
+>           "title" : "Plan 9 from Outer Space",
+>           "year" : 1959,
+> ~~~
 
 ## 11 "Search as you type"
 
-> d
+功能：类似google的搜索提示
+
+可以使用`match_phrase_prefix`来完成，还可以通过制定slop来对”prefix phrase“进行模糊匹配，下面是一个例子（只是slop值设置的过高了）
+
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_search_as_you_type.jpg" width="400" /></div>
+
+例子
+
+> ~~~bash
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ curl -H 'Content-Type:application/json' -XGET '127.0.0.1:9200/movies/_search?pretty' -d '
+> {
+>   "query": {
+>     "match_phrase_prefix": {
+>       "title": {
+>         "query":"star", "slop":10
+>       }
+>     }
+>   }
+> }' | grep title
+>           "title" : "Star Trek Beyond",
+>           "title" : "Star Wars: Episode VII - The Force Awakens",
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ curl -H 'Content-Type:application/json' -XGET '127.0.0.1:9200/movies/_search?pretty' -d '
+> {
+>   "query": {
+>     "match_phrase_prefix": {
+>       "title": {
+>         "query":"star tr", "slop":10
+>       }
+>     }
+>   }
+> }' | grep title
+>           "title" : "Star Trek Beyond",
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # t匹配了结果1的Trek中的T，结果2的The中的t
+> $ # 同时slop=10起了作用
+> $ curl -H 'Content-Type:application/json' -XGET '127.0.0.1:9200/movies/_search?pretty' -d '
+> {
+>   "query": {
+>     "match_phrase_prefix": {
+>       "title": {
+>         "query":"star t", "slop":10
+>       }
+>     }
+>   }
+> }' | grep title
+>           "title" : "Star Trek Beyond",
+>           "title" : "Star Wars: Episode VII - The Force Awakens",
+> ~~~
 
 ## 12 N-Grams
 
-> d
+### (1) N-Grams索引
+
+N-Grams索引可以用于加快上一小节中的“搜索提示”功能的查询速度
+
+以单词”star“为例，从`1-grams`到`4-grams`生成的索引如下
+
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_ngram_idx_by_exmp_star.jpg" width="600" /></div>
+
+对于搜索提示（”search as you are typing"）的场景、可以通过这类索引来完成，例如
+
+> 当键入“s”时，可以匹配unigram索引中的s，进一步找到对应的单词
+>
+> 键入到“st”时，可以匹配bigram索引；……；键入到“star”时可以额匹配到4-gram
+
+### (2) Edge N-Gram索引
+
+在N-gram索引中，有一种叫做`Edge N-gram`更加适合上面的”搜索提示“应用场景
+
+> `Edge N-Gram`只从filed的起始位置开始建立索引、在上面例子中分别对应“s”、“st”、“sta”、“star”
+
+### (3) Autocomplete Analyzer
+
+可以使用`n-gram索引`创建`autocomplete_filter`并进一步创建`autocomplete analyzer`，例子如下
+
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_autocomplete_analyzer.jpg" width="600" /></div>
+>
+> 使用了从1-gram到20-gram的`edge_ngram`索引，最多支持长度为20的字符串前缀
+
+在创建mapping时，将其上面的analyzer作用在需要的text field上，例如
+
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_apply_autocomplete_analyzer_on_field.jpg" width="500" /></div>
+
+但是设置了基于n-gram的analyzer之后，对这个filed的默认查询行为也会发生改变：默认会把query term也拆成同样数量的n-gram，然后匹配各个ngram索引。
+
+如果不想要这种查询行为，需要设置`"analyzer":"standard"`重新改回使用标准analyzer
+
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_reset_to_standard_analyzer.jpg" width="600" /></div>
+
+### (4) Completion Suggesters
+
+> 除了上面的autocomplete analyzer，ES还提供completion suggesters功能，可以通过提前上传一个列表、来实现”自动完成"/"搜索建议"这样的功能
+
+### (5) 例子
+
+> 删除index，新建并设置autocomplete analyzer，重新导入数据到index
+>
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 删除索引
+> $ curl -H 'Content-Type:application/json' -XDELETE '127.0.0.1:9200/movies'
+> {"acknowledged":true}
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 创建n-gram analyzer
+> $ curl -H 'Content-Type:application/json' -XPUT '127.0.0.1:9200/movies?pretty' -d '
+> {
+>   "settings": {
+>     "analysis": {
+>       "filter": {
+>         "autocomplete_filter": { "type":"edge_ngram", "min_gram":1, "max_gram":20 }
+>       },
+>       "analyzer": {
+>         "autocomplete": { "type":"custom", "tokenizer":"standard", "filter": ["lowercase", "autocomplete_filter"]}
+>       }
+>     }
+>   }
+> }'
+> {
+>   "acknowledged" : true,
+>   "shards_acknowledged" : true,
+>   "index" : "movies"
+> }
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 查看n-gram analyzer的功能
+> $ curl -H 'Content-Type:application/json' -XGET 127.0.0.1:9200/movies/_analyze?pretty -d '
+> {
+>   "analyzer":"autocomplete",
+>   "text":"Sta"
+> }'
+> {
+>   "tokens" : [
+>     {"token" : "s",   "start_offset" : 0, "end_offset" : 3, "type" : "<ALPHANUM>", "position" : 0},
+>     {"token" : "st",  "start_offset" : 0, "end_offset" : 3, "type" : "<ALPHANUM>", "position" : 0},
+>     {"token" : "sta", "start_offset" : 0, "end_offset" : 3, "type" : "<ALPHANUM>", "position" : 0}
+>   ]
+> }
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 将analyzer作用在某个text field上
+> $ curl -H "Content-Type:application/json" -XPUT '127.0.0.1:9200/movies/_mapping?pretty' -d'
+>   {
+>     "properties": {
+>       "title": {
+>         "type":"text",
+>         "analyzer":"autocomplete"
+>       }
+>     }
+>   }'
+> {
+>   "acknowledged" : true
+> }
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 导入数据
+> $ curl -H 'Content-Type:application/json' -XPUT 127.0.0.1:9200/_bulk --data-binary @movies.json
+> {"took":130,"errors":false,"items":[{"create":{"_index":"movies","_type":"_doc","_id":"135569","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":0,"_primary_term":1,"status":201}},{"create":{"_index":"movies","_type":"_doc","_id":"122886","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":1,"_primary_term":1,"status":201}},{"create":{"_index":"movies","_type":"_doc","_id":"109487","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":2,"_primary_term":1,"status":201}},{"create":{"_index":"movies","_type":"_doc","_id":"58559","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":3,"_primary_term":1,"status":201}},{"create":{"_index":"movies","_type":"_doc","_id":"1924","_version":1,"result":"created","_shards":{"total":2,"successful":1,"failed":0},"_seq_no":4,"_primary_term":1,"status":201}}]}
+> ~~~
+>
+> 对设置了autocomplete analyzer的字段title进行查询，发现虽然“Plan 9 from Outer Space”不包含“sta”但仍然那鞥被搜索到，是因为”sta“中的1-edge-gram “s”可以匹配到“Space"中的1-edge-gram ”S“
+>
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ curl -H 'Content-Type:application/json' '127.0.0.1:9200/movies/_search?pretty' -d '
+> {
+>   "query": {
+>     "match" : {
+>       "title": "sta"
+>     }
+>   }
+> }' | grep title
+>           "title" : "Star Trek Beyond",
+>           "title" : "Star Wars: Episode VII - The Force Awakens",
+>           "title" : "Plan 9 from Outer Space",
+> ~~~
+>
+> 因此如果不希望使用n-gram进行搜索，避免上述问题，可以指定
+>
+> * Query Side所使用analyzer为Standard Analyzer
+> * 于此同时Index Side仍然会使用之前的Autocomplete Analyzer
+>
+> 此时搜索“sta”返回的结果正确了
+>
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ curl -H 'Content-Type:application/json' '127.0.0.1:9200/movies/_search?pretty' -d '
+> {
+>   "query": {
+>     "match" : {
+>       "title": {
+>         "query": "sta",
+>         "analyzer": "standard"
+>       }
+>     }
+>   }
+> }' | grep title
+>           "title" : "Star Trek Beyond",
+>           "title" : "Star Wars: Episode VII - The Force Awakens",
+> ~~~
+>
+> 但是如果继续模拟用户的查询，搜索”star tr“，这是所有结果出现了我们不想要的”Star Wars：..."，这是因为standard analyzer对于每个token都独立进行处理所导致的。虽然“Tr”不能匹配”Star War:..."中的任何单词，但仍然将其作为结果返回。好在借助Index Side使用的Autocomplete Analyzer，因此“Star Trek……”的score仍然比“Star Wars”高。
+>
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ curl -H 'Content-Type:application/json' '127.0.0.1:9200/movies/_search?pretty' -d '
+> {
+>   "query": {
+>     "match" : {
+>       "title": {
+>         "query": "star tr",
+>         "analyzer": "standard"
+>       }
+>     }
+>   }
+> }' | grep title
+>           "title" : "Star Trek Beyond",
+>           "title" : "Star Wars: Episode VII - The Force Awakens",
+> ~~~
+>
+> 要想彻底解决上述问题，还需要使用“Completion Suggesters”来进行查询
+
+
+
