@@ -1,4 +1,31 @@
-[TOC]
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!--**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*-->
+
+- [CH04 向索引中导入数据](#ch04-%E5%90%91%E7%B4%A2%E5%BC%95%E4%B8%AD%E5%AF%BC%E5%85%A5%E6%95%B0%E6%8D%AE)
+  - [01 本章内容](#01-%E6%9C%AC%E7%AB%A0%E5%86%85%E5%AE%B9)
+  - [02 使用脚本导入数据](#02-%E4%BD%BF%E7%94%A8%E8%84%9A%E6%9C%AC%E5%AF%BC%E5%85%A5%E6%95%B0%E6%8D%AE)
+  - [03 使用Client Lib导入数据](#03-%E4%BD%BF%E7%94%A8client-lib%E5%AF%BC%E5%85%A5%E6%95%B0%E6%8D%AE)
+  - [04 Logstash介绍](#04-logstash%E4%BB%8B%E7%BB%8D)
+  - [05 Logstash安装和运行：以导入Apache日志为例](#05-logstash%E5%AE%89%E8%A3%85%E5%92%8C%E8%BF%90%E8%A1%8C%E4%BB%A5%E5%AF%BC%E5%85%A5apache%E6%97%A5%E5%BF%97%E4%B8%BA%E4%BE%8B)
+    - [(1) 在Ubuntu上安装和运行logstash](#1-%E5%9C%A8ubuntu%E4%B8%8A%E5%AE%89%E8%A3%85%E5%92%8C%E8%BF%90%E8%A1%8Clogstash)
+    - [(2) 在Mac上安装和运行logstash](#2-%E5%9C%A8mac%E4%B8%8A%E5%AE%89%E8%A3%85%E5%92%8C%E8%BF%90%E8%A1%8Clogstash)
+    - [(3) Demo过程（在MacOS上）](#3-demo%E8%BF%87%E7%A8%8B%E5%9C%A8macos%E4%B8%8A)
+  - [06 使用Logstash导入MySQL中的数据](#06-%E4%BD%BF%E7%94%A8logstash%E5%AF%BC%E5%85%A5mysql%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE)
+    - [(1) 准备JDBC Driver](#1-%E5%87%86%E5%A4%87jdbc-driver)
+    - [(2) 用于JDBC数据源的Input Config](#2-%E7%94%A8%E4%BA%8Ejdbc%E6%95%B0%E6%8D%AE%E6%BA%90%E7%9A%84input-config)
+    - [(3) Demo过程（MacOS上）](#3-demo%E8%BF%87%E7%A8%8Bmacos%E4%B8%8A)
+  - [08 使用Logstash导入`S3`文件到Elasticsearch](#08-%E4%BD%BF%E7%94%A8logstash%E5%AF%BC%E5%85%A5s3%E6%96%87%E4%BB%B6%E5%88%B0elasticsearch)
+    - [(1) Logstash输入配置](#1-logstash%E8%BE%93%E5%85%A5%E9%85%8D%E7%BD%AE)
+    - [(2) 演示](#2-%E6%BC%94%E7%A4%BA)
+  - [09 使用LogStash将Kafka的数据导入到Elasticsearch](#09-%E4%BD%BF%E7%94%A8logstash%E5%B0%86kafka%E7%9A%84%E6%95%B0%E6%8D%AE%E5%AF%BC%E5%85%A5%E5%88%B0elasticsearch)
+    - [(1) Logstash输入配置](#1-logstash%E8%BE%93%E5%85%A5%E9%85%8D%E7%BD%AE-1)
+    - [(2) 演示](#2-%E6%BC%94%E7%A4%BA-1)
+  - [10 使用Elasticsearch Spark包存储Spark Dataframe到Elasticsearch](#10-%E4%BD%BF%E7%94%A8elasticsearch-spark%E5%8C%85%E5%AD%98%E5%82%A8spark-dataframe%E5%88%B0elasticsearch)
+    - [(1) 用于存入数据到Spark脚本](#1-%E7%94%A8%E4%BA%8E%E5%AD%98%E5%85%A5%E6%95%B0%E6%8D%AE%E5%88%B0spark%E8%84%9A%E6%9C%AC)
+    - [(2) 演示](#2-%E6%BC%94%E7%A4%BA-2)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # CH04 向索引中导入数据
 
@@ -536,7 +563,6 @@ LogStash支持的输出目的地
 安装并启动MySQL
 
 > <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_mysql_server_on_mac.jpg" width="500" /></div>
->
 
 下载并解压数据
 
@@ -555,11 +581,15 @@ LogStash支持的输出目的地
 > inflating: ml-100k/ub.test
 > __________________________________________________________________
 > $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
-> $ # 要加载到MySQL中的数据
-> $ ls $(pwd)/ml-100k/u.item
-> /Users/fangkun/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/ml-100k/u.item
+> $ # 要加载到MySQL中的数据，这份文件有一些字符串与utf8不兼容导入MySQL后会出问题
+> $ ls ml-100k/u.item
+> ml-100k/u.item
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 另存了一份可以可以成功导入的文件
+> $ ls ../demo/ch04/03_load_from_jdbc/ml-100k/u.item
+> ../demo/ch04/03_load_from_jdbc/ml-100k/u.item
 > ~~~
->
 
 建库建表，导入数据到MySQL
 
@@ -644,21 +674,215 @@ LogStash支持的输出目的地
 > mysql> quit
 > Bye
 > ~~~
+
+准备MySQL Java Connector
+
+> 到MySQL官网查找：[http://dev.mysql.com/downloads/connector/j/](http://dev.mysql.com/downloads/connector/j/)，没有MacOS专用版本，选择Platform Independent版本，下载`mysql-connector-java-8.0.25.tar.gz`
 >
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 下载好的文件
+> $ ls mysql-connector-java-8.0.25.tar.gz
+> mysql-connector-java-8.0.25.tar.gz
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 解压
+> $ tar xvfz mysql-connector-java-8.0.25.tar.gz
+> ...
+> x mysql-connector-java-8.0.25/src/test/java/testsuite/x/internal/XProtocolTest.java
+> x mysql-connector-java-8.0.25/src/test/java/testsuite/x/internal/package-info.java
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 查看解压后的目录
+> $ ls mysql-connector-java-8.0.25
+> CHANGES                         LICENSE                         mysql-connector-java-8.0.25.jar
+> INFO_BIN                        README                          src
+> INFO_SRC                        build.xml
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 将用做connector的JAR包拷贝到一个路径简单的目录中
+> $ cp mysql-connector-java-8.0.25/mysql-connector-java-8.0.25.jar /Users/fangkun/tmp/mysql-connector-java-8.0.25.jar; ls /Users/fangkun/tmp/mysql-connector-java-8.0.25.jar
+> /Users/fangkun/tmp/mysql-connector-java-8.0.25.jar
+> ~~~
+
+编写LogStash配置文件，使用MySQL Connector从MySQL中提取数据
+
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 打开编辑器编写配置文件
+> $ vi /usr/local/etc/logstash/logstash-mysql-demo.conf
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 查看文件内容
+> $ cat /usr/local/etc/logstash/logstash-mysql-demo.conf
+> input {
+> 	jdbc {
+> 		jdbc_connection_string => "jdbc:mysql://localhost:3306/movielens"
+> 		jdbc_user => "demo_user"
+> 		jdbc_password => "password"
+> 		jdbc_driver_library => "/Users/fangkun/tmp/mysql-connector-java-8.0.25.jar"
+> 		jdbc_driver_class => "com.mysql.jdbc.Driver"
+> 		statement => "SELECT * FROM movies"
+> 	}
+> }
+> output {
+> 	stdout { codec => json_lines }
+> 	elasticsearch {
+> 		hosts => ["localhost:9200"]
+> 		index => "movielens-sql"
+> 	}
+> }
+> ~~~
+
+因为使用了新的账号、需要为MySQL创建账号并授权
+
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ mysql -u root -p
+> Enter password:
 > 
+> mysql> CREATE USER 'demo_user'@'localhost' IDENTIFIED BY 'password';
+> Query OK, 0 rows affected (0.16 sec)
+> 
+> mysql> GRANT ALL PRIVILEGES ON *.* TO 'demo_user'@'localhost';
+> Query OK, 0 rows affected (0.03 sec)
+> 
+> mysql> FLUSH PRIVILEGES;
+> Query OK, 0 rows affected (0.02 sec)
+> 
+> mysql> quit
+> Bye
+> ~~~
 
-## 08 Logstash与`S#`
+启动LogStash，从MySQL中读取数据，并导入到Elasticsearch同时输出在标准输出中
 
-> d
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ logstash -f /usr/local/etc/logstash/logstash-mysql-demo.conf
+> Using bundled JDK: /usr/local/Cellar/logstash-full/7.13.1/libexec/jdk.app/Contents/Home
+> ...
+> {"@timestamp":"2021-06-06T07:19:18.500Z","title":"Mat' i syn (1997)","releasedate":"1998-02-05T16:00:00.000Z","@version":"1","movieid":1678}
+> {"@timestamp":"2021-06-06T07:19:18.500Z","title":"B. Monkey (1998)","releasedate":"1998-02-05T16:00:00.000Z","@version":"1","movieid":1679}
+> {"@timestamp":"2021-06-06T07:19:18.500Z","title":"Sliding Doors (1998)","releasedate":"1997-12-31T16:00:00.000Z","@version":"1","movieid":1680}
+> {"@timestamp":"2021-06-06T07:19:18.500Z","title":"You So Crazy (1994)","releasedate":"1993-12-31T16:00:00.000Z","@version":"1","movieid":1681}
+> {"@timestamp":"2021-06-06T07:19:18.500Z","title":"Scream of Stone (Schrei aus Stein) (1991)","releasedate":"1996-03-07T16:00:00.000Z","@version":"1","movieid":1682}
+> [2021-06-06T15:19:19,905][INFO ][logstash.javapipeline    ][main] Pipeline terminated {"pipeline.id"=>"main"}
+> [2021-06-06T15:19:20,394][INFO ][logstash.pipelinesregistry] Removed pipeline from registry successfully {:pipeline_id=>:main}
+> [2021-06-06T15:19:20,436][INFO ][logstash.runner          ] Logstash shut down.
+> ~~~
 
-## 09 Elasticsearch与Kafka
+查看导入到Elasticsearch中的数据
 
-> d
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ curl -H 'Content-Type:application/json' -XGET 'localhost:9200/movielens-sql/_search?q=title:Star&pretty' | grep title
+>           "title" : "Star Maps (1997)",
+>           "title" : "Star Kid (1997)",
+>           "title" : "Lone Star (1996)",
+>           "title" : "Star Wars (1977)",
+>           "title" : "Star Trek: Generations (1994)",
+>           "title" : "Evening Star, The (1996)",
+>           "title" : "Star Trek: First Contact (1996)",
+>           "title" : "Star Trek: The Motion Picture (1979)",
+>           "title" : "Star Trek: The Wrath of Khan (1982)",
+>           "title" : "Star Trek VI: The Undiscovered Country (1991)",
+> ~~~
 
-## 10 Elasticsearch与Apache Spark
+## 08 使用Logstash导入`S3`文件到Elasticsearch
 
-> d
+### (1) Logstash输入配置
 
-## 11 例子：从Spark导入数据到Elasticsearch
+从AWS S3导入数据到Logstash，输入配置如下
 
-> d
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_logstash_load_from_s3.jpg" width="500" /></div>
+
+### (2) 演示
+
+> AWS Console
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_logstash_s3_demo_aws.jpg" width="700" /></div>
+>
+> 创建名为sundog-es的bucket，在bucket内上传文件access_log.txt，设置文件权限
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_logstash_s3_demo_bkt_and_file.jpg" width="700" /></div>
+>
+> 在AWS IAM（Identity Access Management）中设置user、权限、秘钥
+>
+> User
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_logstash_s3_demo_user2.jpg" width="700" /></div>
+>
+> security credentials：access key id
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_logstash_s3_demo_credential.jpg" width="700" /></div>
+>
+> 配置文件编写：input插件使用s3，填入bucket、access_key_id、secret_access_key（来自AWS账户）
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_logstash_s3_demo_cfg2.jpg" width="700" /></div>
+>
+> 之后可以运行LogStash从S3文件导入数据到Elasticsearch
+
+## 09 使用LogStash将Kafka的数据导入到Elasticsearch
+
+### (1) Logstash输入配置
+
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_logstash_kafka_input_cfg.jpg" width="400" /></div>
+
+### (2) 演示
+
+> [https://livevideo.manning.com/module/96_4_11/elasticsearch-7-and-elastic-stack/importing-data-into-your-index---big-or-small/elasticsearch-and-kafka-part-1?](https://livevideo.manning.com/module/96_4_11/elasticsearch-7-and-elastic-stack/importing-data-into-your-index---big-or-small/elasticsearch-and-kafka-part-1?)
+>
+> 步骤1：安装Kafka
+>
+> 步骤2：启动Kafka
+>
+> 步骤3：创建名为kafka-logs的Kafka Topic
+>
+> 步骤4：编写logstash配置文件
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_logstash_kafka_demo_cfg_writing.jpg" width="700" /></div>
+>
+> 步骤5：启动Logstash
+>
+> 步骤6：启动Producer向Kafka发送数据，数据为一份Apache日志，
+>
+> 步骤7：Logstash开始接收从Kfaka传来的Apache日志，并将其存入Elasticsearch
+>
+> 日志内容与上面的Logstash中配置的COMBINEDaPACHELOG grok filer向匹配，能够将Apache Log解析为所需要的Json数据
+
+## 10 使用Elasticsearch Spark包存储Spark Dataframe到Elasticsearch
+
+### (1) 用于存入数据到Spark脚本
+
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_logstash_spark_demo_data_prep.jpg" width="700" /></div>
+
+### (2) 演示
+
+> Step 1：从[spark.apache.org](http://spark.apache.org)下载Spark并安装（注意scala版本支持）
+>
+> Step 2：从[mvnrepository.com](https://mvnrepository.com)查找名为Elasticsearch Spark的Jar包（注意支持的Spark版本）
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_logstash_spark_demo_pkg.jpg" width="700" /></div>
+>
+> Step 3：准备一份数据文件，格式是csv
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_logstash_spark_demo_data.jpg" width="700" /></div>
+>
+> Step 4：启动Spark Shell，需要让Spark启动时加载前面提到的Elasticsearch Spark第三方包
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_logstash_spark_demo_start.jpg" width="700" /></div>
+>
+> Step 5：在Spark Sell中执行之前列出的脚本，Spark会从csv文件中载入数据，并使用elasticsearch spark包将数据存入到Elasticsearch中
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_logstash_spark_demo_data_prep.jpg" width="700" /></div>
+>
+> Step 6：在Elasticsearch中查询导入的数据
+>
+> ~~~bash
+> curl -H 'Content-Type:application/json' -XGET '127.0.0.1:9200/spark-friends/_search?pretty'
+> ~~~
