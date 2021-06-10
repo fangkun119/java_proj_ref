@@ -83,7 +83,7 @@ X-Pack包含如下功能：
 
 ### (1) 在Ubuntu上安装和配置Filebeat
 
-> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/upload/es7_filebeat_install_on_ubuntu.png" width="500" /></div>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_filebeat_install_on_ubuntu.jpg" width="500" /></div>
 
 ### (2) 在MacOS上安装Filebeat
 
@@ -316,7 +316,98 @@ X-Pack包含如下功能：
 
 ## 05 使用Kibana Dashboard分析数据
 
-> 
+> filebeat数据导入Kibana之后，可以对Kibana进行配置以可视化这些数据，过程如下
 
-## 
+### (1) 配置Dashboard
+
+> 执行`filebeat setup --dashboards`命令，让filebeat访问Kibana配置Dashboard
+>
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/
+> $ # 如果是ubuntu需要cd到/usr/share/filebeat/bin目录下、使用sudo执行
+> $ filebeat setup --dashboards 
+> Loading dashboards (Kibana must be running and reachable)
+> Loaded dashboards
+> ~~~
+
+### (2) 重启Kibana
+
+> 重启kibiana以使这些配置生效：因为之前是使用`nohup kibana &`命令启动的kibana、要通过`kill ${process_id}`的方式来关闭kibana然后再重启
+>
+> ~~~bash
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 查进程ID
+> $ ps ax | grep kibana | grep -v grep
+> 82803   ??  S      5:17.15 /usr/local/Cellar/kibana-full/7.13.1/libexec/node/bin/node --preserve-symlinks-main --preserve-symlinks /usr/local/Cellar/kibana-full/7.13.1/libexec/src/cli/dist
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 发送终端信号给kibana，kibina收到后会主动退出
+> $ kill 82803
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 检查
+> $ ps ax | grep kibana | grep -v grep
+> __________________________________________________________________
+> $ /fangkundeMacBook-Pro/ fangkun@fangkundeMacBook-Pro.local:~/Dev/git/java_proj_ref/321_elasticsearch/es7stack/tmp/
+> $ # 重启
+> $ nohup kibana &
+> [1] 94257
+> ~~~
+>
+> MacOS上如果是使用brew service启动，需要用brew service的方式重启
+>
+> Ubuntu上使用如下命令重启
+>
+> ~~~bash
+> sudo /bin/systemctl stop kibana.service
+> sudo /bin/systemctl start kibana.service
+> ~~~
+
+### (3) 查看Index Pattern
+
+> 访问`http://127.0.0.1:5601/app/home/`可以找到Kibana
+>
+> 点击页面左上角的菜单按钮：`Home` → `Management`可以进入管理页面: `http://127.0.0.1:5601/app/management`
+>
+> 点击管理页面左侧的：`Kibana`→`Index Pattern`可以之前已经配置好的名为`filebeat-*`的`Index Pattern`
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_filebeat_index_pattern.jpg" width="800" /></div>
+>
+> 点击后，可以看到索引的schema，包含了大量的字段
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_filebeat_idxptn.jpg" width="800" /></div>
+
+### (4) 查看数据
+
+> 点击左上角的菜单按钮：`Analytics` → `Discovery` 然后切换到`filebeat-*`
+>
+> ![](https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_filebeat_discover.jpg)
+>
+> 将timestamp范围从默认的最近15分钟，改为指定时间段，可以查看日志
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_filebeat_discover_2.jpg" width="800" /></div>
+>
+> 可以对具体的field进行drill down和可视化
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_filebeat_drill_down.jpg" width="800" /></div>
+>
+> 对可视化图的配置进行一定调整，得到如下的图
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_beat_drill_down2.jpg" width="800" /></div>
+>
+> 回到菜单中的`Home`→`Analytics`→`Discover`，设置过滤器如下，可以看到response 500的日志
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_filebeat_sample_logs.jpg" width="800" /></div>
+
+### (5) 创建Dashboard
+
+> 左上角菜单按钮：`Home` → `Analytics` →`Dashboard`，Dashboard类型选择`[Filebeat Apache] Access and error logs ECS`，可以查看使用filebeat安装好的Dashboard
+>
+> <div align="left"><img src="https://raw.githubusercontent.com/kenfang119/pics/main/321_elasticsearch/es7_filebeat_dashboard.jpg" width="800" /></div>
+>
+> 可以在Dashboard上进行交互查询，例如可以查看在某个时间段，产生404 Response的请求，都来自哪个城市
+>
+> 视频链接：[https://livevideo.manning.com/module/96_7_6/elasticsearch-7-and-elastic-stack/analyzing-log-data-with-elastic-stack/%5bexercise%5d-log-analysis-with-kibana?](https://livevideo.manning.com/module/96_7_6/elasticsearch-7-and-elastic-stack/analyzing-log-data-with-elastic-stack/%5bexercise%5d-log-analysis-with-kibana?)
 
