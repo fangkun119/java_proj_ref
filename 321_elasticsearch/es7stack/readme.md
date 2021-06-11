@@ -22,24 +22,21 @@
 
 ## CH05 聚合
 
-> 
+> [note/05_aggregation.md](note/05_aggregation.md)
 
 ## CH06 使用Kibana
 
-> 
+> [note/06_kibana.md](note/06_kibana.md)
 
 ## CH07 分析日志数据
 
-> 
+> [note/07_log_analysis_with_es_stack.md](note/07_log_analysis_with_es_stack.md)
 
 ## CH08 操作以及SQL
 
-> 
+> [note/08_es_ops_and_sql.md](note/08_es_ops_and_sql.md)
 
 ## CH09 在Cloud环境中使用Elasticsearch
 
-> 
+> [note/09_es_cloud.md](note/09_es_cloud.md)
 
-## CH10 回顾
-
-> 
