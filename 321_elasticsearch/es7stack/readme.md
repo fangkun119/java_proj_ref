@@ -12,7 +12,7 @@
 
 > [note/02_mapping_and_indexing_data.md](note/02_mapping_and_indexing_data.md)
 
-## CH03 搜索
+## CH03 查询
 
 > [note/03_search_with_es.md](note/03_search_with_es.md)
 
@@ -32,11 +32,11 @@
 
 > [note/07_log_analysis_with_es_stack.md](note/07_log_analysis_with_es_stack.md)
 
-## CH08 操作以及SQL
+## CH08 运维以及Elasticsearch SQL
 
 > [note/08_es_ops_and_sql.md](note/08_es_ops_and_sql.md)
 
-## CH09 在Cloud环境中使用Elasticsearch
+## CH09 在AWS中使用Elasticsearch
 
 > [note/09_es_cloud.md](note/09_es_cloud.md)
 
