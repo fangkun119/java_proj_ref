@@ -270,10 +270,12 @@
 
 ### (3) Securing REST Security
 
-> Spring In Action第6版第9章尚未出版（全书预计出版日期2021.07）
->
-> 笔记链接（资料来源：Spring Microservice In Action 第2版第9章：身份验证及访问管理）
->
+笔记链接1（资料来源：Spring In Action第6版第9章 Rest Security）
+
+> [https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch09_rest_security.md](https://github.com/fangkun119/spring-in-action-6-samples/blob/main/note/ch09_rest_security.md)
+
+笔记链接2（资料来源：Spring Microservice In Action 第2版第9章：身份验证及访问管理）
+
 > [https://github.com/fangkun119/manning-smia/blob/master/note/ch09_security.md](https://github.com/fangkun119/manning-smia/blob/master/note/ch09_security.md)
 
 主要内容
