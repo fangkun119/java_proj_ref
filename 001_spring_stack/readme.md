@@ -32,9 +32,6 @@
     - [(2) Spring Boot Demo 1](#2-spring-boot-demo-1)
     - [(4) Spring Boot Demo 2](#4-spring-boot-demo-2)
     - [(3) Thymeleaf参考文档](#3-thymeleaf%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3)
-  - [7. TODO](#7-todo)
-    - [(1) Reactive  Spring：Reactor/RSocket/Reactively](#1-reactive--springreactorrsocketreactively)
-    - [(2) Deploying Spring：Actuator/JMX/Administerning/Delpoying](#2-deploying-springactuatorjmxadministerningdelpoying)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -460,32 +457,27 @@
 
 > [https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/002_spring_boot/note/02_thymeleaf.md](https://github.com/fangkun119/java_proj_ref/blob/master/001_spring_stack/002_spring_boot/note/02_thymeleaf.md)
 
-## 7. TODO
+<!--Reactive  Spring：Reactor/RSocket/Reactively-->
 
-### (1) Reactive  Spring：Reactor/RSocket/Reactively
+<!--Spring In Action第6版 CH12-15：Reactor，RSocket，Reactively-->
 
-> Spring In Action第6版 CH12-15：Reactor，RSocket，Reactively
+<!--CH12 Introducing Reactor：对应[第5版CH10](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-10?origin=product-toc)-->
 
-笔记尚未完成，包含4章
+<!--CH13 Developing Reactive API：对应[第5版CH11](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-11?origin=product-toc)-->
 
-> CH12 Introducing Reactor：对应[第5版CH10](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-10?origin=product-toc)
->
-> CH13 Developing Reactive API：对应[第5版CH11](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-11?origin=product-toc)
->
-> CH14 Working with RSocket：第5版无对应章节
->
-> CH15 Persisting Data Reactively：对应[第5版CH12](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-12?origin=product-toc)
+<!--CH14 Working with RSocket：第5版无对应章节-->
 
-### (2) Deploying Spring：Actuator/JMX/Administerning/Delpoying
+<!--CH15 Persisting Data Reactively：对应[第5版CH12](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-12?origin=product-toc)-->
 
-> Spring In Action第6版  CH16-19：Actuator，JMX，Administerning，Deploying）
+### <!--(2) Deploying Spring：Actuator/JMX/Administerning/Delpoying-->
 
-笔记尚未完成，包含4章
+ <!--Spring In Action第6版  CH16-19：Actuator，JMX，Administerning，Deploying）-->
 
-> CH16 Spring Boot Actuator：对应[第5版CH16](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-16?origin=product-toc)
->
-> CH17 Admnistering Spring：对应[第5版CH17](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-17?origin=product-toc)
->
-> CH18 Monitoring Spring with JMX：对应[第5版CH18](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-17?origin=product-toc)
->
-> CH19 Delpoying Spring：对应[第5版CH19](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-19?origin=product-toc)
+ <!--CH16 Spring Boot Actuator：对应[第5版CH16](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-16?origin=product-toc)-->
+
+ <!--CH17 Admnistering Spring：对应[第5版CH17](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-17?origin=product-toc)-->
+
+ <!--CH18 Monitoring Spring with JMX：对应[第5版CH18](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-17?origin=product-toc)-->
+
+ <!--CH19 Delpoying Spring：对应[第5版CH19](https://livebook.manning.com/book/spring-in-action-fifth-edition/chapter-19?origin=product-toc)--> 
+
